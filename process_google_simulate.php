@@ -9,10 +9,13 @@ if($email) {
     $_SESSION['user_email'] = $email;
     $_SESSION['user_name'] = $name;
     $_SESSION['logado'] = true;
-    $_SESSION['login_type'] = 'google';
+    $_SESSION['login_type'] = 'Google';
     
-    echo json_encode(['success' => true]);
+    // Redireciona para dashboard.php (CORRIGIDO)
+    header('Location: dashboard.php');
+    exit();
 } else {
-    echo json_encode(['success' => false, 'error' => 'Email não fornecido']);
+    header('Location: index.php?error=Email não fornecido');
+    exit();
 }
 ?>

@@ -9,8 +9,10 @@ if($codigo == '123456') {
     $_SESSION['user_telefone'] = $telefone;
     $_SESSION['user_name'] = 'Usuário SMS';
     $_SESSION['logado'] = true;
+    $_SESSION['login_type'] = 'SMS';
     
-    header('Location: dashboard.html');
+    // Redireciona para dashboard.php (CORRIGIDO)
+    header('Location: dashboard.php');
     exit();
 } else {
     header('Location: index.php?error=Código inválido! Use: 123456');
