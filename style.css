@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* style.css */
 * {
     margin: 0;
@@ -459,4 +460,467 @@ body {
     .hero-message h1 {
         font-size: 1.8rem;
     }
+=======
+/* style.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8f9fc 0%, #f0f2f5 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    position: relative;
+}
+
+/* Elementos decorativos de fundo */
+.bg-shape {
+    position: fixed;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+.shape-1 {
+    top: -10%;
+    left: -5%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(128, 0, 32, 0.15) 0%, rgba(128, 0, 32, 0) 70%);
+    border-radius: 50%;
+}
+
+.shape-2 {
+    bottom: -8%;
+    right: -5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(139, 0, 0, 0.12) 0%, rgba(139, 0, 0, 0) 70%);
+    border-radius: 50%;
+}
+
+/* Container principal */
+.login-container {
+    width: 100%;
+    max-width: 1200px;
+    background: white;
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-wrap: wrap;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+/* Lado esquerdo - Branding e imagem */
+.brand-side {
+    flex: 1.2;
+    background: linear-gradient(145deg, #5a1e2c, #3e0f1a);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-side::before {
+    content: "❤️";
+    font-size: 220px;
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+    z-index: 2;
+}
+
+.logo-icon {
+    background: rgba(255, 255, 255, 0.2);
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    backdrop-filter: blur(2px);
+}
+
+.logo-text h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.5px;
+}
+
+.logo-text p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+.hero-message {
+    z-index: 2;
+    margin: 2rem 0;
+}
+
+.hero-message h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.hero-message p {
+    font-size: 1rem;
+    opacity: 0.9;
+    line-height: 1.5;
+    max-width: 85%;
+}
+
+.health-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    padding: 0.6rem 1.2rem;
+    border-radius: 60px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.stat i {
+    font-size: 1rem;
+}
+
+.testimonial {
+    margin-top: 2rem;
+    font-style: italic;
+    border-left: 3px solid #e6b422;
+    padding-left: 1rem;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Lado direito - Formulário */
+.form-side {
+    flex: 1;
+    padding: 2.5rem 2rem;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-header {
+    margin-bottom: 2rem;
+}
+
+.form-header h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e2a3a;
+    margin-bottom: 0.5rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.form-header p {
+    color: #5a6e7c;
+    font-size: 0.9rem;
+}
+
+.input-group {
+    margin-bottom: 1.3rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 2.7rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background-color: #fefefe;
+    font-family: 'Inter', sans-serif;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #9e2a3e;
+    box-shadow: 0 0 0 3px rgba(158, 42, 62, 0.15);
+}
+
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.2rem 0 1.5rem 0;
+}
+
+.forgot-link {
+    font-size: 0.8rem;
+    color: #9e2a3e;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: #6b1e2c;
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    background: #851e32;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 6px 14px rgba(133, 30, 50, 0.25);
+}
+
+.btn-login:hover {
+    background: #6a182c;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(133, 30, 50, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(1px);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #8f9ba8;
+    font-size: 0.75rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.divider span {
+    padding: 0 1rem;
+}
+
+.social-login {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.8rem;
+}
+
+.social-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 2rem;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2d3e50;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-btn i {
+    font-size: 1rem;
+}
+
+.social-btn:hover {
+    background: white;
+    border-color: #851e32;
+    color: #851e32;
+}
+
+.register-prompt {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #4b5e6c;
+}
+
+.register-prompt a {
+    color: #851e32;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* Toast message */
+.toast-message {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: #1f2937;
+    color: white;
+    padding: 0.8rem 1.8rem;
+    border-radius: 60px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    background: rgba(31, 41, 55, 0.95);
+}
+
+.toast-message.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #aaa;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.9);}
+    to {opacity: 1; transform: scale(1);}
+}
+
+/* Estilo para campos dentro do modal */
+.modal .input-field {
+    margin-bottom: 12px;
+    padding: 0.8rem 1rem;
+}
+.modal .btn-login {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* Responsividade */
+@media (max-width: 850px) {
+    .login-container {
+        flex-direction: column;
+        max-width: 500px;
+    }
+    .brand-side {
+        text-align: center;
+        padding: 2rem;
+    }
+    .hero-message p {
+        max-width: 100%;
+    }
+    .health-stats {
+        justify-content: center;
+    }
+    .testimonial {
+        text-align: left;
+    }
+    .form-side {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .social-login {
+        flex-direction: column;
+        align-items: center;
+    }
+    .social-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .hero-message h1 {
+        font-size: 1.8rem;
+    }
+>>>>>>> 726677b42bba7bd6978a1db01e6f8f37c062b38d
 }
