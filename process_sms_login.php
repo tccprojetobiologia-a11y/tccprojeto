@@ -1,42 +1,21 @@
-<<<<<<< HEAD
 <?php
+/**
+ * PROCESS_SMS_LOGIN.PHP (Legado - Redireciona para o novo sistema centralizado)
+ */
+
 session_start();
 
-$telefone = $_POST['telefone'] ?? '';
-$codigo = $_POST['codigo'] ?? '';
+$phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
+$code = isset($_POST['code']) ? trim($_POST['code']) : '';
 
-if($codigo == '123456') {
-    $_SESSION['user_id'] = '4';
-    $_SESSION['user_telefone'] = $telefone;
-    $_SESSION['user_name'] = 'Usuário SMS';
-    $_SESSION['logado'] = true;
-    $_SESSION['login_type'] = 'SMS';
+if ($phone && $code) {
+    $_POST['login_type'] = 'sms';
+    $_POST['phone'] = $phone;
+    $_POST['code'] = $code;
     
-    // Redireciona para dashboard.php (CORRIGIDO)
-    header('Location: dashboard.php');
-    exit();
+    include 'auth-process.php';
 } else {
-    header('Location: index.php?error=Código inválido! Use: 123456');
+    header('Location: index.php?error=Telefone e código são obrigatórios');
     exit();
 }
-=======
-<?php
-session_start();
-
-$telefone = $_POST['telefone'] ?? '';
-$codigo = $_POST['codigo'] ?? '';
-
-if($codigo == '123456') {
-    $_SESSION['user_id'] = '4';
-    $_SESSION['user_telefone'] = $telefone;
-    $_SESSION['user_name'] = 'Usuário SMS';
-    $_SESSION['logado'] = true;
-    
-    header('Location: dashboard.html');
-    exit();
-} else {
-    header('Location: index.php?error=Código inválido! Use: 123456');
-    exit();
-}
->>>>>>> 726677b42bba7bd6978a1db01e6f8f37c062b38d
 ?>

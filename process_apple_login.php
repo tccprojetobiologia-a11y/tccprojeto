@@ -1,42 +1,19 @@
-<<<<<<< HEAD
 <?php
+/**
+ * PROCESS_APPLE_LOGIN.PHP (Legado - Redireciona para o novo sistema centralizado)
+ */
+
 session_start();
 
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
 
-if($email && $password) {
-    $_SESSION['user_id'] = '3';
-    $_SESSION['user_email'] = $email;
-    $_SESSION['user_name'] = 'Usuário Apple';
-    $_SESSION['logado'] = true;
-    $_SESSION['login_type'] = 'Apple';
+if ($email) {
+    $_POST['login_type'] = 'apple';
+    $_POST['email'] = $email;
     
-    // Redireciona para dashboard.php (CORRIGIDO)
-    header('Location: dashboard.php');
-    exit();
+    include 'auth-process.php';
 } else {
-    header('Location: index.php?error=E-mail e senha obrigatórios');
+    header('Location: index.php?error=E-mail do Apple é obrigatório');
     exit();
 }
-=======
-<?php
-session_start();
-
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
-
-if($email && $password) {
-    $_SESSION['user_id'] = '3';
-    $_SESSION['user_email'] = $email;
-    $_SESSION['user_name'] = 'Usuário Apple';
-    $_SESSION['logado'] = true;
-    
-    header('Location: dashboard.html');
-    exit();
-} else {
-    header('Location: index.php?error=E-mail e senha obrigatórios');
-    exit();
-}
->>>>>>> 726677b42bba7bd6978a1db01e6f8f37c062b38d
 ?>
