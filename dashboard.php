@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 session_start();
 
@@ -14,6 +13,8 @@ $login_type = $_SESSION['login_type'] ?? 'Padrão';
 
 // Conteúdo padrão (Início)
 $page = $_GET['page'] ?? 'inicio';
+require_once __DIR__ . '/dashboard-sections/consultas.php';
+require_once __DIR__ . '/dashboard-sections/exames.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -32,7 +33,7 @@ $page = $_GET['page'] ?? 'inicio';
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f5f7fa;
+            background: #f6ecee;
             overflow: hidden;
             height: 100vh;
         }
@@ -44,21 +45,21 @@ $page = $_GET['page'] ?? 'inicio';
             width: 100%;
         }
 
-        /* ========== SIDEBAR ESQUERDA (ÁREA AZUL) ========== */
+        /* ========== SIDEBAR ESQUERDA (ÁREA VINHO) ========== */
         .sidebar {
             width: 280px;
-            background: linear-gradient(180deg, #1a73e8 0%, #0d5bba 100%);
+            background: linear-gradient(180deg, #4c0719 0%, #7e1b31 100%);
             color: white;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
             overflow-y: auto;
         }
 
-        /* Logo (Área Vermelha) */
+        /* Logo (Área Vinho) */
         .logo-area {
             padding: 30px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             margin-bottom: 30px;
         }
 
@@ -110,12 +111,12 @@ $page = $_GET['page'] ?? 'inicio';
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             color: white;
         }
 
         .nav-item.active {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.18);
             color: white;
             font-weight: 500;
         }
@@ -133,7 +134,7 @@ $page = $_GET['page'] ?? 'inicio';
         .user-section {
             padding: 20px;
             margin: 20px;
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, #7a1d34 0%, #5c1230 100%);
             border-radius: 16px;
             margin-top: auto;
             margin-bottom: 20px;
@@ -341,8 +342,8 @@ $page = $_GET['page'] ?? 'inicio';
         /* ========== CHAT (ÁREA VERDE) ========== */
         .chat-sidebar {
             width: 350px;
-            background: white;
-            border-left: 1px solid #e2e8f0;
+            background: #fff5f6;
+            border-left: 1px solid #f3d8de;
             display: flex;
             flex-direction: column;
             box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
@@ -350,8 +351,8 @@ $page = $_GET['page'] ?? 'inicio';
 
         .chat-header {
             padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-bottom: 1px solid #f3d8de;
+            background: linear-gradient(135deg, #7a1e31 0%, #a22a44 100%);
             color: white;
         }
 
@@ -511,6 +512,14 @@ $page = $_GET['page'] ?? 'inicio';
                     <i class="fas fa-newspaper"></i>
                     <span>Blog</span>
                 </div>
+                <div class="nav-item <?php echo $page == 'consultas' ? 'active' : ''; ?>" onclick="changePage('consultas')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Consultas</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" onclick="changePage('exames')">
+                    <i class="fas fa-flask"></i>
+                    <span>Exames</span>
+                </div>
                 <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" onclick="changePage('informacoes')">
                     <i class="fas fa-info-circle"></i>
                     <span>Informações</span>
@@ -580,6 +589,8 @@ $page = $_GET['page'] ?? 'inicio';
             const titles = {
                 'inicio': 'Início',
                 'blog': 'Blog',
+                'consultas': 'Consultas',
+                'exames': 'Exames',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
             };
@@ -700,6 +711,12 @@ $page = $_GET['page'] ?? 'inicio';
                         </div>
                     </div>
                 `;
+            }
+            else if (page === 'consultas') {
+                contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;
+            }
+            else if (page === 'exames') {
+                contentArea.innerHTML = <?php echo json_encode(getExamesHtml()); ?>;
             }
             else if (page === 'informacoes') {
                 contentArea.innerHTML = `
@@ -859,591 +876,4 @@ $page = $_GET['page'] ?? 'inicio';
         loadContent('<?php echo $page; ?>');
     </script>
 </body>
-=======
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard - CardioWeb</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #851e32;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .box {<?php
-session_start();
-
-// Verifica se o usuário está logado
-if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
-    header('Location: index.php');
-    exit();
-}
-
-$user_name = $_SESSION['user_name'] ?? 'Usuário';
-$user_email = $_SESSION['user_email'] ?? $_SESSION['user_telefone'] ?? 'usuario@email.com';
-$page = $_GET['page'] ?? 'inicio';
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardioWeb - Painel Principal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
-
-        /* SIDEBAR - ÁREA AZUL CLARO */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* LOGO - ÁREA VERMELHA */
-        .logo-area {
-            padding: 25px 20px;
-            border-bottom: 2px solid rgba(133, 30, 50, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            background: linear-gradient(135deg, #851e32, #5a1e2c);
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-        }
-
-        .logo-text h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #851e32;
-        }
-
-        .logo-text p {
-            font-size: 10px;
-            color: #666;
-        }
-
-        /* MENU */
-        .nav-menu {
-            flex: 1;
-            padding: 0 15px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 18px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #1e40af;
-            font-weight: 500;
-        }
-
-        .nav-item:hover {
-            background: rgba(133, 30, 50, 0.1);
-            color: #851e32;
-        }
-
-        .nav-item.active {
-            background: #851e32;
-            color: white;
-        }
-
-        .nav-item i {
-            width: 24px;
-        }
-
-        /* USUÁRIO - ÁREA ROXA */
-        .user-section {
-            padding: 20px;
-            margin: 20px;
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            border-radius: 16px;
-            margin-top: auto;
-            margin-bottom: 20px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 12px;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 16px;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .user-email {
-            font-size: 11px;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 12px;
-        }
-
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        /* CONTEÚDO PRINCIPAL - ÁREA BRANCA/AMARELA */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: #fffef7;
-        }
-
-        .main-header {
-            background: white;
-            padding: 15px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 400px;
-            position: relative;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 10px 20px 10px 45px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 30px;
-            font-size: 14px;
-        }
-
-        .page-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e2a3a;
-            min-width: 120px;
-        }
-
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 25px;
-        }
-
-        /* CARDS */
-        .welcome-card {
-            background: linear-gradient(135deg, #851e32 0%, #5a1e2c 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            background: #fff0f0;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #851e32;
-            margin-bottom: 15px;
-        }
-
-        .stat-card h3 {
-            font-size: 28px;
-            color: #1e2a3a;
-        }
-
-        .info-card {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .info-card h3 {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        /* CHAT - ÁREA VERDE */
-        .chat-sidebar {
-            width: 320px;
-            background: white;
-            border-left: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background: #f9fafb;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            max-width: 90%;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        .message.user .message-avatar {
-            background: #851e32;
-            color: white;
-        }
-
-        .message.bot .message-avatar {
-            background: #10b981;
-            color: white;
-        }
-
-        .message-bubble {
-            background: white;
-            padding: 8px 12px;
-            border-radius: 16px;
-            font-size: 13px;
-        }
-
-        .message.user .message-bubble {
-            background: #851e32;
-            color: white;
-        }
-
-        .chat-input-area {
-            padding: 15px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 10px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 25px;
-            outline: none;
-        }
-
-        .chat-send {
-            width: 40px;
-            height: 40px;
-            background: #851e32;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-        }
-
-        @media (max-width: 800px) {
-            .chat-sidebar {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="app-container">
-    <!-- SIDEBAR AZUL -->
-    <div class="sidebar">
-        <div class="logo-area">
-            <div class="logo">
-                <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
-                <div class="logo-text">
-                    <h2>CardioWeb</h2>
-                    <p>Saúde & Monitoramento</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-menu">
-            <div class="nav-item <?php echo $page == 'inicio' ? 'active' : ''; ?>" onclick="changePage('inicio')">
-                <i class="fas fa-home"></i> <span>Início</span>
-            </div>
-            <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" onclick="changePage('blog')">
-                <i class="fas fa-newspaper"></i> <span>Blog</span>
-            </div>
-            <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" onclick="changePage('informacoes')">
-                <i class="fas fa-info-circle"></i> <span>Informações</span>
-            </div>
-            <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" onclick="changePage('suporte')">
-                <i class="fas fa-headset"></i> <span>Suporte</span>
-            </div>
-        </div>
-
-        <!-- ÁREA ROXA - USUÁRIO -->
-        <div class="user-section">
-            <div class="user-avatar"><?php echo strtoupper(substr($user_name, 0, 1)); ?></div>
-            <div class="user-name"><?php echo htmlspecialchars($user_name); ?></div>
-            <div class="user-email"><?php echo htmlspecialchars($user_email); ?></div>
-            <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
-        </div>
-    </div>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="main-content">
-        <div class="main-header">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Pesquisar..." onkeyup="searchContent()">
-            </div>
-            <h1 class="page-title" id="pageTitle">Início</h1>
-            <div><i class="fas fa-bell" style="font-size: 20px; color: #666; cursor: pointer;"></i></div>
-        </div>
-        <div class="content-area" id="contentArea"></div>
-    </div>
-
-    <!-- CHAT VERDE -->
-    <div class="chat-sidebar">
-        <div class="chat-header">
-            <h3><i class="fas fa-comment-dots"></i> Assistente</h3>
-            <p>💬 Converse sobre sua saúde</p>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="message-avatar"><i class="fas fa-robot"></i></div>
-                <div class="message-bubble">Olá! Como posso ajudar? 💙</div>
-            </div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-</div>
-
-<script>
-    function changePage(page) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('page', page);
-        window.history.pushState({}, '', url);
-        
-        const titles = { 'inicio': 'Início', 'blog': 'Blog', 'informacoes': 'Informações', 'suporte': 'Suporte' };
-        document.getElementById('pageTitle').innerText = titles[page] || 'Início';
-        
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        document.querySelector(`.nav-item[onclick="changePage('${page}')"]`).classList.add('active');
-        
-        loadContent(page);
-    }
-    
-    function loadContent(page) {
-        const area = document.getElementById('contentArea');
-        
-        if (page === 'inicio') {
-            area.innerHTML = `
-                <div class="welcome-card">
-                    <h2>Bem-vindo de volta, <?php echo htmlspecialchars($user_name); ?>! 👋</h2>
-                    <p>Monitore sua saúde cardiológica em tempo real.</p>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><h3>12</h3><p>Registros</p></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-heartbeat"></i></div><h3>72</h3><p>Batimentos/min</p></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><h3>2</h3><p>Consultas</p></div>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-heart"></i> Últimos Registros</h3>
-                    <div>Pressão Arterial: <strong>120/80 mmHg</strong> - Normal</div>
-                    <div style="margin-top:10px">Colesterol: <strong>180 mg/dL</strong> - Normal</div>
-                    <div style="margin-top:10px">Glicemia: <strong>95 mg/dL</strong> - Normal</div>
-                </div>
-            `;
-        } else if (page === 'blog') {
-            area.innerHTML = `<div class="info-card"><h3><i class="fas fa-newspaper"></i> Artigos</h3>
-                <div style="padding:12px 0; border-bottom:1px solid #eee"><b>7 hábitos para o coração saudável</b><br><small>15/04/2024</small></div>
-                <div style="padding:12px 0; border-bottom:1px solid #eee"><b>Alimentação e saúde cardiovascular</b><br><small>10/04/2024</small></div>
-                <div style="padding:12px 0"><b>Exercícios para cardíacos</b><br><small>05/04/2024</small></div>
-            </div>`;
-        } else if (page === 'informacoes') {
-            area.innerHTML = `<div class="info-card"><h3><i class="fas fa-info-circle"></i> Sobre</h3>
-                <p>O CardioWeb é uma plataforma de monitoramento cardiológico que permite acompanhar sua saúde, agendar consultas e acessar exames.</p>
-            </div>
-            <div class="info-card"><h3><i class="fas fa-shield-alt"></i> Segurança</h3>
-                <p>Seus dados são protegidos com criptografia e seguimos a LGPD.</p>
-            </div>`;
-        } else if (page === 'suporte') {
-            area.innerHTML = `<div class="info-card"><h3><i class="fas fa-headset"></i> Suporte</h3>
-                <p><i class="fas fa-phone"></i> Telefone: (11) 4002-8922</p>
-                <p><i class="fas fa-envelope"></i> E-mail: suporte@cardioweb.com</p>
-                <p><i class="fab fa-whatsapp"></i> WhatsApp: (11) 9 9999-9999</p>
-            </div>`;
-        }
-    }
-    
-    function sendMessage() {
-        const input = document.getElementById('chatInput');
-        const msg = input.value.trim();
-        if (!msg) return;
-        
-        const container = document.getElementById('chatMessages');
-        const userDiv = document.createElement('div');
-        userDiv.className = 'message user';
-        userDiv.innerHTML = `<div class="message-avatar"><i class="fas fa-user"></i></div><div class="message-bubble">${msg}</div>`;
-        container.appendChild(userDiv);
-        
-        input.value = '';
-        container.scrollTop = container.scrollHeight;
-        
-        setTimeout(() => {
-            let response = '';
-            const m = msg.toLowerCase();
-            if (m.includes('olá') || m.includes('oi')) response = 'Olá! Como posso ajudar? 💙';
-            else if (m.includes('pressão')) response = 'A pressão ideal é abaixo de 120/80 mmHg.';
-            else if (m.includes('colesterol')) response = 'O colesterol total deve ficar abaixo de 190 mg/dL.';
-            else response = 'Entendi! Para mais informações, fale com nossos atendentes. 💙';
-            
-            const botDiv = document.createElement('div');
-            botDiv.className = 'message bot';
-            botDiv.innerHTML = `<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-bubble">${response}</div>`;
-            container.appendChild(botDiv);
-            container.scrollTop = container.scrollHeight;
-        }, 500);
-    }
-    
-    function searchContent() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const items = document.querySelectorAll('.info-card, .stat-card, .welcome-card');
-        items.forEach(item => {
-            const text = item.innerText.toLowerCase();
-            item.style.display = text.includes(search) ? 'block' : 'none';
-        });
-    }
-    
-    // Carregar página inicial
-    loadContent('<?php echo $page; ?>');
-</script>
-</body>
-</html>
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .btn {
-            background: #851e32;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h2>✅ Login realizado com sucesso!</h2>
-        <p>Bem-vindo ao CardioWeb!</p>
-        <a href="logout.php" class="btn">Sair</a>
-    </div>
-</body>
->>>>>>> 726677b42bba7bd6978a1db01e6f8f37c062b38d
 </html>
