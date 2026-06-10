@@ -13,6 +13,7 @@ $login_type = $_SESSION['login_type'] ?? 'Padrão';
 
 // Conteúdo padrão (Início)
 $page = $_GET['page'] ?? 'inicio';
+require_once __DIR__ . '/dashboard-sections/blog.php';
 require_once __DIR__ . '/dashboard-sections/consultas.php';
 require_once __DIR__ . '/dashboard-sections/exames.php';
 ?>
@@ -35,7 +36,7 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             font-family: 'Inter', sans-serif;
             background: #f6ecee;
             overflow: hidden;
-            height: 100vh;
+            height: 100px;
         }
 
         /* ========== LAYOUT PRINCIPAL ========== */
@@ -339,6 +340,96 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             margin-bottom: 15px;
         }
 
+        /* ========== ARTIGOS DETALHADOS ========== */
+        .article-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .article-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #851e32;
+            margin-bottom: 20px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .article-back-btn:hover {
+            background: #f8fafc;
+        }
+
+        .article-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .article-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .article-content {
+            line-height: 1.8;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .article-content h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin: 30px 0 15px 0;
+        }
+
+        .article-image-inline {
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            margin: 15px 15px 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .article-image-inline.right {
+            float: right;
+            margin-left: 15px;
+            margin-right: 0;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
         /* ========== CHAT (ÁREA VERDE) ========== */
         .chat-sidebar {
             width: 350px;
@@ -578,6 +669,9 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
     </div>
 
     <script>
+        // Dados dos artigos (importados do blog.php)
+        const articlesData = <?php echo json_encode(getBlogArticles()); ?>;
+
         // Função para trocar de página
         function changePage(page) {
             // Atualizar URL sem recarregar
@@ -604,6 +698,54 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             
             // Carregar conteúdo
             loadContent(page);
+        }
+
+        // Função para abrir artigo individual
+        function openArticle(articleId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const article = articlesData[articleId];
+            if (!article) {
+                console.error('Artigo não encontrado:', articleId);
+                return;
+            }
+
+            const contentArea = document.getElementById('contentArea');
+            
+            const html = `
+                <div class="article-container">
+                    <div class="article-back-btn" onclick="changePage('blog')">
+                        <i class="fas fa-arrow-left"></i> Voltar aos artigos
+                    </div>
+                    
+                    <div class="article-header">
+                        <h1 class="article-title">${article.title}</h1>
+                        <div class="article-meta">
+                            <div class="article-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                ${article.date}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="article-content">
+                        ${article.content}
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                        <div class="article-back-btn" onclick="changePage('blog')">
+                            <i class="fas fa-arrow-left"></i> Voltar aos artigos
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.innerHTML = html;
+            
+            // Atualizar título da página
+            document.getElementById('pageTitle').innerText = 'Artigo';
         }
         
         function loadContent(page) {
@@ -686,31 +828,23 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
                 `;
             } 
             else if (page === 'blog') {
-                contentArea.innerHTML = `
+                let blogHtml = `
                     <div class="info-card">
                         <h3><i class="fas fa-newspaper"></i> Artigos Recentes</h3>
-                        <div class="blog-post">
-                            <div class="blog-title">7 hábitos para manter o coração saudável</div>
-                            <div class="blog-date">15 de Abril, 2024 • 5 min de leitura</div>
-                        </div>
-                        <div class="blog-post">
-                            <div class="blog-title">Alimentação e saúde cardiovascular: o que evitar</div>
-                            <div class="blog-date">10 de Abril, 2024 • 8 min de leitura</div>
-                        </div>
-                        <div class="blog-post">
-                            <div class="blog-title">Exercícios físicos recomendados para cardíacos</div>
-                            <div class="blog-date">05 de Abril, 2024 • 6 min de leitura</div>
-                        </div>
-                        <div class="blog-post">
-                            <div class="blog-title">Como monitorar sua pressão arterial em casa</div>
-                            <div class="blog-date">01 de Abril, 2024 • 4 min de leitura</div>
-                        </div>
-                        <div class="blog-post">
-                            <div class="blog-title">Tecnologia e saúde: apps para monitoramento cardíaco</div>
-                            <div class="blog-date">28 de Março, 2024 • 7 min de leitura</div>
-                        </div>
-                    </div>
                 `;
+                
+                Object.keys(articlesData).forEach(articleId => {
+                    const article = articlesData[articleId];
+                    blogHtml += `
+                        <div class="blog-post cursor-pointer" onclick="openArticle('${articleId}', event)">
+                            <div class="blog-title">${article.title}</div>
+                            <div class="blog-date">${article.date}</div>
+                        </div>
+                    `;
+                });
+                
+                blogHtml += `</div>`;
+                contentArea.innerHTML = blogHtml;
             }
             else if (page === 'consultas') {
                 contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;

@@ -451,15 +451,25 @@ if (isset($_SESSION['user_id'])) {
         }
         
         function selectGoogleAccount(email, name) {
-            // Salva na sessão via fetch
-            fetch('index.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'google_login=1&email=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name)
-            });
-            
-            // Redireciona para o dashboard
-            window.location.href = 'dashboard.html';
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'process_google_login.php';
+            form.style.display = 'none';
+
+            const inputEmail = document.createElement('input');
+            inputEmail.type = 'hidden';
+            inputEmail.name = 'email';
+            inputEmail.value = email;
+            form.appendChild(inputEmail);
+
+            const inputName = document.createElement('input');
+            inputName.type = 'hidden';
+            inputName.name = 'name';
+            inputName.value = name;
+            form.appendChild(inputName);
+
+            document.body.appendChild(form);
+            form.submit();
         }
         
         function addNewGoogleAccount() {
@@ -499,7 +509,26 @@ if (isset($_SESSION['user_id'])) {
         function loginNewGoogleAccount() {
             const email = document.getElementById('newGoogleEmail').value;
             if(email) {
-                window.location.href = 'dashboard.html';
+                const name = email.split('@')[0];
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'process_google_login.php';
+                form.style.display = 'none';
+
+                const inputEmail = document.createElement('input');
+                inputEmail.type = 'hidden';
+                inputEmail.name = 'email';
+                inputEmail.value = email;
+                form.appendChild(inputEmail);
+
+                const inputName = document.createElement('input');
+                inputName.type = 'hidden';
+                inputName.name = 'name';
+                inputName.value = name;
+                form.appendChild(inputName);
+
+                document.body.appendChild(form);
+                form.submit();
             } else {
                 alert('Preencha o e-mail');
             }
@@ -540,7 +569,19 @@ if (isset($_SESSION['user_id'])) {
         function loginApple() {
             const email = document.getElementById('appleEmail').value;
             if(email) {
-                window.location.href = 'dashboard.html';
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'process_apple_login.php';
+                form.style.display = 'none';
+
+                const inputEmail = document.createElement('input');
+                inputEmail.type = 'hidden';
+                inputEmail.name = 'email';
+                inputEmail.value = email;
+                form.appendChild(inputEmail);
+
+                document.body.appendChild(form);
+                form.submit();
             } else {
                 alert('Preencha os campos');
             }
@@ -605,8 +646,27 @@ if (isset($_SESSION['user_id'])) {
         
         function verifySmsCode() {
             const code = document.getElementById('smsCode').value;
-            if(code == '123456') {
-                window.location.href = 'dashboard.html';
+            const phone = document.getElementById('smsPhone').value;
+            if(code == '123456' && phone) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'process_sms_login.php';
+                form.style.display = 'none';
+
+                const inputPhone = document.createElement('input');
+                inputPhone.type = 'hidden';
+                inputPhone.name = 'phone';
+                inputPhone.value = phone;
+                form.appendChild(inputPhone);
+
+                const inputCode = document.createElement('input');
+                inputCode.type = 'hidden';
+                inputCode.name = 'code';
+                inputCode.value = code;
+                form.appendChild(inputCode);
+
+                document.body.appendChild(form);
+                form.submit();
             } else {
                 alert('Código inválido! Use: 123456');
             }

@@ -48,14 +48,14 @@ function getBlogSectionHtml() {
     return <<<HTML
                 <div class="info-card">
                     <h3><i class="fas fa-newspaper"></i> Artigos Recentes</h3>
-                    <div class="blog-post" onclick="openArticle('habitos')"><div class="blog-title">7 hábitos para manter o coração saudável</div><div class="blog-date">15 de Maio, 2024 • 14 min</div></div>
-                    <div class="blog-post" onclick="openArticle('alimentacao')"><div class="blog-title">Alimentação e saúde cardiovascular: o que evitar e o que incluir</div><div class="blog-date">10 de Maio, 2024 • 16 min</div></div>
-                    <div class="blog-post" onclick="openArticle('exercicios')"><div class="blog-title">Exercícios físicos recomendados para cardíacos</div><div class="blog-date">05 de Maio, 2024 • 13 min</div></div>
-                    <div class="blog-post" onclick="openArticle('pressao')"><div class="blog-title">Como monitorar sua pressão arterial em casa</div><div class="blog-date">01 de Maio, 2024 • 11 min</div></div>
-                    <div class="blog-post" onclick="openArticle('tecnologia')"><div class="blog-title">Tecnologia e saúde: apps para monitoramento cardíaco</div><div class="blog-date">28 de Abril, 2024 • 12 min</div></div>
-                    <div class="blog-post" onclick="openArticle('diabetes')"><div class="blog-title">O impacto do diabetes na saúde do coração</div><div class="blog-date">20 de Abril, 2024 • 15 min</div></div>
-                    <div class="blog-post" onclick="openArticle('colesterol')"><div class="blog-title">Colesterol: mitos e verdades que você precisa saber</div><div class="blog-date">15 de Abril, 2024 • 13 min</div></div>
-                    <div class="blog-post" onclick="openArticle('insuficiencia')"><div class="blog-title">Insuficiência cardíaca: sinais de alerta e cuidados diários</div><div class="blog-date">10 de Abril, 2024 • 14 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('habitos', event)"><div class="blog-title">7 hábitos para manter o coração saudável</div><div class="blog-date">15 de Maio, 2024 • 14 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('alimentacao', event)"><div class="blog-title">Alimentação e saúde cardiovascular: o que evitar e o que incluir</div><div class="blog-date">10 de Maio, 2024 • 16 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('exercicios', event)"><div class="blog-title">Exercícios físicos recomendados para cardíacos</div><div class="blog-date">05 de Maio, 2024 • 13 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('pressao', event)"><div class="blog-title">Como monitorar sua pressão arterial em casa</div><div class="blog-date">01 de Maio, 2024 • 11 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('tecnologia', event)"><div class="blog-title">Tecnologia e saúde: apps para monitoramento cardíaco</div><div class="blog-date">28 de Abril, 2024 • 12 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('diabetes', event)"><div class="blog-title">O impacto do diabetes na saúde do coração</div><div class="blog-date">20 de Abril, 2024 • 15 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('colesterol', event)"><div class="blog-title">Colesterol: mitos e verdades que você precisa saber</div><div class="blog-date">15 de Abril, 2024 • 13 min</div></div>
+                    <div class="blog-post cursor-pointer" onclick="openArticle('insuficiencia', event)"><div class="blog-title">Insuficiência cardíaca: sinais de alerta e cuidados diários</div><div class="blog-date">10 de Abril, 2024 • 14 min</div></div>
                 </div>
 HTML;
 }
