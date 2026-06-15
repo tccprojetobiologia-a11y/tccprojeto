@@ -564,6 +564,136 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             border-radius: 3px;
         }
 
+        /* ========== MODAL CONSULTA ========== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #851e32;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e2a3a;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            font-family: inherit;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #851e32;
+            box-shadow: 0 0 0 3px rgba(133, 30, 50, 0.1);
+        }
+
+        .contact-btn {
+            background: #851e32;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .contact-btn:hover {
+            background: #5a1e2c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(133, 30, 50, 0.3);
+        }
+
+        .contact-btn:active {
+            transform: translateY(0);
+        }
+
         /* Responsive */
         @media (max-width: 1000px) {
             .chat-sidebar {
@@ -646,6 +776,65 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
 
             <div class="content-area" id="contentArea">
                 <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Modal Nova Consulta -->
+        <div id="consultaModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-plus"></i> Agendar Nova Consulta</h2>
+                    <button class="modal-close" onclick="closeConsultaModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="consultaForm" onsubmit="agendarConsulta(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-user-md"></i> Médico:</label>
+                            <select id="medicSelect" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+                                <option value="">Selecione um médico</option>
+                                <option value="Dra. Ana Beatriz|Cardiologia">Dra. Ana Beatriz - Cardiologia</option>
+                                <option value="Dr. Carlos Silva|Cardiologia">Dr. Carlos Silva - Cardiologia</option>
+                                <option value="Dr. Ricardo Alves|Nutrologia">Dr. Ricardo Alves - Nutrologia</option>
+                                <option value="Dra. Mariana Costa|Clínica Geral">Dra. Mariana Costa - Clínica Geral</option>
+                                <option value="Dr. Felipe Santos|Pneumologia">Dr. Felipe Santos - Pneumologia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Data:</label>
+                            <input type="date" id="dataConsulta" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-clock"></i> Horário:</label>
+                            <select id="horaConsulta" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+                                <option value="">Selecione um horário</option>
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-stethoscope"></i> Tipo de Consulta:</label>
+                            <select id="tipoConsulta" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+                                <option value="">Selecione o tipo</option>
+                                <option value="Presencial">Presencial</option>
+                                <option value="Online">Online</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-file-alt"></i> Observações (opcional):</label>
+                            <textarea id="obsConsulta" placeholder="Descreva os sintomas ou motivo da consulta..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px; resize:vertical; min-height:80px;"></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button type="submit" class="contact-btn" style="flex:1;"><i class="fas fa-check"></i> Confirmar Agendamento</button>
+                            <button type="button" class="contact-btn" style="flex:1; background:#6c757d;" onclick="closeConsultaModal()"><i class="fas fa-times"></i> Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -1004,6 +1193,79 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             }
             
             return 'Entendi! Para informações mais específicas, recomendo falar com um de nossos atendentes ou acessar nossa central de suporte. 💙';
+        }
+        
+        // ========== FUNÇÕES DO MODAL CONSULTA ==========
+        function openConsultaModal() {
+            const modal = document.getElementById('consultaModal');
+            modal.style.display = 'flex';
+            // Definir data mínima como hoje
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dataConsulta').min = today;
+        }
+        
+        function closeConsultaModal() {
+            const modal = document.getElementById('consultaModal');
+            modal.style.display = 'none';
+            // Resetar o formulário
+            document.getElementById('consultaForm').reset();
+        }
+        
+        // Fechar modal ao clicar fora
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('consultaModal');
+            if (modal && event.target === modal) {
+                closeConsultaModal();
+            }
+        });
+        
+        function agendarConsulta(event) {
+            event.preventDefault();
+            
+            const medicSelect = document.getElementById('medicSelect');
+            const dataConsulta = document.getElementById('dataConsulta');
+            const horaConsulta = document.getElementById('horaConsulta');
+            const tipoConsulta = document.getElementById('tipoConsulta');
+            const obsConsulta = document.getElementById('obsConsulta');
+            
+            if (!medicSelect.value || !dataConsulta.value || !horaConsulta.value || !tipoConsulta.value) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            // Extrair nome do médico e especialidade
+            const [nomeMedico, especialidade] = medicSelect.value.split('|');
+            
+            // Formatar data para exibição
+            const data = new Date(dataConsulta.value);
+            const dataFormatada = data.toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            
+            // Criar card da nova consulta
+            const novaConsulta = document.createElement('div');
+            novaConsulta.className = 'stat-card';
+            novaConsulta.innerHTML = `
+                <div class="stat-icon"><i class="fas fa-user-md"></i></div>
+                <h3>${nomeMedico}</h3>
+                <p>${especialidade}</p>
+                <div style="margin-top:10px; font-size:14px;">
+                    <i class="fas fa-calendar-alt"></i> ${dataFormatada}<br>
+                    <i class="fas fa-clock"></i> ${horaConsulta.value}<br>
+                    <i class="fas fa-stethoscope"></i> ${tipoConsulta.value}<br>
+                    <span style="color:#ff9800;">🕓 Pendente</span>
+                </div>
+            `;
+            
+            // Adicionar à lista de consultas
+            const grid = document.getElementById('consultasGrid');
+            if (grid) {
+                grid.insertBefore(novaConsulta, grid.firstChild);
+            }
+            
+            // Fechar modal
+            closeConsultaModal();
+            
+            // Mostrar mensagem de sucesso
+            alert(`✓ Consulta agendada com sucesso!\n\nMédico: ${nomeMedico}\nEspecialidade: ${especialidade}\nData: ${dataFormatada}\nHora: ${horaConsulta.value}\nTipo: ${tipoConsulta.value}${obsConsulta.value ? '\n\nObservações: ' + obsConsulta.value : ''}`);
         }
         
         // Carregar conteúdo inicial
