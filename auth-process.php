@@ -12,7 +12,7 @@ $login_type = isset($_POST['login_type']) ? $_POST['login_type'] : '';
 $error = '';
 $success = false;
 
-// ============== LOGIN POR EMAIL/SENHA ==============
+// ============== LOGIN POR EMAIL/SENHA ==============\
 if ($login_type === 'email') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -29,46 +29,66 @@ if ($login_type === 'email') {
         $_SESSION['user_name'] = explode('@', $email)[0];
         $_SESSION['login_type'] = 'Email';
         $_SESSION['logado'] = true;
+
+        // VERIFICAÇÃO DE ADMINISTRADOR
+        if ($email === 'coordenacao@vidaviva.com') {
+            $_SESSION['user_role'] = 'admin';
+        } else {
+            $_SESSION['user_role'] = 'paciente';
+        }
+
         $success = true;
     }
 }
 
-// ============== LOGIN POR GOOGLE ==============
+// ============== LOGIN POR GOOGLE ==============\
 else if ($login_type === 'google') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $name = isset($_POST['name']) ? trim($_POST['name']) : '';
     
     if (empty($email)) {
-        $error = 'E-mail do Google é obrigatório';
+        $error = 'Erro na autenticação do Google';
     } else {
-        // TODO: Validar token do Google
         $_SESSION['user_id'] = '2';
         $_SESSION['user_email'] = $email;
-        $_SESSION['user_name'] = $name ?: explode('@', $email)[0];
+        $_SESSION['user_name'] = explode('@', $email)[0];
         $_SESSION['login_type'] = 'Google';
         $_SESSION['logado'] = true;
+
+        // Se entrar via Google com o e-mail da coordenação, vira Admin
+        if ($email === 'coordenacao@vidaviva.com') {
+            $_SESSION['user_role'] = 'admin';
+        } else {
+            $_SESSION['user_role'] = 'paciente';
+        }
+
         $success = true;
     }
 }
 
-// ============== LOGIN POR APPLE ==============
+// ============== LOGIN POR APPLE ==============\
 else if ($login_type === 'apple') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     
     if (empty($email)) {
-        $error = 'E-mail do Apple é obrigatório';
+        $error = 'Erro na autenticação da Apple';
     } else {
-        // TODO: Validar token do Apple
         $_SESSION['user_id'] = '3';
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name'] = explode('@', $email)[0];
         $_SESSION['login_type'] = 'Apple';
         $_SESSION['logado'] = true;
+
+        if ($email === 'coordenacao@vidaviva.com') {
+            $_SESSION['user_role'] = 'admin';
+        } else {
+            $_SESSION['user_role'] = 'paciente';
+        }
+
         $success = true;
     }
 }
 
-// ============== LOGIN POR SMS ==============
+// ============== LOGIN POR SMS ==============\
 else if ($login_type === 'sms') {
     $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
     $code = isset($_POST['code']) ? trim($_POST['code']) : '';
@@ -87,22 +107,23 @@ else if ($login_type === 'sms') {
         $_SESSION['user_name'] = 'Usuário SMS';
         $_SESSION['login_type'] = 'SMS';
         $_SESSION['logado'] = true;
+        $_SESSION['user_role'] = 'paciente'; // SMS assume sempre paciente por padrão
         $success = true;
     }
 }
 
-// ============== RESPONDER ==============
+// ============== RESPONDER E REDIRECIONAR ==============\
 if ($success) {
-    // Redirecionar para dashboard
-    header('Location: dashboard.php');
-    exit();
-} else if ($error) {
-    // Redirecionar para login com erro
-    header('Location: index.php?error=' . urlencode($error));
+    // Redireciona com base na função/role do utilizador
+    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+        header('Location: admin/dashboard.php');
+    } else {
+        header('Location: dashboard.php');
+    }
     exit();
 } else {
-    // Nenhum tipo de login detectado
-    header('Location: index.php?error=Tipo de login inválido');
+    // Retornar erro para a página anterior via sessão
+    $_SESSION['login_error'] = $error;
+    header('Location: index.php');
     exit();
 }
-?>
