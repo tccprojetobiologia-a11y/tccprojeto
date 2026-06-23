@@ -19,54 +19,59 @@
 </div>
 
 <script>
-    function renderCalendario(medicoNome, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        const mes = 5, ano = 2026; // Junho 2026
-        const primeiroDia = new Date(ano, mes, 1).getDay();
-        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    window.renderAgenda = function() {
         const agenda = window.agendaMedicos || {};
-        const consultas = agenda[medicoNome] || [];
 
-        let html = '<table style="width:100%; border-collapse:collapse; font-size:14px;">';
-        html += '<thead><tr><th style="padding:8px; text-align:center; background:#f8fafc;">Dom</th><th style="padding:8px; text-align:center; background:#f8fafc;">Seg</th><th style="padding:8px; text-align:center; background:#f8fafc;">Ter</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qua</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qui</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sex</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sáb</th></tr></thead><tbody><tr>';
-        for (let i = 0; i < primeiroDia; i++) {
-            html += '<td style="padding:8px; text-align:center; color:#cbd5e1;"></td>';
-        }
-        for (let dia = 1; dia <= diasNoMes; dia++) {
-            const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-            const consultasDia = consultas.filter(c => c.data === dataStr);
-            const temConsulta = consultasDia.length > 0;
-            const bgColor = temConsulta ? '#fee2e2' : 'transparent';
-            const textColor = temConsulta ? '#991b1b' : '#1e2a3a';
-            html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; font-weight:${temConsulta?'600':'400'};">
-                ${dia}
-                ${temConsulta ? `<br><small style="font-size:10px; color:#6b7280;">${consultasDia.map(c => c.paciente + ' ' + c.hora).join('<br>')}</small>` : ''}
-            </td>`;
-            if ((primeiroDia + dia) % 7 === 0) {
-                html += '</tr><tr>';
-            }
-        }
-        const totalDias = primeiroDia + diasNoMes;
-        const resto = totalDias % 7;
-        if (resto > 0) {
-            for (let i = 0; i < (7 - resto); i++) {
+        function renderCalendario(medicoNome, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const mes = 5; // Junho
+            const ano = 2026;
+            const primeiroDia = new Date(ano, mes, 1).getDay();
+            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+            const consultas = agenda[medicoNome] || [];
+
+            let html = '<table style="width:100%; border-collapse:collapse; font-size:14px;">';
+            html += '<thead><tr><th style="padding:8px; text-align:center; background:#f8fafc;">Dom</th><th style="padding:8px; text-align:center; background:#f8fafc;">Seg</th><th style="padding:8px; text-align:center; background:#f8fafc;">Ter</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qua</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qui</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sex</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sáb</th></tr></thead><tbody><tr>';
+
+            for (let i = 0; i < primeiroDia; i++) {
                 html += '<td style="padding:8px; text-align:center; color:#cbd5e1;"></td>';
             }
+
+            for (let dia = 1; dia <= diasNoMes; dia++) {
+                const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                const consultasDia = consultas.filter(c => c.data === dataStr);
+                const temConsulta = consultasDia.length > 0;
+                const bgColor = temConsulta ? '#fee2e2' : 'transparent';
+                const textColor = temConsulta ? '#991b1b' : '#1e2a3a';
+
+                html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; font-weight:${temConsulta ? '600' : '400'};">
+                    ${dia}
+                    ${temConsulta ? `<br><small style="font-size:10px; color:#6b7280;">${consultasDia.map(c => c.paciente + ' ' + c.hora).join('<br>')}</small>` : ''}
+                </td>`;
+
+                if ((primeiroDia + dia) % 7 === 0) {
+                    html += '</tr><tr>';
+                }
+            }
+
+            const totalDias = primeiroDia + diasNoMes;
+            const resto = totalDias % 7;
+            if (resto > 0) {
+                for (let i = 0; i < (7 - resto); i++) {
+                    html += '<td style="padding:8px; text-align:center; color:#cbd5e1;"></td>';
+                }
+            }
+
+            html += '</tr></tbody></table>';
+            container.innerHTML = html;
         }
-        html += '</tr></tbody></table>';
-        container.innerHTML = html;
-    }
+
+        renderCalendario('Dr. Roberto Mendes', 'calendario-roberto');
+        renderCalendario('Dra. Aline Costa', 'calendario-aline');
+    };
 
     document.addEventListener('DOMContentLoaded', function() {
-        function carregarCalendarios() {
-            if (typeof window.agendaMedicos !== 'undefined') {
-                renderCalendario('Dr. Roberto Mendes', 'calendario-roberto');
-                renderCalendario('Dra. Aline Costa', 'calendario-aline');
-            } else {
-                setTimeout(carregarCalendarios, 200);
-            }
-        }
-        carregarCalendarios();
+        window.renderAgenda();
     });
 </script>

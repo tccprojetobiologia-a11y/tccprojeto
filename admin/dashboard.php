@@ -23,51 +23,19 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f6ecee; overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; width: 100%; }
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #4c0719 0%, #7e1b31 100%);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.12);
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
+        .sidebar { width: 280px; background: linear-gradient(180deg, #4c0719 0%, #7e1b31 100%); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.12); overflow-y: auto; flex-shrink: 0; }
         .logo-area { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 30px; }
         .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon { background: rgba(255,255,255,0.2); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
         .logo-text h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
         .logo-text p { font-size: 10px; opacity: 0.8; margin-top: 4px; }
         .nav-menu { flex: 1; padding: 0 20px; }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 18px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border: none;
-            background: transparent;
-            width: 100%;
-            font-size: 15px;
-            font-family: inherit;
-        }
+        .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.8); text-decoration: none; border: none; background: transparent; width: 100%; font-size: 15px; font-family: inherit; }
         .nav-item:hover { background: rgba(255,255,255,0.12); color: white; }
         .nav-item.active { background: rgba(255,255,255,0.18); color: white; font-weight: 500; }
         .nav-item i { width: 24px; font-size: 20px; }
         .nav-item span { font-size: 15px; }
-        .user-section {
-            padding: 20px;
-            margin: 20px;
-            background: linear-gradient(135deg, #7a1d34 0%, #5c1230 100%);
-            border-radius: 16px;
-            margin-top: auto;
-            margin-bottom: 20px;
-        }
+        .user-section { padding: 20px; margin: 20px; background: linear-gradient(135deg, #7a1d34 0%, #5c1230 100%); border-radius: 16px; margin-top: auto; margin-bottom: 20px; }
         .user-avatar { width: 50px; height: 50px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
         .user-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
         .user-email { font-size: 11px; opacity: 0.8; margin-bottom: 12px; word-break: break-all; }
@@ -134,28 +102,30 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                     <div class="header-icon"><i class="fas fa-cog"></i></div>
                 </div>
             </header>
-            <div class="content-area" id="contentArea"></div>
+            <div class="content-area" id="contentArea">
+                <!-- Carregado via AJAX -->
+            </div>
         </div>
     </div>
 
     <script>
-        // ========== DADOS GLOBAIS (simulados) ==========
-        window.consultas = {
+        // ========== DADOS GLOBAIS (compartilhados com paciente) ==========
+        window.consultas = window.consultas || {
             pendentes: [
-                { id: 1, paciente: 'Carlos Silva', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-22', hora: '14:30', status: 'pendente' },
-                { id: 2, paciente: 'Maria Oliveira', medico: 'Dra. Aline Costa', especialidade: 'Arritmologia', data: '2026-06-24', hora: '09:00', status: 'pendente' },
-                { id: 3, paciente: 'João Pereira', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-25', hora: '16:00', status: 'pendente' }
+                { id: 1, paciente: 'Carlos Silva', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-22', hora: '14:30' },
+                { id: 2, paciente: 'Maria Oliveira', medico: 'Dra. Aline Costa', especialidade: 'Arritmologia', data: '2026-06-24', hora: '09:00' },
+                { id: 3, paciente: 'João Pereira', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-25', hora: '16:00' }
             ],
             confirmadas: [],
             recusadas: []
         };
 
-        window.agendaMedicos = {
+        window.agendaMedicos = window.agendaMedicos || {
             'Dr. Roberto Mendes': [],
             'Dra. Aline Costa': []
         };
 
-        // Funções globais
+        // ========== FUNÇÕES DE APROVAÇÃO/RECUSA ==========
         window.aprovarConsulta = function(id) {
             const consulta = window.consultas.pendentes.find(c => c.id === id);
             if (!consulta) return;
@@ -163,7 +133,12 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             consulta.status = 'confirmada';
             window.consultas.confirmadas.push(consulta);
             if (!window.agendaMedicos[consulta.medico]) window.agendaMedicos[consulta.medico] = [];
-            window.agendaMedicos[consulta.medico].push({ data: consulta.data, hora: consulta.hora, paciente: consulta.paciente });
+            window.agendaMedicos[consulta.medico].push({
+                data: consulta.data,
+                hora: consulta.hora,
+                paciente: consulta.paciente
+            });
+            // Recarregar a seção para atualizar a UI
             loadContent('confirmar-consultas');
             alert('✓ Consulta de ' + consulta.paciente + ' confirmada e adicionada à agenda!');
         };
@@ -203,6 +178,12 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 })
                 .then(html => {
                     contentArea.innerHTML = html;
+                    // Disparar a renderização após o carregamento
+                    if (section === 'confirmar-consultas') {
+                        if (typeof window.renderConsultas === 'function') window.renderConsultas();
+                    } else if (section === 'agenda-medicos') {
+                        if (typeof window.renderAgenda === 'function') window.renderAgenda();
+                    }
                 })
                 .catch(error => {
                     contentArea.innerHTML = `
