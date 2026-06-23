@@ -17,8 +17,21 @@
 <div id="lista-recusadas" class="tab-content" style="display: none;"></div>
 
 <script>
-    // Função para renderizar as listas
+    // Função para renderizar as listas usando dados do window.consultas
     window.renderConsultas = function() {
+        // Recarregar dados do localStorage para garantir sincronia
+        function carregarDados() {
+            let dados = localStorage.getItem('cardioweb_dados');
+            if (dados) {
+                try {
+                    return JSON.parse(dados);
+                } catch(e) {}
+            }
+            return { consultas: { pendentes: [], confirmadas: [], recusadas: [] } };
+        }
+        let dados = carregarDados();
+        window.consultas = dados.consultas;
+
         const pendentes = window.consultas.pendentes || [];
         const confirmadas = window.consultas.confirmadas || [];
         const recusadas = window.consultas.recusadas || [];

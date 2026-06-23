@@ -20,6 +20,18 @@
 
 <script>
     window.renderAgenda = function() {
+        // Recarregar dados do localStorage
+        function carregarDados() {
+            let dados = localStorage.getItem('cardioweb_dados');
+            if (dados) {
+                try {
+                    return JSON.parse(dados);
+                } catch(e) {}
+            }
+            return { agendaMedicos: { 'Dr. Roberto Mendes': [], 'Dra. Aline Costa': [] } };
+        }
+        let dados = carregarDados();
+        window.agendaMedicos = dados.agendaMedicos;
         const agenda = window.agendaMedicos || {};
 
         function renderCalendario(medicoNome, containerId) {

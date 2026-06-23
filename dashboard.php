@@ -246,35 +246,42 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
     </div>
 
     <script>
-        // ========== INICIALIZAÇÃO DE DADOS GLOBAIS (compartilhados com admin via localStorage) ==========
+        // ========== INICIALIZAÇÃO DOS DADOS NO LOCALSTORAGE ==========
+        // Função para carregar dados do localStorage ou definir padrão
         function carregarDados() {
-            const dados = localStorage.getItem('cardioweb_dados');
+            let dados = localStorage.getItem('cardioweb_dados');
             if (dados) {
-                const obj = JSON.parse(dados);
-                window.agendaMedicos = obj.agendaMedicos || {
-                    'Dr. Roberto Mendes': [],
-                    'Dra. Aline Costa': []
-                };
-                window.consultas = obj.consultas || { pendentes: [], confirmadas: [], recusadas: [] };
-            } else {
-                window.agendaMedicos = {
-                    'Dr. Roberto Mendes': [],
-                    'Dra. Aline Costa': []
-                };
-                window.consultas = { pendentes: [], confirmadas: [], recusadas: [] };
+                try {
+                    return JSON.parse(dados);
+                } catch(e) {}
             }
+            // Dados padrão
+            return {
+                consultas: {
+                    pendentes: [],
+                    confirmadas: [],
+                    recusadas: []
+                },
+                agendaMedicos: {
+                    'Dr. Roberto Mendes': [],
+                    'Dra. Aline Costa': []
+                }
+            };
         }
 
+        // Função para salvar dados no localStorage
         function salvarDados() {
             const dados = {
-                agendaMedicos: window.agendaMedicos,
-                consultas: window.consultas
+                consultas: window.consultas,
+                agendaMedicos: window.agendaMedicos
             };
             localStorage.setItem('cardioweb_dados', JSON.stringify(dados));
         }
 
-        // Carregar dados ao iniciar
-        carregarDados();
+        // Carregar dados iniciais
+        let dadosSalvos = carregarDados();
+        window.consultas = dadosSalvos.consultas;
+        window.agendaMedicos = dadosSalvos.agendaMedicos;
 
         // ========== DADOS DOS ARTIGOS ==========
         const articlesData = <?php echo json_encode(getBlogArticles()); ?>;
@@ -472,8 +479,10 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
                 status: 'pendente'
             };
             window.consultas.pendentes.push(novaConsulta);
-            salvarDados(); // Salvar no localStorage
+            // Salvar no localStorage
+            salvarDados();
 
+            // Atualizar a UI da lista de consultas (se estiver na página)
             const grid = document.getElementById('consultasGrid');
             if (grid) {
                 const card = document.createElement('div');
