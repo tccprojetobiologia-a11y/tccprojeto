@@ -20,7 +20,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS igual ao anterior (mantenha o mesmo) */
+        /* ===== SEU CSS EXISTENTE (mantenha o mesmo) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f6ecee; overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; width: 100%; }
@@ -112,39 +112,42 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
     <script>
         // ========== CARREGAR DADOS DO LOCALSTORAGE ==========
         function carregarDados() {
-            let dados = localStorage.getItem('cardioweb_dados');
-            if (dados) {
-                try {
-                    return JSON.parse(dados);
-                } catch(e) {}
-            }
-            // Dados padrão (para primeira execução)
-            return {
-                consultas: {
-                    pendentes: [],
+            const storedConsultas = localStorage.getItem('consultas');
+            const storedAgenda = localStorage.getItem('agendaMedicos');
+            
+            if (storedConsultas) {
+                window.consultas = JSON.parse(storedConsultas);
+            } else {
+                // Dados mockados iniciais (apenas se não houver nada salvo)
+                window.consultas = {
+                    pendentes: [
+                        { id: 1, paciente: 'Carlos Silva', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-22', hora: '14:30' },
+                        { id: 2, paciente: 'Maria Oliveira', medico: 'Dra. Aline Costa', especialidade: 'Arritmologia', data: '2026-06-24', hora: '09:00' }
+                    ],
                     confirmadas: [],
                     recusadas: []
-                },
-                agendaMedicos: {
+                };
+                localStorage.setItem('consultas', JSON.stringify(window.consultas));
+            }
+            
+            if (storedAgenda) {
+                window.agendaMedicos = JSON.parse(storedAgenda);
+            } else {
+                window.agendaMedicos = {
                     'Dr. Roberto Mendes': [],
                     'Dra. Aline Costa': []
-                }
-            };
+                };
+                localStorage.setItem('agendaMedicos', JSON.stringify(window.agendaMedicos));
+            }
         }
 
-        // Função para salvar dados no localStorage
         function salvarDados() {
-            const dados = {
-                consultas: window.consultas,
-                agendaMedicos: window.agendaMedicos
-            };
-            localStorage.setItem('cardioweb_dados', JSON.stringify(dados));
+            localStorage.setItem('consultas', JSON.stringify(window.consultas));
+            localStorage.setItem('agendaMedicos', JSON.stringify(window.agendaMedicos));
         }
 
-        // Carregar dados iniciais
-        let dadosSalvos = carregarDados();
-        window.consultas = dadosSalvos.consultas;
-        window.agendaMedicos = dadosSalvos.agendaMedicos;
+        // Carregar dados ao iniciar
+        carregarDados();
 
         // ========== FUNÇÕES DE APROVAÇÃO/RECUSA ==========
         window.aprovarConsulta = function(id) {
