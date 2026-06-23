@@ -7,7 +7,8 @@ if (!isset($_SESSION['logado']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
     exit();
 }
 
-$page = $_GET['page'] ?? 'consultas';
+// Página atual (via GET)
+$page = $_GET['page'] ?? 'confirmar-consultas';
 $user_name = $_SESSION['user_name'] ?? 'Admin';
 $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
 ?>
@@ -99,6 +100,11 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             transition: all 0.3s;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 15px;
+            font-family: inherit;
         }
         .nav-item:hover {
             background: rgba(255, 255, 255, 0.12);
@@ -216,7 +222,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             padding: 30px;
         }
 
-        /* ===== ESTILOS REUTILIZÁVEIS (cards, etc) ===== */
+        /* ===== ESTILOS REUTILIZÁVEIS ===== */
         .info-card {
             background: white;
             border-radius: 16px;
@@ -320,15 +326,14 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             </div>
 
             <nav class="nav-menu">
-                <a class="nav-item <?php echo $page == 'consultas' ? 'active' : ''; ?>" onclick="loadContent('consultas')">
+                <button class="nav-item <?php echo $page == 'confirmar-consultas' ? 'active' : ''; ?>" onclick="loadContent('confirmar-consultas')">
                     <i class="fas fa-check-circle"></i>
                     <span>Confirmar Consultas</span>
-                </a>
-                <a class="nav-item <?php echo $page == 'agendas' ? 'active' : ''; ?>" onclick="loadContent('agendas')">
+                </button>
+                <button class="nav-item <?php echo $page == 'agenda-medicos' ? 'active' : ''; ?>" onclick="loadContent('agenda-medicos')">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Agenda dos Médicos</span>
-                </a>
-                <!-- Adicione mais itens aqui se necessário -->
+                </button>
             </nav>
 
             <div class="user-section">
@@ -358,10 +363,10 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
     </div>
 
     <script>
-        // Mapeamento de títulos para cada seção
+        // Mapeamento de títulos
         const titles = {
-            'consultas': 'Confirmar Consultas',
-            'agendas': 'Agenda dos Médicos'
+            'confirmar-consultas': 'Confirmar Consultas',
+            'agenda-medicos': 'Agenda dos Médicos'
         };
 
         // Carregar conteúdo via AJAX
@@ -387,12 +392,13 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 })
                 .then(html => {
                     contentArea.innerHTML = html;
+                    // Re-aplicar eventos de botões (se necessário)
                 })
                 .catch(error => {
                     contentArea.innerHTML = `
                         <div class="info-card">
                             <h3><i class="fas fa-exclamation-triangle"></i> Erro</h3>
-                            <p style="color: #c00;">Não foi possível carregar a seção. Tente novamente.</p>
+                            <p style="color: #c00;">Não foi possível carregar a seção. Verifique se o arquivo admin-sections/${section}.php existe.</p>
                         </div>
                     `;
                     console.error(error);
@@ -404,6 +410,26 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             const page = '<?php echo $page; ?>';
             loadContent(page);
         });
+
+        // Funções globais para os botões das seções (serão chamadas a partir do HTML carregado)
+        window.aprovarConsulta = function(id, paciente) {
+            alert('✓ Consulta de ' + paciente + ' CONFIRMADA!');
+            const statusBadge = document.getElementById('status-' + id);
+            const actionButtons = document.getElementById('actions-' + id);
+            if(statusBadge) {
+                statusBadge.innerHTML = 'Confirmada';
+                statusBadge.style.background = 'rgba(34, 197, 94, 0.15)';
+                statusBadge.style.color = '#4ade80';
+            }
+            if(actionButtons) actionButtons.style.display = 'none';
+        };
+
+        window.rejeitarConsulta = function(id, paciente) {
+            if(confirm('Recusar consulta de ' + paciente + '?')) {
+                const card = document.getElementById('card-' + id);
+                if(card) card.style.opacity = '0.3';
+            }
+        };
     </script>
 </body>
 </html>
