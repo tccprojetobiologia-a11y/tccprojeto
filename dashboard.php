@@ -1,11 +1,17 @@
 <?php
 session_start();
+
+// Verifica se o usuário está logado
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     header('Location: index.php');
     exit();
 }
+
 $user_name = $_SESSION['user_name'] ?? 'Usuário';
 $user_email = $_SESSION['user_email'] ?? $_SESSION['user_telefone'] ?? 'usuario@email.com';
+$login_type = $_SESSION['login_type'] ?? 'Padrão';
+
+// Conteúdo padrão (Início)
 $page = $_GET['page'] ?? 'inicio';
 require_once __DIR__ . '/dashboard-sections/blog.php';
 require_once __DIR__ . '/dashboard-sections/consultas.php';
@@ -20,7 +26,7 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* (mesmo CSS anterior, mantenha igual) */
+        /* ===== SEU CSS EXISTENTE (mantenha o mesmo) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f6ecee; overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; width: 100%; }
@@ -172,7 +178,7 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             </div>
         </div>
 
-        <!-- MODAL NOVA CONSULTA -->
+        <!-- MODAL NOVA CONSULTA (com horários disponíveis) -->
         <div id="consultaModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -240,49 +246,31 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
     </div>
 
     <script>
-        // ========== INICIALIZAÇÃO DE DADOS GLOBAIS (compartilhados via localStorage) ==========
+        // ========== INICIALIZAÇÃO DE DADOS GLOBAIS (compartilhados com admin via localStorage) ==========
         function carregarDados() {
-            // Carregar consultas pendentes do localStorage
-            let pendentes = localStorage.getItem('consultas_pendentes');
-            if (pendentes) {
-                window.consultasPendentes = JSON.parse(pendentes);
-            } else {
-                window.consultasPendentes = []; // começa vazio
-            }
-
-            // Carregar consultas confirmadas
-            let confirmadas = localStorage.getItem('consultas_confirmadas');
-            if (confirmadas) {
-                window.consultasConfirmadas = JSON.parse(confirmadas);
-            } else {
-                window.consultasConfirmadas = [];
-            }
-
-            // Carregar consultas recusadas
-            let recusadas = localStorage.getItem('consultas_recusadas');
-            if (recusadas) {
-                window.consultasRecusadas = JSON.parse(recusadas);
-            } else {
-                window.consultasRecusadas = [];
-            }
-
-            // Carregar agenda dos médicos
-            let agenda = localStorage.getItem('agendaMedicos');
-            if (agenda) {
-                window.agendaMedicos = JSON.parse(agenda);
+            const dados = localStorage.getItem('cardioweb_dados');
+            if (dados) {
+                const obj = JSON.parse(dados);
+                window.agendaMedicos = obj.agendaMedicos || {
+                    'Dr. Roberto Mendes': [],
+                    'Dra. Aline Costa': []
+                };
+                window.consultas = obj.consultas || { pendentes: [], confirmadas: [], recusadas: [] };
             } else {
                 window.agendaMedicos = {
                     'Dr. Roberto Mendes': [],
                     'Dra. Aline Costa': []
                 };
+                window.consultas = { pendentes: [], confirmadas: [], recusadas: [] };
             }
         }
 
         function salvarDados() {
-            localStorage.setItem('consultas_pendentes', JSON.stringify(window.consultasPendentes));
-            localStorage.setItem('consultas_confirmadas', JSON.stringify(window.consultasConfirmadas));
-            localStorage.setItem('consultas_recusadas', JSON.stringify(window.consultasRecusadas));
-            localStorage.setItem('agendaMedicos', JSON.stringify(window.agendaMedicos));
+            const dados = {
+                agendaMedicos: window.agendaMedicos,
+                consultas: window.consultas
+            };
+            localStorage.setItem('cardioweb_dados', JSON.stringify(dados));
         }
 
         // Carregar dados ao iniciar
@@ -483,12 +471,9 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
                 hora: horaConsulta.value,
                 status: 'pendente'
             };
+            window.consultas.pendentes.push(novaConsulta);
+            salvarDados(); // Salvar no localStorage
 
-            // Adicionar à lista pendentes e salvar
-            window.consultasPendentes.push(novaConsulta);
-            salvarDados();
-
-            // Atualizar lista de consultas na UI (se estiver na página)
             const grid = document.getElementById('consultasGrid');
             if (grid) {
                 const card = document.createElement('div');
