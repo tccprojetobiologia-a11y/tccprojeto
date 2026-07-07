@@ -20,7 +20,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== SEU CSS EXISTENTE (mantenha o mesmo) ===== */
+        /* ===== CSS COMPLETO (mesmo do paciente) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f6ecee; overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; width: 100%; }
@@ -110,7 +110,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
     </div>
 
     <script>
-        // ========== CARREGAR DADOS DO LOCALSTORAGE ==========
+        // ========== FUNÇÕES DE ACESSO AO LOCALSTORAGE ==========
         function carregarDados() {
             const storedConsultas = localStorage.getItem('consultas');
             const storedAgenda = localStorage.getItem('agendaMedicos');
@@ -118,12 +118,9 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             if (storedConsultas) {
                 window.consultas = JSON.parse(storedConsultas);
             } else {
-                // Dados mockados iniciais (apenas se não houver nada salvo)
+                // Dados iniciais para demonstração (apenas se nunca houver nada)
                 window.consultas = {
-                    pendentes: [
-                        { id: 1, paciente: 'Carlos Silva', medico: 'Dr. Roberto Mendes', especialidade: 'Cardiologia', data: '2026-06-22', hora: '14:30' },
-                        { id: 2, paciente: 'Maria Oliveira', medico: 'Dra. Aline Costa', especialidade: 'Arritmologia', data: '2026-06-24', hora: '09:00' }
-                    ],
+                    pendentes: [],
                     confirmadas: [],
                     recusadas: []
                 };
@@ -153,17 +150,26 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         window.aprovarConsulta = function(id) {
             const consulta = window.consultas.pendentes.find(c => c.id === id);
             if (!consulta) return;
+            
+            // Remover dos pendentes
             window.consultas.pendentes = window.consultas.pendentes.filter(c => c.id !== id);
+            // Adicionar aos confirmados
             consulta.status = 'confirmada';
             window.consultas.confirmadas.push(consulta);
-            if (!window.agendaMedicos[consulta.medico]) window.agendaMedicos[consulta.medico] = [];
+            
+            // Adicionar à agenda do médico
+            if (!window.agendaMedicos[consulta.medico]) {
+                window.agendaMedicos[consulta.medico] = [];
+            }
             window.agendaMedicos[consulta.medico].push({
                 data: consulta.data,
                 hora: consulta.hora,
                 paciente: consulta.paciente
             });
+            
             // Salvar no localStorage
             salvarDados();
+            
             // Recarregar a seção para atualizar a UI
             loadContent('confirmar-consultas');
             alert('✓ Consulta de ' + consulta.paciente + ' confirmada e adicionada à agenda!');
@@ -172,14 +178,20 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         window.recusarConsulta = function(id) {
             const consulta = window.consultas.pendentes.find(c => c.id === id);
             if (!consulta) return;
+            
             const mensagem = prompt('Digite a mensagem para o paciente (motivo da recusa ou sugestão de novo horário):', 'Horário indisponível. Sugerimos outro horário.');
             if (mensagem === null) return;
+            
+            // Remover dos pendentes
             window.consultas.pendentes = window.consultas.pendentes.filter(c => c.id !== id);
+            // Adicionar aos recusados
             consulta.status = 'recusada';
             consulta.mensagem = mensagem || 'Sem mensagem';
             window.consultas.recusadas.push(consulta);
+            
             // Salvar no localStorage
             salvarDados();
+            
             loadContent('confirmar-consultas');
             alert('✉️ Mensagem enviada ao paciente: "' + mensagem + '"');
         };
@@ -195,6 +207,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             url.searchParams.set('page', section);
             window.history.pushState({}, '', url);
             document.getElementById('pageTitle').innerText = titles[section] || section;
+            
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             document.querySelector(`.nav-item[onclick="loadContent('${section}')"]`).classList.add('active');
 
@@ -224,6 +237,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 });
         }
 
+        // Carregar página inicial
         document.addEventListener('DOMContentLoaded', () => {
             const page = '<?php echo $page; ?>';
             loadContent(page);
