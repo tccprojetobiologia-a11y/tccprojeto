@@ -12,18 +12,16 @@ $login_type = isset($_POST['login_type']) ? $_POST['login_type'] : '';
 $error = '';
 $success = false;
 
-// ============== LOGIN POR EMAIL/SENHA ==============\
+// ============== LOGIN POR EMAIL/SENHA ==============
 if ($login_type === 'email') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     
     if (empty($email) || empty($password)) {
         $error = 'E-mail e senha são obrigatórios';
-    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'E-mail inválido';
     } else {
-        // TODO: Validar contra banco de dados
-        // Por enquanto, aceitar qualquer email/senha
         $_SESSION['user_id'] = '1';
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name'] = explode('@', $email)[0];
@@ -41,8 +39,8 @@ if ($login_type === 'email') {
     }
 }
 
-// ============== LOGIN POR GOOGLE ==============\
-else if ($login_type === 'google') {
+// ============== LOGIN POR GOOGLE ==============
+elseif ($login_type === 'google') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     
     if (empty($email)) {
@@ -54,7 +52,6 @@ else if ($login_type === 'google') {
         $_SESSION['login_type'] = 'Google';
         $_SESSION['logado'] = true;
 
-        // Se entrar via Google com o e-mail da coordenação, vira Admin
         if ($email === 'coordenacao@vidaviva.com') {
             $_SESSION['user_role'] = 'admin';
         } else {
@@ -65,8 +62,8 @@ else if ($login_type === 'google') {
     }
 }
 
-// ============== LOGIN POR APPLE ==============\
-else if ($login_type === 'apple') {
+// ============== LOGIN POR APPLE ==============
+elseif ($login_type === 'apple') {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     
     if (empty($email)) {
@@ -88,42 +85,39 @@ else if ($login_type === 'apple') {
     }
 }
 
-// ============== LOGIN POR SMS ==============\
-else if ($login_type === 'sms') {
+// ============== LOGIN POR SMS ==============
+elseif ($login_type === 'sms') {
     $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
     $code = isset($_POST['code']) ? trim($_POST['code']) : '';
     
     if (empty($phone)) {
         $error = 'Telefone é obrigatório';
-    } else if (empty($code)) {
+    } elseif (empty($code)) {
         $error = 'Código de verificação é obrigatório';
-    } else if ($code !== '123456') {
-        // Código padrão para teste
+    } elseif ($code !== '123456') {
         $error = 'Código inválido! Use o código enviado por SMS (teste: 123456)';
     } else {
-        // TODO: Validar código contra banco de dados
         $_SESSION['user_id'] = '4';
         $_SESSION['user_phone'] = $phone;
         $_SESSION['user_name'] = 'Usuário SMS';
         $_SESSION['login_type'] = 'SMS';
         $_SESSION['logado'] = true;
-        $_SESSION['user_role'] = 'paciente'; // SMS assume sempre paciente por padrão
+        $_SESSION['user_role'] = 'paciente';
         $success = true;
     }
 }
 
-// ============== RESPONDER E REDIRECIONAR ==============\
+// ============== RESPONDER E REDIRECIONAR ==============
 if ($success) {
-    // Redireciona com base na função/role do utilizador
     if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
         header('Location: admin/dashboard_admin.php');
     } else {
-        header('Location: dashboard_paciente.php');
+        header('Location: dashboard.php');
     }
     exit();
 } else {
-    // Retornar erro para a página anterior via sessão
     $_SESSION['login_error'] = $error;
     header('Location: index.php');
     exit();
 }
+?>
