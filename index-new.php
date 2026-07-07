@@ -1,10 +1,11 @@
 <?php
 session_start();
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
+    header('Location: dashboard_paciente.php');
     exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">

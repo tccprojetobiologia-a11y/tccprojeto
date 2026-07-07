@@ -112,7 +112,7 @@ if ($success) {
     if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
         header('Location: admin/dashboard_admin.php');
     } else {
-        header('Location: dashboard.php');
+        header('Location: dashboard_paciente.php');
     }
     exit();
 } else {
