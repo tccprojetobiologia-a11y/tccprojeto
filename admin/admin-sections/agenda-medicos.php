@@ -71,7 +71,4 @@
         renderCalendario('Dra. Aline Costa', 'calendario-aline');
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        window.renderAgenda();
-    });
 </script>

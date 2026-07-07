@@ -135,12 +135,10 @@
         btn.style.borderBottom = '3px solid #851e32';
     };
 
-    // Inicializar a renderização ao carregar
-    document.addEventListener('DOMContentLoaded', function() {
-        // Garantir que apenas pendentes esteja visível
+    // Inicializar apenas quando a seção for carregada e a função for chamada explicitamente pelo dashboard
+    window.initializeConsultasSection = function() {
         document.getElementById('lista-pendentes').style.display = 'block';
         document.getElementById('lista-confirmadas').style.display = 'none';
         document.getElementById('lista-recusadas').style.display = 'none';
-        window.renderConsultas();
-    });
+    };
 </script>

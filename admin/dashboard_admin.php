@@ -218,9 +218,26 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                     return response.text();
                 })
                 .then(html => {
-                    contentArea.innerHTML = html;
-                    // Disparar a renderização após o carregamento
+                    const template = document.createElement('template');
+                    template.innerHTML = html;
+                    contentArea.innerHTML = '';
+                    while (template.content.firstChild) {
+                        contentArea.appendChild(template.content.firstChild);
+                    }
+
+                    // Executar scripts incluídos no HTML carregado
+                    contentArea.querySelectorAll('script').forEach(oldScript => {
+                        const script = document.createElement('script');
+                        if (oldScript.src) {
+                            script.src = oldScript.src;
+                        } else {
+                            script.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(script).parentNode.removeChild(script);
+                    });
+
                     if (section === 'confirmar-consultas') {
+                        if (typeof window.initializeConsultasSection === 'function') window.initializeConsultasSection();
                         if (typeof window.renderConsultas === 'function') window.renderConsultas();
                     } else if (section === 'agenda-medicos') {
                         if (typeof window.renderAgenda === 'function') window.renderAgenda();
