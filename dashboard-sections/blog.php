@@ -187,3 +187,17 @@ function getBlogSectionHtml() {
                 </div>
 HTML;
 }
+
+// Se requisitado diretamente com ?article=chave, retornar o HTML do artigo
+if (php_sapi_name() !== 'cli' && isset($_GET['article'])) {
+    $key = $_GET['article'];
+    $articles = getBlogArticles();
+    if (!isset($articles[$key])) {
+        http_response_code(404);
+        echo '<div class="info-card"><h3>Artigo não encontrado</h3><p>Desculpe, este artigo não existe.</p></div>';
+        exit;
+    }
+    $a = $articles[$key];
+    echo '<div class="info-card"><h3>' . htmlspecialchars($a["title"]) . '</h3><div style="color:#64748b;margin-bottom:12px">' . htmlspecialchars($a["date"]) . '</div><div class="article-content">' . $a["content"] . '</div></div>';
+    exit;
+}
