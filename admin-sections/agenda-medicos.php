@@ -20,12 +20,19 @@
 
 <script>
     window.renderAgenda = function() {
-        const agenda = window.agendaMedicos || {};
+        if (!window.agendaMedicos) {
+            console.warn('Dados de agenda não disponíveis.');
+            return;
+        }
+        
+        const agenda = window.agendaMedicos;
 
         function renderCalendario(medicoNome, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            const mes = 5; // Junho
+            
+            // Mês atual (junho 2026 para exemplo)
+            const mes = 5; // Junho (0-indexado)
             const ano = 2026;
             const primeiroDia = new Date(ano, mes, 1).getDay();
             const diasNoMes = new Date(ano, mes + 1, 0).getDate();
