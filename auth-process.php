@@ -116,7 +116,7 @@ else if ($login_type === 'sms') {
 if ($success) {
     // Redireciona com base na função/role do utilizador
     if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-        header('Location: admin/dashboard.php');
+        header('Location: admin/dashboard_admin.php');
     } else {
         header('Location: dashboard.php');
     }
