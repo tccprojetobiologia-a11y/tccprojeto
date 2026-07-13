@@ -1,9 +1,0 @@
-<?php
-function getExamesHtml() {
-    return <<<HTML
-                <div class="info-card"><h3><i class="fas fa-flask"></i> Meus Exames</h3><p>Acompanhe os resultados dos seus exames laboratoriais e de imagem.</p></div>
-                <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-tint"></i></div><h3>Hemograma Completo</h3><p>Realizado em 10/05/2024</p><a href="#" onclick="alert('Abrindo resultado do hemograma...')" style="color:#8b2a3e; text-decoration:none;">📄 Visualizar resultado</a></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-heartbeat"></i></div><h3>Eletrocardiograma</h3><p>Realizado em 02/05/2024</p><a href="#" onclick="alert('Abrindo ECG...')" style="color:#8b2a3e; text-decoration:none;">📄 Visualizar resultado</a></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><h3>Colesterol e Triglicerídeos</h3><p>Realizado em 28/04/2024</p><a href="#" onclick="alert('Abrindo resultado lipídico...')" style="color:#8b2a3e; text-decoration:none;">📄 Visualizar resultado</a></div></div>
-                <div class="info-card"><h3><i class="fas fa-plus-circle"></i> Solicitar Novo Exame</h3><p>Peça ao seu médico a solicitação de exames complementares.</p><button class="contact-btn" style="margin-top:10px;" onclick="alert('Solicitação enviada ao médico responsável.')"><i class="fas fa-paper-plane"></i> Solicitar Exame</button></div>
-                <div class="info-card"><h3><i class="fas fa-clock"></i> Exames Pendentes</h3><ul style="list-style:none; padding-left:0;"><li style="padding:10px 0; border-bottom:1px solid #f0e0d8;">🩸 Glicemia de jejum - Coleta prevista: 20/06/2024</li><li style="padding:10px 0;">🩻 Raio-X de tórax - Aguardando autorização</li></ul></div>
-HTML;
-}
