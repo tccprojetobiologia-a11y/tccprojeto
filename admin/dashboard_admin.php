@@ -5,7 +5,6 @@ if (!isset($_SESSION['logado']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
     exit();
 }
 
-$page = $_GET['page'] ?? 'confirmar-consultas';
 $user_name = $_SESSION['user_name'] ?? 'Admin';
 $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
 ?>
@@ -34,6 +33,8 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         .main-header { background: white; padding: 20px 30px; border-bottom: 1px solid #ddd; }
         .page-title { font-size: 24px; font-weight: bold; }
         .content-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .loading { text-align: center; padding: 50px; color: #999; }
+        .loading i { font-size: 30px; color: #851e32; }
     </style>
 </head>
 <body>
@@ -45,13 +46,13 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                     <div><h2>CardioWeb</h2><small>Administração</small></div>
                 </div>
             </div>
-            <button class="nav-item active" onclick="loadContent('confirmar-consultas')">
+            <button class="nav-item active" onclick="carregar('confirmar-consultas')">
                 <i class="fas fa-check-circle"></i> Confirmar Consultas
             </button>
-            <button class="nav-item" onclick="loadContent('agenda-medicos')">
+            <button class="nav-item" onclick="carregar('agenda-medicos')">
                 <i class="fas fa-calendar-alt"></i> Agenda dos Médicos
             </button>
-            <button class="nav-item" onclick="loadContent('pacientes')">
+            <button class="nav-item" onclick="carregar('pacientes')">
                 <i class="fas fa-users"></i> Pacientes
             </button>
             <div class="user-section">
@@ -66,10 +67,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 <h1 class="page-title" id="pageTitle">Confirmar Consultas</h1>
             </div>
             <div class="content-area" id="contentArea">
-                <div style="text-align:center;padding:50px;color:#999;">
-                    <i class="fas fa-spinner fa-spin" style="font-size:30px;color:#851e32;"></i>
-                    <p>Carregando...</p>
-                </div>
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Carregando...</p></div>
             </div>
         </div>
     </div>
@@ -78,23 +76,24 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         // ============================================================
         // FUNÇÃO PARA CARREGAR CONTEÚDO
         // ============================================================
-        function loadContent(section) {
-            var titles = {
+        function carregar(section) {
+            var titulos = {
                 'confirmar-consultas': 'Confirmar Consultas',
                 'agenda-medicos': 'Agenda dos Médicos',
                 'pacientes': 'Pacientes'
             };
-            document.getElementById('pageTitle').innerText = titles[section] || section;
+            document.getElementById('pageTitle').innerText = titulos[section] || section;
             
             document.querySelectorAll('.nav-item').forEach(function(el) {
                 el.classList.remove('active');
             });
-            document.querySelector('.nav-item[onclick="loadContent(\'' + section + '\')"]').classList.add('active');
+            document.querySelector('.nav-item[onclick="carregar(\'' + section + '\')"]').classList.add('active');
             
             var contentArea = document.getElementById('contentArea');
-            contentArea.innerHTML = '<div style="text-align:center;padding:50px;color:#999;"><i class="fas fa-spinner fa-spin" style="font-size:30px;color:#851e32;"></i><p>Carregando...</p></div>';
+            contentArea.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Carregando...</p></div>';
             
-            fetch('admin-sections/' + section + '.php')
+            // Forçar limpar cache
+            fetch('admin-sections/' + section + '.php?t=' + Date.now())
                 .then(function(response) {
                     if (!response.ok) throw new Error('Erro ' + response.status);
                     return response.text();
@@ -103,26 +102,31 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                     contentArea.innerHTML = html;
                     
                     // ================================================
-                    // 🔥 CHAMAR A FUNÇÃO VÁRIAS VEZES ATÉ FUNCIONAR
+                    // EXECUTAR O SCRIPT APÓS CARREGAR
                     // ================================================
+                    var scripts = contentArea.querySelectorAll('script');
+                    scripts.forEach(function(script) {
+                        var newScript = document.createElement('script');
+                        if (script.src) {
+                            newScript.src = script.src;
+                        } else {
+                            newScript.textContent = script.textContent;
+                        }
+                        document.body.appendChild(newScript);
+                    });
+                    
+                    // Se a seção for consultas, chamar a função
                     if (section === 'confirmar-consultas') {
-                        // Tentar a cada 200ms por até 3 segundos
-                        var tentativas = 0;
-                        var maxTentativas = 15;
-                        var intervalo = setInterval(function() {
-                            tentativas++;
-                            console.log('⏳ Tentativa ' + tentativas + ' de ' + maxTentativas);
-                            
-                            if (typeof window.renderConsultas === 'function') {
-                                console.log('✅ renderConsultas encontrada!');
-                                window.renderConsultas();
-                                clearInterval(intervalo);
-                            } else if (tentativas >= maxTentativas) {
-                                console.error('❌ renderConsultas NÃO foi carregada');
-                                contentArea.innerHTML += '<p style="color:red;text-align:center;padding:20px;">❌ Erro ao carregar. Recarregue a página.</p>';
-                                clearInterval(intervalo);
-                            }
-                        }, 200);
+                        if (typeof window.renderConsultas === 'function') {
+                            window.renderConsultas();
+                        } else {
+                            // Tentar novamente após 500ms
+                            setTimeout(function() {
+                                if (typeof window.renderConsultas === 'function') {
+                                    window.renderConsultas();
+                                }
+                            }, 500);
+                        }
                     } else if (section === 'agenda-medicos') {
                         if (typeof window.renderAgenda === 'function') {
                             window.renderAgenda();
@@ -142,8 +146,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         // INICIAR
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            var page = '<?php echo $page; ?>';
-            loadContent(page);
+            carregar('confirmar-consultas');
         });
     </script>
 </body>

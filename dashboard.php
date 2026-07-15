@@ -7,6 +7,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     exit();
 }
 
+$user_id = $_SESSION['user_id'] ?? '';
 $user_name = $_SESSION['user_name'] ?? 'Usuário';
 $user_email = $_SESSION['user_email'] ?? $_SESSION['user_telefone'] ?? 'usuario@email.com';
 $login_type = $_SESSION['login_type'] ?? 'Padrão';
@@ -178,7 +179,7 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             </div>
         </div>
 
-        <!-- MODAL NOVA CONSULTA (com horários disponíveis) -->
+        <!-- MODAL NOVA CONSULTA -->
         <div id="consultaModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -246,40 +247,12 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
     </div>
 
     <script>
-        // ========== INICIALIZAÇÃO DE DADOS (carregar do localStorage) ==========
-        function carregarDados() {
-            const storedConsultas = localStorage.getItem('consultas');
-            const storedAgenda = localStorage.getItem('agendaMedicos');
-            
-            if (storedConsultas) {
-                window.consultas = JSON.parse(storedConsultas);
-            } else {
-                window.consultas = { pendentes: [], confirmadas: [], recusadas: [] };
-            }
-            
-            if (storedAgenda) {
-                window.agendaMedicos = JSON.parse(storedAgenda);
-            } else {
-                window.agendaMedicos = {
-                    'Dr. Roberto Mendes': [],
-                    'Dra. Aline Costa': []
-                };
-            }
-        }
-        
-        // Salvar dados no localStorage
-        function salvarDados() {
-            localStorage.setItem('consultas', JSON.stringify(window.consultas));
-            localStorage.setItem('agendaMedicos', JSON.stringify(window.agendaMedicos));
-        }
-
-        // Carregar dados ao iniciar
-        carregarDados();
-
         // ========== DADOS DOS ARTIGOS ==========
         const articlesData = <?php echo json_encode(getBlogArticles()); ?>;
 
-        // ========== FUNÇÕES DE NAVEGAÇÃO ==========
+        // ============================================================
+        // FUNÇÕES DE NAVEGAÇÃO
+        // ============================================================
         function changePage(page) {
             const url = new URL(window.location.href);
             url.searchParams.set('page', page);
@@ -367,7 +340,9 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             }
         }
 
-        // ========== CHAT ==========
+        // ============================================================
+        // CHAT
+        // ============================================================
         function sendMessage() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
@@ -397,7 +372,9 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             return 'Entendi! Para mais informações, leia nossos artigos no blog ou acesse o suporte. 💙';
         }
 
-        // ========== MODAL DE AGENDAMENTO COM HORÁRIOS DISPONÍVEIS ==========
+        // ============================================================
+        // MODAL DE AGENDAMENTO
+        // ============================================================
         function openConsultaModal() {
             const modal = document.getElementById('consultaModal');
             modal.style.display = 'flex';
@@ -423,21 +400,35 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             if (!medicoSelect.value || !data) return;
 
             const medicoNome = medicoSelect.value.split('|')[0];
-            const agenda = window.agendaMedicos[medicoNome] || [];
-            const ocupados = agenda.filter(c => c.data === data).map(c => c.hora);
-            const todosHorarios = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
-            const disponiveis = todosHorarios.filter(h => !ocupados.includes(h));
+            
+            // Buscar horários ocupados do banco
+            fetch(`api/horarios_ocupados.php?medico=${encodeURIComponent(medicoNome)}&data=${data}`)
+                .then(response => response.json())
+                .then(ocupados => {
+                    const todosHorarios = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+                    const disponiveis = todosHorarios.filter(h => !ocupados.includes(h));
 
-            if (disponiveis.length === 0) {
-                horaSelect.innerHTML = '<option value="">Nenhum horário disponível nesta data</option>';
-                return;
-            }
-            disponiveis.forEach(h => {
-                const opt = document.createElement('option');
-                opt.value = h;
-                opt.textContent = h;
-                horaSelect.appendChild(opt);
-            });
+                    if (disponiveis.length === 0) {
+                        horaSelect.innerHTML = '<option value="">Nenhum horário disponível nesta data</option>';
+                        return;
+                    }
+                    disponiveis.forEach(h => {
+                        const opt = document.createElement('option');
+                        opt.value = h;
+                        opt.textContent = h;
+                        horaSelect.appendChild(opt);
+                    });
+                })
+                .catch(() => {
+                    // Fallback: todos horários disponíveis
+                    const todosHorarios = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+                    todosHorarios.forEach(h => {
+                        const opt = document.createElement('option');
+                        opt.value = h;
+                        opt.textContent = h;
+                        horaSelect.appendChild(opt);
+                    });
+                });
         }
 
         document.addEventListener('click', function(event) {
@@ -445,8 +436,12 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             if (modal && event.target === modal) closeConsultaModal();
         });
 
+        // ============================================================
+        // AGENDAR CONSULTA - ENVIA PARA O BANCO DE DADOS
+        // ============================================================
         function agendarConsulta(event) {
             event.preventDefault();
+            
             const medicSelect = document.getElementById('medicSelect');
             const dataConsulta = document.getElementById('dataConsulta');
             const horaConsulta = document.getElementById('horaConsulta');
@@ -459,48 +454,44 @@ require_once __DIR__ . '/dashboard-sections/exames.php';
             }
 
             const [nomeMedico, especialidade] = medicSelect.value.split('|');
-            const data = new Date(dataConsulta.value);
-            const dataFormatada = data.toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const idPaciente = '<?php echo $user_id; ?>';
+            const nomePaciente = '<?php echo htmlspecialchars($user_name); ?>';
 
-            const novaConsulta = {
-                id: Date.now(),
-                paciente: '<?php echo htmlspecialchars($user_name); ?>',
-                medico: nomeMedico,
-                especialidade: especialidade,
-                data: dataConsulta.value,
-                hora: horaConsulta.value,
-                status: 'pendente'
-            };
-            
-            // Adicionar à lista pendente
-            window.consultas.pendentes.push(novaConsulta);
-            
-            // Salvar no localStorage
-            salvarDados();
-
-            const grid = document.getElementById('consultasGrid');
-            if (grid) {
-                const card = document.createElement('div');
-                card.className = 'stat-card';
-                card.innerHTML = `
-                    <div class="stat-icon"><i class="fas fa-user-md"></i></div>
-                    <h3>${nomeMedico}</h3>
-                    <p>${especialidade}</p>
-                    <div style="margin-top:10px; font-size:14px;">
-                        <i class="fas fa-calendar-alt"></i> ${dataFormatada}<br>
-                        <i class="fas fa-clock"></i> ${horaConsulta.value}<br>
-                        <i class="fas fa-stethoscope"></i> ${tipoConsulta.value}<br>
-                        <span style="color:#ff9800;">🕓 Pendente</span>
-                    </div>
-                `;
-                grid.insertBefore(card, grid.firstChild);
-            }
-
-            closeConsultaModal();
-            alert(`✓ Consulta solicitada com sucesso!\nAguardando confirmação do médico.\n\nMédico: ${nomeMedico}\nEspecialidade: ${especialidade}\nData: ${dataFormatada}\nHorário: ${horaConsulta.value}\nTipo: ${tipoConsulta.value}`);
+            // Enviar para o banco de dados via API
+            fetch('api/solicitar_consulta.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_paciente: idPaciente,
+                    nome_paciente: nomePaciente,
+                    medico: nomeMedico,
+                    especialidade: especialidade,
+                    data: dataConsulta.value,
+                    hora: horaConsulta.value,
+                    tipo: tipoConsulta.value,
+                    observacoes: obsConsulta.value || ''
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.success) {
+                    alert('✓ Consulta solicitada com sucesso!\nAguardando confirmação do médico.');
+                    closeConsultaModal();
+                    // Recarregar a página para atualizar a lista de consultas
+                    location.reload();
+                } else {
+                    alert('❌ Erro: ' + result.error);
+                }
+            })
+            .catch(function(error) {
+                alert('Erro ao solicitar consulta: ' + error.message);
+                console.error('Erro:', error);
+            });
         }
 
-        // ========== CARREGAR CONTEÚDO INICIAL ==========
+        // ============================================================
+        // CARREGAR CONTEÚDO INICIAL
+        // ============================================================
         loadContent('<?php echo $page; ?>');
     </script>
 </body>
