@@ -153,7 +153,7 @@ if ($success && $userData) {
         header('Location: admin/dashboard.php');
     } else {
         $_SESSION['user_role'] = 'paciente';
-        header('Location: dashboard.php');
+        header('Location: dashboard_paciente.php');
     }
     exit();
 } else {
