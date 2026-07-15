@@ -14,13 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_email'] = $email;
             $_SESSION['login_type'] = 'Google';
             $_SESSION['logado'] = true;
-            $_SESSION['user_role'] = ($email === 'coordenacao@vidaviva.com') ? 'admin' : 'paciente';
             
-            if ($_SESSION['user_role'] === 'admin') {
-                header('Location: admin/dashboard_admin.php');
-            } else {
-                header('Location: dashboard_paciente.php');
-            }
+            header('Location: dashboard.php');
             exit();
         } else {
             header('Location: index.php?error=Falha no login com Google');
@@ -38,13 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_email'] = $email;
             $_SESSION['login_type'] = 'Apple';
             $_SESSION['logado'] = true;
-            $_SESSION['user_role'] = ($email === 'coordenacao@vidaviva.com') ? 'admin' : 'paciente';
             
-            if ($_SESSION['user_role'] === 'admin') {
-                header('Location: admin/dashboard_admin.php');
-            } else {
-                header('Location: dashboard_paciente.php');
-            }
+            header('Location: dashboard.php');
             exit();
         } else {
             header('Location: index.php?error=Falha no login com Apple');
@@ -63,9 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_telefone'] = $phone;
             $_SESSION['login_type'] = 'SMS';
             $_SESSION['logado'] = true;
-            $_SESSION['user_role'] = 'paciente';
             
-            header('Location: dashboard_paciente.php');
+            header('Location: dashboard.php');
             exit();
         } else {
             header('Location: index.php?error=Código SMS inválido. Use: 123456');
