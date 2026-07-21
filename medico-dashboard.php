@@ -76,6 +76,8 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         .tab-button i { width:18px; text-align:center; }
         .tab-view { display:none; }
         .tab-view.active { display:block; }
+        .sidebar-tab-content { margin-top:12px; }
+        .search-input { width:100%; padding:12px 14px; border-radius:12px; border:1px solid #d1d5db; margin-top:10px; font-size:14px; color:#0f172a; }
         .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
         .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
         .calendar-cell { padding:12px; border:1px solid #e5e7eb; border-radius:12px; min-height:90px; background:white; cursor:pointer; position:relative; display:flex; flex-direction:column; justify-content:space-between; }
@@ -99,9 +101,44 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         <h2 style="margin-top:0;">CardioWeb</h2>
         <p style="opacity:0.9;">Portal do Médico</p>
         <div style="margin-top:30px; background:rgba(255,255,255,0.12); padding:16px; border-radius:12px;">
-            <div style="font-weight:700; font-size:18px;"><?php echo htmlspecialchars($doctor['name'] ?? 'Médico'); ?></div>
-            <div style="font-size:13px; opacity:0.85; margin-top:4px;"><?php echo htmlspecialchars($doctor['specialty'] ?? 'Especialidade'); ?></div>
+            <div style="font-weight:700; font-size:18px;">Dr. <?php echo htmlspecialchars($doctor['name'] ?? 'Médico'); ?></div>
+            <div style="font-size:13px; opacity:0.85; margin-top:4px;">Especialidade: <?php echo htmlspecialchars($doctor['specialty'] ?? 'Especialidade'); ?></div>
             <div style="font-size:13px; opacity:0.85; margin-top:6px;"><?php echo htmlspecialchars($doctor['email'] ?? ''); ?></div>
+        </div>
+        <div class="tab-menu" style="margin-top:24px;">
+            <button class="tab-button active" data-tab="agenda"><i class="fas fa-calendar-alt"></i>Agenda</button>
+            <button class="tab-button" data-tab="pacientes"><i class="fas fa-users"></i>Pacientes</button>
+        </div>
+        <div class="sidebar-tab-content">
+            <div id="agendaTab" class="tab-view active">
+                <div class="card" style="margin-top:10px; padding:16px;">
+                    <div style="font-weight:700; margin-bottom:12px;">Agenda</div>
+                    <div id="monthLabel" style="color:#64748b; margin-bottom:10px;"></div>
+                    <div class="calendar" id="calendarContainer"></div>
+                </div>
+                <div class="card" style="margin-top:10px; padding:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                        <div>
+                            <h3 id="dayScheduleTitle" style="margin-top:0;">Agenda do dia</h3>
+                            <div id="dayScheduleSubtitle" class="muted">Clique em um dia do calendário para ver os atendimentos.</div>
+                        </div>
+                        <div id="dayScheduleCount" style="font-weight:700; color:#1e2a3a;"></div>
+                    </div>
+                    <div id="dayScheduleList" style="margin-top:16px;"></div>
+                </div>
+            </div>
+            <div id="pacientesTab" class="tab-view hidden">
+                <div class="card" style="margin-top:10px; padding:16px;">
+                    <div style="font-weight:700; margin-bottom:12px;">Pacientes</div>
+                    <input id="patientSearch" class="search-input" type="text" placeholder="Pesquisar paciente...">
+                    <div id="patientList" style="display:grid; gap:12px; margin-top:12px;"></div>
+                </div>
+                <div class="card" style="margin-top:10px; padding:16px;">
+                    <div style="font-weight:700; margin-bottom:12px;">Histórico médico</div>
+                    <div id="patientHistory"></div>
+                    <div id="patientDetailCard" style="margin-top:16px;"></div>
+                </div>
+            </div>
         </div>
         <a href="logout.php" style="display:inline-block; margin-top:20px; padding:10px 14px; background:rgba(255,255,255,0.2); color:white; text-decoration:none; border-radius:10px;">Sair</a>
     </aside>
@@ -109,63 +146,9 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         <h1 style="margin-top:0;">Painel do médico</h1>
         <p class="muted">Acompanhe a agenda, os pacientes e atualize o status das consultas.</p>
         <?php echo $message; ?>
-
-        <div class="grid grid-3">
-            <div class="card">
-                <div style="font-size:14px; color:#64748b;">Consultas pendentes</div>
-                <div style="font-size:28px; font-weight:700; color:#851e32; margin-top:6px;"><?php echo $pendingCount; ?></div>
-            </div>
-            <div class="card">
-                <div style="font-size:14px; color:#64748b;">Consultas realizadas</div>
-                <div style="font-size:28px; font-weight:700; color:#166534; margin-top:6px;"><?php echo $doneCount; ?></div>
-            </div>
-            <div class="card">
-                <div style="font-size:14px; color:#64748b;">Consultas canceladas</div>
-                <div style="font-size:28px; font-weight:700; color:#b91c1c; margin-top:6px;"><?php echo $cancelledCount; ?></div>
-            </div>
-        </div>
-
-        <div class="card" style="display:flex; gap:20px; flex-wrap:wrap;">
-            <div class="tab-menu" style="flex:1; min-width:220px;">
-                <button class="tab-button active" data-tab="agenda"><i class="fas fa-calendar-alt"></i>Agenda</button>
-                <button class="tab-button" data-tab="pacientes"><i class="fas fa-users"></i>Pacientes</button>
-            </div>
-            <div style="flex:3; min-width:300px;">
-                <div id="agendaTab" class="tab-view active">
-                    <div class="card">
-                        <div class="calendar-header">
-                            <div>
-                                <div style="font-size:18px; font-weight:700; color:#1e2a3a;">Calendário</div>
-                                <div id="monthLabel" style="color:#64748b; margin-top:4px;"></div>
-                            </div>
-                        </div>
-                        <div class="calendar" id="calendarContainer"></div>
-                    </div>
-
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-                            <div>
-                                <h3 id="dayScheduleTitle" style="margin-top:0;">Agenda do dia</h3>
-                                <div id="dayScheduleSubtitle" class="muted">Clique em um dia do calendário para ver os atendimentos.</div>
-                            </div>
-                            <div id="dayScheduleCount" style="font-weight:700; color:#1e2a3a;"></div>
-                        </div>
-                        <div id="dayScheduleList" style="margin-top:16px;"></div>
-                    </div>
-                </div>
-
-                <div id="patientsTab" class="tab-view hidden">
-                    <div class="card">
-                        <h3 style="margin-top:0;">Pacientes</h3>
-                        <div id="patientList" style="display:grid; gap:12px;"></div>
-                    </div>
-                    <div class="card">
-                        <h3 style="margin-top:0;">Histórico médico</h3>
-                        <div id="patientHistory" style="margin-top:16px;"></div>
-                        <div id="patientDetailCard" style="margin-top:16px;"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="card">
+            <div style="font-size:18px; font-weight:700; color:#1e2a3a; margin-bottom:10px;">Use o painel à esquerda</div>
+            <p class="muted">Selecione a aba Agenda para ver o calendário ou Pacientes para pesquisar e revisar históricos.</p>
         </div>
     </main>
 </div>
@@ -184,6 +167,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', () => switchTab(button.dataset.tab));
         });
+        document.getElementById('patientSearch')?.addEventListener('input', () => renderPatients());
         renderCalendar();
         renderPatients();
         selectDate(selectedDate);
@@ -315,6 +299,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
     function renderPatients() {
         const patientList = document.getElementById('patientList');
         patientList.innerHTML = '';
+        const searchTerm = document.getElementById('patientSearch')?.value.trim().toLowerCase() || '';
         const uniquePatients = {};
         appointments.forEach(appointment => {
             const name = appointment.patient_name;
@@ -324,8 +309,16 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             }
             uniquePatients[key].appointments.push(appointment);
         });
-
-        Object.values(uniquePatients).sort((a, b) => a.name.localeCompare(b.name)).forEach(patient => {
+        const filteredPatients = Object.values(uniquePatients).filter(patient => {
+            return patient.name.toLowerCase().includes(searchTerm) || patient.cpf.toLowerCase().includes(searchTerm);
+        });
+        if (filteredPatients.length === 0) {
+            patientList.innerHTML = '<p class="muted">Nenhum paciente encontrado.</p>';
+            selectedPatient = null;
+            renderPatientHistory();
+            return;
+        }
+        filteredPatients.sort((a, b) => a.name.localeCompare(b.name)).forEach(patient => {
             const item = document.createElement('div');
             item.className = 'patient-list-item';
             item.dataset.patientName = patient.name;
@@ -341,9 +334,9 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             item.addEventListener('click', () => selectPatient(patient.name));
             patientList.appendChild(item);
         });
-
-        if (Object.keys(uniquePatients).length > 0 && !selectedPatient) {
-            selectedPatient = Object.values(uniquePatients)[0].name;
+        const selectedStillVisible = filteredPatients.some(patient => patient.name === selectedPatient);
+        if (!selectedStillVisible) {
+            selectedPatient = filteredPatients[0].name;
         }
         renderPatientHistory();
     }
