@@ -20,7 +20,7 @@ function getConnection() {
         );
         return $pdo;
     } catch (PDOException $e) {
-        die("Erro de conexão com o banco de dados: " . $e->getMessage());
+        throw new PDOException("Erro de conexão com o banco de dados: " . $e->getMessage());
     }
 }
 ?>

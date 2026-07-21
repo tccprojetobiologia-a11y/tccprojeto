@@ -10,6 +10,7 @@ session_start();
 
 // ========== INCLUIR CONFIGURAÇÃO DO BANCO ==========
 require_once 'config/database.php';
+require_once 'config/auth_storage.php';
 
 // Detectar tipo de login
 $login_type = isset($_POST['login_type']) ? $_POST['login_type'] : '';
@@ -18,7 +19,12 @@ $success = false;
 $userData = null;
 
 try {
-    $pdo = getConnection();
+    $pdo = null;
+    try {
+        $pdo = getConnection();
+    } catch (Exception $e) {
+        $pdo = null;
+    }
 
     // ============== LOGIN POR EMAIL/SENHA ==============
     if ($login_type === 'email') {
@@ -30,19 +36,27 @@ try {
         } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = 'E-mail inválido';
         } else {
-            // Buscar usuário no banco
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($user) {
-                // Verificar senha (em produção use password_verify)
-                // Por enquanto, comparação simples (hash em produção)
-                if ($user['senha_hash'] === $password) {
-                    $userData = $user;
-                    $success = true;
+            $localUser = authenticate_local_user($email, $password);
+            if ($localUser) {
+                $userData = $localUser;
+                $success = true;
+            } else if ($pdo) {
+                // Buscar usuário no banco
+                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($user) {
+                    // Verificar senha (em produção use password_verify)
+                    // Por enquanto, comparação simples (hash em produção)
+                    if ($user['senha_hash'] === $password) {
+                        $userData = $user;
+                        $success = true;
+                    } else {
+                        $error = 'Senha incorreta';
+                    }
                 } else {
-                    $error = 'Senha incorreta';
+                    $error = 'Usuário não encontrado';
                 }
             } else {
                 $error = 'Usuário não encontrado';
@@ -180,24 +194,23 @@ try {
 
 // ============== PROCESSAR SUCESSO ==============
 if ($success && $userData) {
-    // Decodificar nome
-    $nomeDecodificado = base64_decode($userData['nome_criptografado']);
-    
     // Criar sessão
-    $_SESSION['user_id'] = $userData['id_usuario'];
+    $_SESSION['user_id'] = $userData['id'] ?? $userData['id_usuario'] ?? uniqid();
     $_SESSION['user_email'] = $userData['email'];
-    $_SESSION['user_name'] = $nomeDecodificado ?: 'Usuário';
+    $_SESSION['user_name'] = $userData['name'] ?? (isset($userData['nome_criptografado']) ? base64_decode($userData['nome_criptografado']) : 'Usuário');
     $_SESSION['login_type'] = $login_type;
     $_SESSION['logado'] = true;
     
     // Definir role
-    if (strtolower($userData['tipo_perfil']) === 'admin') {
+    $role = strtolower($userData['role'] ?? $userData['tipo_perfil'] ?? 'paciente');
+    if ($role === 'admin') {
         $_SESSION['user_role'] = 'admin';
-        // Redirecionar para admin
         header('Location: admin/dashboard.php');
+    } elseif ($role === 'doctor') {
+        $_SESSION['user_role'] = 'doctor';
+        header('Location: medico-dashboard.php');
     } else {
         $_SESSION['user_role'] = 'paciente';
-        // Redirecionar para dashboard do paciente
         header('Location: dashboard.php');
     }
     exit();

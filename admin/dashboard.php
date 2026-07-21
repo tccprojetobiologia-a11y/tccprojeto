@@ -54,6 +54,9 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             <button class="nav-item" onclick="loadContent('pacientes')">
                 <i class="fas fa-users"></i> Pacientes
             </button>
+            <button class="nav-item" onclick="loadContent('medicos')">
+                <i class="fas fa-user-md"></i> Médicos
+            </button>
             <div class="user-section">
                 <div class="user-avatar"><?php echo strtoupper(substr($user_name, 0, 1)); ?></div>
                 <div><?php echo htmlspecialchars($user_name); ?></div>
@@ -82,7 +85,8 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             var titles = {
                 'confirmar-consultas': 'Confirmar Consultas',
                 'agenda-medicos': 'Agenda dos Médicos',
-                'pacientes': 'Pacientes'
+                'pacientes': 'Pacientes',
+                'medicos': 'Médicos'
             };
             document.getElementById('pageTitle').innerText = titles[section] || section;
             
