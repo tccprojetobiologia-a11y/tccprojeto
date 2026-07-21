@@ -12,6 +12,7 @@ if (!$doctor) {
     header('Location: logout.php');
     exit();
 }
+$doctorName = preg_replace('/^Dr\.\s+/i', '', $doctor['name'] ?? 'Médico');
 
 $doctorId = $doctor['id'] ?? '';
 $message = '';
@@ -101,7 +102,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         <h2 style="margin-top:0;">CardioWeb</h2>
         <p style="opacity:0.9;">Portal do Médico</p>
         <div style="margin-top:30px; background:rgba(255,255,255,0.12); padding:16px; border-radius:12px;">
-            <div style="font-weight:700; font-size:18px;">Dr. <?php echo htmlspecialchars($doctor['name'] ?? 'Médico'); ?></div>
+            <div style="font-weight:700; font-size:18px;">Dr. <?php echo htmlspecialchars($doctorName); ?></div>
             <div style="font-size:13px; opacity:0.85; margin-top:4px;">Especialidade: <?php echo htmlspecialchars($doctor['specialty'] ?? 'Especialidade'); ?></div>
             <div style="font-size:13px; opacity:0.85; margin-top:6px;"><?php echo htmlspecialchars($doctor['email'] ?? ''); ?></div>
         </div>
@@ -109,7 +110,13 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             <button class="tab-button active" data-tab="agenda"><i class="fas fa-calendar-alt"></i>Agenda</button>
             <button class="tab-button" data-tab="pacientes"><i class="fas fa-users"></i>Pacientes</button>
         </div>
-        <div class="sidebar-tab-content">
+        <a href="logout.php" style="display:inline-block; margin-top:20px; padding:10px 14px; background:rgba(255,255,255,0.2); color:white; text-decoration:none; border-radius:10px;">Sair</a>
+    </aside>
+    <main class="main">
+        <h1 style="margin-top:0;">Painel do médico</h1>
+        <p class="muted">Acompanhe a agenda, os pacientes e atualize o status das consultas.</p>
+        <?php echo $message; ?>
+        <div class="main-tab-content">
             <div id="agendaTab" class="tab-view active">
                 <div class="card" style="margin-top:10px; padding:16px;">
                     <div style="font-weight:700; margin-bottom:12px;">Agenda</div>
@@ -139,16 +146,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                     <div id="patientDetailCard" style="margin-top:16px;"></div>
                 </div>
             </div>
-        </div>
-        <a href="logout.php" style="display:inline-block; margin-top:20px; padding:10px 14px; background:rgba(255,255,255,0.2); color:white; text-decoration:none; border-radius:10px;">Sair</a>
-    </aside>
-    <main class="main">
-        <h1 style="margin-top:0;">Painel do médico</h1>
-        <p class="muted">Acompanhe a agenda, os pacientes e atualize o status das consultas.</p>
-        <?php echo $message; ?>
-        <div class="card">
-            <div style="font-size:18px; font-weight:700; color:#1e2a3a; margin-bottom:10px;">Use o painel à esquerda</div>
-            <p class="muted">Selecione a aba Agenda para ver o calendário ou Pacientes para pesquisar e revisar históricos.</p>
         </div>
     </main>
 </div>
