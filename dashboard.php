@@ -17,6 +17,7 @@ $page = $_GET['page'] ?? 'inicio';
 require_once __DIR__ . '/blog.php';
 require_once __DIR__ . '/consultas.php';
 require_once __DIR__ . '/exames.php';
+require_once __DIR__ . '/informacoes.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -321,11 +322,7 @@ require_once __DIR__ . '/exames.php';
             } else if (page === 'exames') {
                 contentArea.innerHTML = <?php echo json_encode(getExamesHtml()); ?>;
             } else if (page === 'informacoes') {
-                contentArea.innerHTML = `
-                    <div class="info-card"><h3><i class="fas fa-info-circle"></i> Sobre o CardioWeb</h3><p>O CardioWeb é uma plataforma completa de monitoramento cardiológico que permite acompanhar sua saúde em tempo real, agendar consultas, acessar exames e receber orientações personalizadas.</p></div>
-                    <div class="info-card"><h3><i class="fas fa-chart-line"></i> Funcionalidades</h3><div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:15px;"><div style="padding:15px; background:#f8fafc; border-radius:12px;"><i class="fas fa-heartbeat" style="color:#851e32; font-size:24px;"></i><div style="font-weight:600; margin-top:10px;">Monitoramento</div><div style="font-size:12px; color:#666;">Acompanhe batimentos e pressão</div></div><div style="padding:15px; background:#f8fafc; border-radius:12px;"><i class="fas fa-file-alt" style="color:#851e32; font-size:24px;"></i><div style="font-weight:600; margin-top:10px;">Exames Online</div><div style="font-size:12px; color:#666;">Acesse resultados de exames</div></div><div style="padding:15px; background:#f8fafc; border-radius:12px;"><i class="fas fa-calendar-check" style="color:#851e32; font-size:24px;"></i><div style="font-weight:600; margin-top:10px;">Agendamentos</div><div style="font-size:12px; color:#666;">Marque consultas facilmente</div></div></div></div>
-                    <div class="info-card"><h3><i class="fas fa-shield-alt"></i> Segurança e Privacidade</h3><p>Seus dados são protegidos com criptografia de ponta a ponta e seguimos rigorosamente a LGPD para garantir sua privacidade.</p></div>
-                `;
+                contentArea.innerHTML = <?php echo json_encode(getInformacoesHtml()); ?>;
             } else if (page === 'suporte') {
                 contentArea.innerHTML = `
                     <div class="info-card"><h3><i class="fas fa-headset"></i> Central de Suporte</h3><p>Estamos aqui para ajudar! Escolha uma opção abaixo:</p></div>

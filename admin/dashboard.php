@@ -94,7 +94,8 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             var contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = '<div style="text-align:center;padding:50px;color:#999;"><i class="fas fa-spinner fa-spin" style="font-size:30px;color:#851e32;"></i><p>Carregando...</p></div>';
             
-            fetch('admin-sections/' + section + '.php')
+            var sectionUrl = '../' + section + '.php';
+            fetch(sectionUrl)
                 .then(function(response) {
                     if (!response.ok) throw new Error('Erro ' + response.status);
                     return response.text();
