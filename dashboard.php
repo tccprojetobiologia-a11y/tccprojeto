@@ -14,9 +14,9 @@ $login_type = $_SESSION['login_type'] ?? 'Padrão';
 
 // Conteúdo padrão (Início)
 $page = $_GET['page'] ?? 'inicio';
-require_once __DIR__ . '/dashboard-sections/blog.php';
-require_once __DIR__ . '/dashboard-sections/consultas.php';
-require_once __DIR__ . '/dashboard-sections/exames.php';
+require_once __DIR__ . '/blog.php';
+require_once __DIR__ . '/consultas.php';
+require_once __DIR__ . '/exames.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
