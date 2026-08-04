@@ -10,6 +10,54 @@ function respondJson($payload, $status = 200)
     exit;
 }
 
+function build_day_slots($date, $appointments)
+{
+    $slots = [];
+    $start = new DateTime($date . ' 08:00');
+    $end = new DateTime($date . ' 18:30');
+    $cursor = clone $start;
+
+    while ($cursor <= $end) {
+        $time = $cursor->format('H:i');
+        $match = null;
+
+        foreach ($appointments as $appointment) {
+            if (($appointment['time'] ?? '09:00') === $time) {
+                $match = $appointment;
+                break;
+            }
+        }
+
+        if ($match) {
+            $slots[] = [
+                'hora' => $time,
+                'ocupado' => true,
+                'appointment_id' => $match['id'] ?? '',
+                'paciente_nome' => $match['patient_name'] ?? 'Paciente',
+                'status' => $match['status'] ?? 'Pendente',
+                'symptoms' => $match['symptoms'] ?? '',
+                'phone' => $match['phone'] ?? '',
+                'cpf' => $match['cpf'] ?? '',
+            ];
+        } else {
+            $slots[] = [
+                'hora' => $time,
+                'ocupado' => false,
+                'appointment_id' => null,
+                'paciente_nome' => null,
+                'status' => 'Disponível',
+                'symptoms' => '',
+                'phone' => '',
+                'cpf' => '',
+            ];
+        }
+
+        $cursor->modify('+30 minutes');
+    }
+
+    return $slots;
+}
+
 $rawBody = file_get_contents('php://input');
 if (trim((string) $rawBody) !== '') {
     $decodedInput = json_decode($rawBody, true);
@@ -77,7 +125,7 @@ switch ($action) {
             return strcmp(($a['time'] ?? '00:00'), ($b['time'] ?? '00:00'));
         });
 
-        respondJson($filtered);
+        respondJson(build_day_slots($data, $filtered));
         break;
 
     case 'get_consultas':
@@ -94,8 +142,11 @@ switch ($action) {
             if ($status === 'Cancelada') {
                 $status = 'Recusada';
             }
-            if ($status === 'Realizada') {
+            if ($status === 'Realizada' || $status === 'Concluída' || $status === 'Concluida') {
                 $status = 'Confirmada';
+            }
+            if ($status === 'Não concluída' || $status === 'Nao concluida' || $status === 'Não concluida') {
+                $status = 'Recusada';
             }
 
             return [
@@ -158,6 +209,32 @@ switch ($action) {
                 $store['appointments'] = $appointments;
                 save_auth_store($store);
                 respondJson(['success' => true, 'message' => 'Consulta recusada com justificativa.']);
+            }
+        }
+
+        respondJson(['success' => false, 'message' => 'Consulta não encontrada.'], 404);
+        break;
+
+    case 'atualizar_status_consulta':
+        $id = trim((string) ($_POST['id'] ?? ''));
+        $status = trim((string) ($_POST['status'] ?? ''));
+        $motivo = trim((string) ($_POST['motivo'] ?? ''));
+
+        if ($id === '' || $status === '') {
+            respondJson(['success' => false, 'message' => 'Dados da consulta incompletos.'], 400);
+        }
+
+        foreach ($appointments as &$appointment) {
+            if (($appointment['id'] ?? '') === $id) {
+                $appointment['status'] = $status;
+                if ($status === 'Concluída' || $status === 'Concluida') {
+                    $appointment['mensagem_recusa'] = '';
+                } else {
+                    $appointment['mensagem_recusa'] = $motivo;
+                }
+                $store['appointments'] = $appointments;
+                save_auth_store($store);
+                respondJson(['success' => true, 'message' => 'Status atualizado com sucesso.']);
             }
         }
 

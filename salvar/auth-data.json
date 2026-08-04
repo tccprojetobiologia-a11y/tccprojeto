@@ -88,10 +88,10 @@
             "exam_results": "",
             "doctor_observations": "",
             "prescribed_exams": "",
-            "status": "Recusada",
+            "status": "Confirmada",
             "date": "2026-08-10",
             "time": "10:30",
-            "mensagem_recusa": "Teste de recusa do admin."
+            "mensagem_recusa": ""
         }
     ]
 }

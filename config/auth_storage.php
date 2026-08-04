@@ -168,7 +168,7 @@ if (!function_exists('authenticate_local_user')) {
 }
 
 if (!function_exists('create_doctor_profile')) {
-    function create_doctor_profile($name, $email, $password, $specialty = '', $phone = '')
+    function create_doctor_profile($name, $email, $password, $specialty = '', $phone = '', $extra = [])
     {
         $store = get_auth_store();
         $users = $store['users'] ?? [];
@@ -186,6 +186,15 @@ if (!function_exists('create_doctor_profile')) {
             'phone' => trim($phone),
             'created_at' => date('Y-m-d H:i:s')
         ];
+
+        if (is_array($extra)) {
+            foreach ($extra as $key => $value) {
+                if ($key === 'password') {
+                    continue;
+                }
+                $user[$key] = $value;
+            }
+        }
 
         $users[] = $user;
         $store['users'] = $users;

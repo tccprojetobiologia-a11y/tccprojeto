@@ -7,7 +7,7 @@ $doctors = get_doctors();
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h3 style="margin: 0; font-size: 24px; color: #1e2a3a;">Agenda dos médicos</h3>
-            <p style="margin: 6px 0 0; color: #64748b;">Selecione o médico e visualize as consultas do mês para confirmar ou cancelar agendamentos.</p>
+            <p style="margin: 6px 0 0; color: #64748b;">Selecione o médico e veja por dia quais horários estão ocupados e quais estão livres.</p>
         </div>
     </div>
 
@@ -39,14 +39,15 @@ $doctors = get_doctors();
 </div>
 
 <script>
-    const doctors = <?php echo json_encode($doctors, JSON_UNESCAPED_UNICODE); ?>;
-    const agendaState = { mes: new Date().getMonth(), ano: new Date().getFullYear() };
+    window.doctors = <?php echo json_encode($doctors, JSON_UNESCAPED_UNICODE); ?>;
+    window.agendaState = { mes: new Date().getMonth(), ano: new Date().getFullYear() };
+    window.currentAgendaContext = { medico: '', data: '' };
 
     function getSelectedDoctor() {
         const select = document.getElementById('doctorSelect');
-        if (!select) return doctors[0] || null;
-        const selectedId = select.value || doctors[0]?.id || '';
-        return doctors.find(doc => doc.id === selectedId) || doctors[0] || null;
+        if (!select) return (window.doctors || [])[0] || null;
+        const selectedId = select.value || (window.doctors[0]?.id || '');
+        return (window.doctors || []).find(doc => doc.id === selectedId) || (window.doctors || [])[0] || null;
     }
 
     async function carregarAgenda() {
@@ -58,14 +59,14 @@ $doctors = get_doctors();
             return;
         }
 
-        titulo.textContent = `${getNomeMes(agendaState.mes)} ${agendaState.ano}`;
+        titulo.textContent = `${getNomeMes(window.agendaState.mes)} ${window.agendaState.ano}`;
 
         const response = await fetch('../api/admin_api.php?action=get_agenda');
         const agenda = await response.json();
         const consultasDoMedico = agenda.filter(item => item.medico === doctor.name);
 
-        const primeiroDia = new Date(agendaState.ano, agendaState.mes, 1);
-        const ultimoDia = new Date(agendaState.ano, agendaState.mes + 1, 0);
+        const primeiroDia = new Date(window.agendaState.ano, window.agendaState.mes, 1);
+        const ultimoDia = new Date(window.agendaState.ano, window.agendaState.mes + 1, 0);
         const inicioSemana = (primeiroDia.getDay() + 6) % 7;
         const diasDoMes = ultimoDia.getDate();
 
@@ -80,7 +81,7 @@ $doctors = get_doctors();
         }
 
         for (let dia = 1; dia <= diasDoMes; dia++) {
-            const data = `${agendaState.ano}-${String(agendaState.mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            const data = `${window.agendaState.ano}-${String(window.agendaState.mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
             const consultasDoDia = consultasDoMedico.filter(item => item.data_consulta === data);
             html += `<td style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px; background:${consultasDoDia.length ? '#fff7f7' : '#fff'};">`;
             html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
@@ -118,90 +119,126 @@ $doctors = get_doctors();
     }
 
     async function abrirModal(medico, data) {
+        window.currentAgendaContext = { medico: medico, data: data };
+
         const response = await fetch(`../api/admin_api.php?action=get_agenda_detalhes&medico=${encodeURIComponent(medico)}&data=${encodeURIComponent(data)}`);
         const consultas = await response.json();
 
         if (consultas.error) {
             document.getElementById('modal-conteudo').innerHTML = `<p style="color: #c00;">${consultas.error}</p>`;
+            document.getElementById('modal-dia').style.display = 'flex';
             return;
         }
 
         document.getElementById('modal-titulo').textContent = `${medico} - ${formatarData(data)}`;
 
-        let html = '';
-        if (!consultas.length) {
-            html = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Nenhuma consulta neste dia.</p>';
+        let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+        if (!Array.isArray(consultas) || consultas.length === 0) {
+            html += '<p style="color: #94a3b8; text-align: center; padding: 20px;">Nenhum horário registrado neste dia.</p>';
         } else {
-            html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
-            consultas.sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00')).forEach((c) => {
-                html += `
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border-left: 4px solid #851e32;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-                            <div>
-                                <strong style="color: #1e2a3a; font-size: 16px;">${c.patient_name || 'Paciente'}</strong>
-                                <div style="font-size: 12px; color: #64748b;">${c.status || 'Pendente'} • ${c.time || '09:00'}</div>
-                            </div>
-                            <span style="background: #851e32; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${c.time || '09:00'}</span>
-                        </div>
-                        <div style="margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap;">
-                            <button type="button" onclick="confirmarConsulta('${c.id}')" style="padding:8px 12px; border:none; border-radius:8px; background:#16a34a; color:white; font-weight:600; cursor:pointer;">Confirmar</button>
-                            <button type="button" onclick="cancelarConsulta('${c.id}')" style="padding:8px 12px; border:none; border-radius:8px; background:#ef4444; color:white; font-weight:600; cursor:pointer;">Cancelar</button>
-                        </div>
-                    </div>
-                `;
+            consultas.forEach((slot) => {
+                const horario = slot.hora || '00:00';
+                if (slot.ocupado) {
+                    html += '<div class="slot-item" style="background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:16px;">';
+                    html += '<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">';
+                    html += '<strong style="font-size:16px; color:#1e2a3a;">' + horario + '</strong>';
+                    html += '<span style="background:#851e32; color:white; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">' + (slot.status || 'Agendado') + '</span>';
+                    html += '</div>';
+                    html += '<div style="color:#1e2a3a; font-weight:600; margin-bottom:4px;">Paciente: ' + (slot.paciente_nome || 'Paciente') + '</div>';
+                    html += '<div style="color:#64748b; font-size:13px; margin-bottom:12px;">Observação: ' + (slot.symptoms || 'Sem observações.') + '</div>';
+                    html += '<div style="display:flex; gap:10px; flex-wrap:wrap;">';
+                    html += '<button type="button" data-agenda-action="Concluída" data-appointment-id="' + (slot.appointment_id || '') + '" style="padding:10px 14px; background:#16a34a; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Consulta concluída</button>';
+                    html += '<button type="button" data-agenda-action="Não concluída" data-appointment-id="' + (slot.appointment_id || '') + '" style="padding:10px 14px; background:#ef4444; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Não concluída</button>';
+                    html += '</div>';
+                    html += '<div class="motivo-box" style="margin-top:12px; display:none;">';
+                    html += '<label style="display:block; margin-bottom:8px; font-weight:600; color:#1e2a3a;">Motivo da não conclusão</label>';
+                    html += '<textarea rows="3" style="width:100%; border:1px solid #dfe3e8; border-radius:10px; padding:12px; resize:vertical; font-family:inherit;"></textarea>';
+                    html += '</div>';
+                    html += '</div>';
+                } else {
+                    html += '<div style="padding:16px; border:1px solid #e2e8f0; background:#f8fafc; border-radius:12px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">';
+                    html += '<strong style="font-size:16px; color:#1e2a3a;">' + horario + '</strong>';
+                    html += '<span style="background:#e2e8f0; color:#475569; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">Sem paciente</span>';
+                    html += '</div>';
+                }
             });
-            html += '</div>';
         }
 
+        html += '</div>';
         document.getElementById('modal-conteudo').innerHTML = html;
         document.getElementById('modal-dia').style.display = 'flex';
     }
 
-    async function confirmarConsulta(id) {
-        const response = await fetch('../api/admin_api.php?action=aprovar_consulta', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-            body: `id=${encodeURIComponent(id)}`
-        });
-        const result = await response.json();
-        if (result.success) {
-            alert(result.message);
-            carregarAgenda();
-            fecharModal();
-        } else {
-            alert(result.message || 'Não foi possível confirmar.');
-        }
-    }
+    document.addEventListener('click', async function(event) {
+        const actionButton = event.target.closest('[data-agenda-action]');
+        if (!actionButton) return;
 
-    async function cancelarConsulta(id) {
-        const response = await fetch('../api/admin_api.php?action=recusar_consulta', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-            body: `id=${encodeURIComponent(id)}`
-        });
-        const result = await response.json();
-        if (result.success) {
-            alert(result.message);
-            carregarAgenda();
-            fecharModal();
-        } else {
-            alert(result.message || 'Não foi possível cancelar.');
+        const appointmentId = actionButton.getAttribute('data-appointment-id');
+        const action = actionButton.getAttribute('data-agenda-action');
+        if (!appointmentId) {
+            alert('Consulta não localizada para atualizar.');
+            return;
         }
-    }
+
+        let motivo = '';
+        const slotBox = actionButton.closest('.slot-item');
+        const motivoBox = slotBox ? slotBox.querySelector('.motivo-box') : null;
+        const textarea = motivoBox ? motivoBox.querySelector('textarea') : null;
+
+        if (action === 'Não concluída') {
+            if (!textarea) {
+                alert('Não foi possível localizar o motivo da não conclusão.');
+                return;
+            }
+            if (!textarea.value.trim()) {
+                motivoBox.style.display = 'block';
+                alert('Descreva o motivo da não conclusão da consulta.');
+                return;
+            }
+            motivo = textarea.value.trim();
+        }
+
+        const payload = {
+            action: 'atualizar_status_consulta',
+            id: appointmentId,
+            status: action,
+            motivo: motivo
+        };
+
+        try {
+            const response = await fetch('../api/admin_api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result && result.success) {
+                alert('Status da consulta atualizado com sucesso.');
+                if (window.currentAgendaContext && window.currentAgendaContext.medico && window.currentAgendaContext.data) {
+                    abrirModal(window.currentAgendaContext.medico, window.currentAgendaContext.data);
+                }
+            } else {
+                alert((result && result.message) || 'Não foi possível atualizar a consulta.');
+            }
+        } catch (error) {
+            alert('Erro ao atualizar a consulta: ' + error.message);
+        }
+    });
 
     function fecharModal() {
         document.getElementById('modal-dia').style.display = 'none';
     }
 
     function mudarMes(delta) {
-        agendaState.mes += delta;
-        while (agendaState.mes > 11) {
-            agendaState.mes = 0;
-            agendaState.ano++;
+        window.agendaState.mes += delta;
+        while (window.agendaState.mes > 11) {
+            window.agendaState.mes = 0;
+            window.agendaState.ano++;
         }
-        while (agendaState.mes < 0) {
-            agendaState.mes = 11;
-            agendaState.ano--;
+        while (window.agendaState.mes < 0) {
+            window.agendaState.mes = 11;
+            window.agendaState.ano--;
         }
         carregarAgenda();
     }
@@ -221,8 +258,6 @@ $doctors = get_doctors();
     });
 
     window.abrirModal = abrirModal;
-    window.confirmarConsulta = confirmarConsulta;
-    window.cancelarConsulta = cancelarConsulta;
     window.fecharModal = fecharModal;
     window.renderAgenda = carregarAgenda;
 
