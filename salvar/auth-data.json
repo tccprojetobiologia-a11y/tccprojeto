@@ -43,7 +43,7 @@
             "exam_results": "Hemograma normal; Ecocardiograma sem alterações.",
             "doctor_observations": "Paciente orientado a retornar em 30 dias.",
             "prescribed_exams": "Exame de esforço",
-            "status": "Pendente",
+            "status": "Realizada",
             "date": "2026-07-23",
             "time": "09:00"
         },
@@ -73,7 +73,7 @@
             "exam_results": "Eletrocardiograma com arritmia leve.",
             "doctor_observations": "Pacientes com arritmia leve; manter acompanhamento.",
             "prescribed_exams": "Holter 24h",
-            "status": "Pendente",
+            "status": "Confirmada",
             "date": "2026-07-24",
             "time": "14:00"
         }

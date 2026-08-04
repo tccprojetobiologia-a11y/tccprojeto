@@ -204,6 +204,20 @@ if (!function_exists('get_doctors')) {
     }
 }
 
+if (!function_exists('find_doctor_by_name')) {
+    function find_doctor_by_name($doctor_name)
+    {
+        $needle = strtolower(trim(preg_replace('/^dr\.?\s+/i', '', (string) $doctor_name)));
+        foreach (get_doctors() as $doctor) {
+            $candidate = strtolower(trim(preg_replace('/^dr\.?\s+/i', '', (string) ($doctor['name'] ?? ''))));
+            if ($candidate === $needle) {
+                return $doctor;
+            }
+        }
+        return null;
+    }
+}
+
 if (!function_exists('get_appointments_for_doctor')) {
     function get_appointments_for_doctor($doctor_id)
     {
@@ -211,6 +225,39 @@ if (!function_exists('get_appointments_for_doctor')) {
         return array_values(array_filter($appointments, function ($appointment) use ($doctor_id) {
             return ($appointment['doctor_id'] ?? '') === $doctor_id;
         }));
+    }
+}
+
+if (!function_exists('get_all_appointments')) {
+    function get_all_appointments()
+    {
+        return get_auth_store()['appointments'] ?? [];
+    }
+}
+
+if (!function_exists('create_appointment_record')) {
+    function create_appointment_record($doctor_id, $patient_name, $patient_age, $cpf, $phone, $symptoms, $exam_results, $doctor_observations, $prescribed_exams, $status, $date, $time)
+    {
+        $store = get_auth_store();
+        $appointments = $store['appointments'] ?? [];
+        $appointments[] = [
+            'id' => 'appt-' . time() . '-' . rand(1000, 9999),
+            'doctor_id' => (string) $doctor_id,
+            'patient_name' => trim((string) $patient_name),
+            'patient_age' => (int) $patient_age,
+            'cpf' => trim((string) $cpf),
+            'phone' => trim((string) $phone),
+            'symptoms' => trim((string) $symptoms),
+            'exam_results' => trim((string) $exam_results),
+            'doctor_observations' => trim((string) $doctor_observations),
+            'prescribed_exams' => trim((string) $prescribed_exams),
+            'status' => trim((string) $status),
+            'date' => trim((string) $date),
+            'time' => trim((string) $time),
+        ];
+        $store['appointments'] = $appointments;
+        save_auth_store($store);
+        return end($appointments);
     }
 }
 

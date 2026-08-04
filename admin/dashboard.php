@@ -106,28 +106,23 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 })
                 .then(function(html) {
                     contentArea.innerHTML = html;
-                    
-                    // ================================================
-                    // 🔥 CHAMAR A FUNÇÃO VÁRIAS VEZES ATÉ FUNCIONAR
-                    // ================================================
+
+                    var scripts = Array.from(contentArea.querySelectorAll('script'));
+                    scripts.forEach(function(oldScript) {
+                        var newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(function(attr) {
+                            newScript.setAttribute(attr.name, attr.value);
+                        });
+                        newScript.textContent = oldScript.textContent;
+                        oldScript.replaceWith(newScript);
+                    });
+
                     if (section === 'confirmar-consultas') {
-                        // Tentar a cada 200ms por até 3 segundos
-                        var tentativas = 0;
-                        var maxTentativas = 15;
-                        var intervalo = setInterval(function() {
-                            tentativas++;
-                            console.log('⏳ Tentativa ' + tentativas + ' de ' + maxTentativas);
-                            
-                            if (typeof window.renderConsultas === 'function') {
-                                console.log('✅ renderConsultas encontrada!');
-                                window.renderConsultas();
-                                clearInterval(intervalo);
-                            } else if (tentativas >= maxTentativas) {
-                                console.error('❌ renderConsultas NÃO foi carregada');
-                                contentArea.innerHTML += '<p style="color:red;text-align:center;padding:20px;">❌ Erro ao carregar. Recarregue a página.</p>';
-                                clearInterval(intervalo);
-                            }
-                        }, 200);
+                        if (typeof window.renderConsultas === 'function') {
+                            window.renderConsultas();
+                        } else {
+                            contentArea.innerHTML += '<p style="color:red;text-align:center;padding:20px;">❌ Erro ao carregar. Recarregue a página.</p>';
+                        }
                     } else if (section === 'agenda-medicos') {
                         if (typeof window.renderAgenda === 'function') {
                             window.renderAgenda();
