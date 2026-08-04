@@ -76,6 +76,22 @@
             "status": "Confirmada",
             "date": "2026-07-24",
             "time": "14:00"
+        },
+        {
+            "id": "appt-1785851408-6081",
+            "doctor_id": "doctor-1",
+            "patient_name": "Teste Pending",
+            "patient_age": 45,
+            "cpf": "000.111.222-33",
+            "phone": "(11) 98888-0000",
+            "symptoms": "Consulta pendente para validação.",
+            "exam_results": "",
+            "doctor_observations": "",
+            "prescribed_exams": "",
+            "status": "Recusada",
+            "date": "2026-08-10",
+            "time": "10:30",
+            "mensagem_recusa": "Teste de recusa do admin."
         }
     ]
 }

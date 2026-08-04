@@ -7,8 +7,17 @@ $doctors = get_doctors();
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h3 style="margin: 0; font-size: 24px; color: #1e2a3a;">Agenda dos médicos</h3>
-            <p style="margin: 6px 0 0; color: #64748b;">Visualize consultas do mês e confirme ou cancele cada agendamento.</p>
+            <p style="margin: 6px 0 0; color: #64748b;">Selecione o médico e visualize as consultas do mês para confirmar ou cancelar agendamentos.</p>
         </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:12px;">
+        <label for="doctorSelect" style="font-weight:600; color:#1e2a3a;">Médico:</label>
+        <select id="doctorSelect" style="padding: 10px 14px; border:1px solid #dfe3e8; border-radius:10px; min-width: 260px; background:#fff; color:#1e2a3a;">
+            <?php foreach ($doctors as $doctor): ?>
+                <option value="<?php echo htmlspecialchars($doctor['id'] ?? ''); ?>"><?php echo htmlspecialchars($doctor['name'] ?? 'Médico'); ?></option>
+            <?php endforeach; ?>
+        </select>
     </div>
 
     <div style="background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 16px;">
@@ -33,13 +42,27 @@ $doctors = get_doctors();
     const doctors = <?php echo json_encode($doctors, JSON_UNESCAPED_UNICODE); ?>;
     const agendaState = { mes: new Date().getMonth(), ano: new Date().getFullYear() };
 
+    function getSelectedDoctor() {
+        const select = document.getElementById('doctorSelect');
+        if (!select) return doctors[0] || null;
+        const selectedId = select.value || doctors[0]?.id || '';
+        return doctors.find(doc => doc.id === selectedId) || doctors[0] || null;
+    }
+
     async function carregarAgenda() {
         const container = document.getElementById('agenda-container');
         const titulo = document.getElementById('mes-atual');
+        const doctor = getSelectedDoctor();
+        if (!doctor) {
+            container.innerHTML = '<p style="color:#64748b; text-align:center; padding:16px;">Nenhum médico disponível.</p>';
+            return;
+        }
+
         titulo.textContent = `${getNomeMes(agendaState.mes)} ${agendaState.ano}`;
 
         const response = await fetch('../api/admin_api.php?action=get_agenda');
         const agenda = await response.json();
+        const consultasDoMedico = agenda.filter(item => item.medico === doctor.name);
 
         const primeiroDia = new Date(agendaState.ano, agendaState.mes, 1);
         const ultimoDia = new Date(agendaState.ano, agendaState.mes + 1, 0);
@@ -58,8 +81,8 @@ $doctors = get_doctors();
 
         for (let dia = 1; dia <= diasDoMes; dia++) {
             const data = `${agendaState.ano}-${String(agendaState.mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-            const consultasDoDia = agenda.filter(item => item.data_consulta === data);
-            html += `<td style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px;">`;
+            const consultasDoDia = consultasDoMedico.filter(item => item.data_consulta === data);
+            html += `<td style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px; background:${consultasDoDia.length ? '#fff7f7' : '#fff'};">`;
             html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
             html += `<span style="font-weight:700; color:#1e2a3a;">${dia}</span>`;
             if (consultasDoDia.length > 0) {
@@ -69,7 +92,7 @@ $doctors = get_doctors();
 
             if (consultasDoDia.length > 0) {
                 consultasDoDia.slice(0, 3).forEach((item) => {
-                    html += `<button type="button" onclick="abrirModal('${String(item.medico || 'Médico').replace(/'/g, "\\'")}', '${data}')" style="display:block; width:100%; text-align:left; background:#851e32; color:white; border:none; border-radius:8px; padding:6px 8px; margin-bottom:6px; cursor:pointer; font-size:12px;">${item.medico}</button>`;
+                    html += `<button type="button" onclick="abrirModal('${String(doctor.name || 'Médico').replace(/'/g, "\\'")}', '${data}')" style="display:block; width:100%; text-align:left; background:#851e32; color:white; border:none; border-radius:8px; padding:6px 8px; margin-bottom:6px; cursor:pointer; font-size:12px;">${item.paciente_nome || 'Paciente'}</button>`;
                 });
                 if (consultasDoDia.length > 3) {
                     html += `<div style="font-size:11px; color:#64748b; text-align:right;">+${consultasDoDia.length - 3}</div>`;
@@ -192,6 +215,10 @@ $doctors = get_doctors();
         const d = new Date(data + 'T00:00:00');
         return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
+
+    document.getElementById('doctorSelect')?.addEventListener('change', function() {
+        carregarAgenda();
+    });
 
     window.abrirModal = abrirModal;
     window.confirmarConsulta = confirmarConsulta;

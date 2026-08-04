@@ -10,6 +10,14 @@ function respondJson($payload, $status = 200)
     exit;
 }
 
+$rawBody = file_get_contents('php://input');
+if (trim((string) $rawBody) !== '') {
+    $decodedInput = json_decode($rawBody, true);
+    if (is_array($decodedInput)) {
+        $_POST = array_merge($_POST, $decodedInput);
+    }
+}
+
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $store = get_auth_store();
 $appointments = $store['appointments'] ?? [];
@@ -73,7 +81,45 @@ switch ($action) {
         break;
 
     case 'get_consultas':
-        respondJson($appointments);
+        $consultas = array_map(function ($appointment) use ($doctors) {
+            $doctor = null;
+            foreach ($doctors as $item) {
+                if (($item['id'] ?? '') === ($appointment['doctor_id'] ?? '')) {
+                    $doctor = $item;
+                    break;
+                }
+            }
+
+            $status = trim((string) ($appointment['status'] ?? 'Pendente'));
+            if ($status === 'Cancelada') {
+                $status = 'Recusada';
+            }
+            if ($status === 'Realizada') {
+                $status = 'Confirmada';
+            }
+
+            return [
+                'id' => $appointment['id'] ?? '',
+                'id_consulta' => $appointment['id'] ?? '',
+                'doctor_id' => $appointment['doctor_id'] ?? '',
+                'medico' => $doctor['name'] ?? 'Médico',
+                'nome_medico' => $doctor['name'] ?? 'Médico',
+                'especialidade' => $doctor['specialty'] ?? 'Consulta',
+                'patient_name' => $appointment['patient_name'] ?? 'Paciente',
+                'paciente_nome' => $appointment['patient_name'] ?? 'Paciente',
+                'date' => $appointment['date'] ?? '',
+                'data_consulta' => $appointment['date'] ?? '',
+                'time' => $appointment['time'] ?? '09:00',
+                'hora_consulta' => $appointment['time'] ?? '09:00',
+                'status' => $status,
+                'mensagem_recusa' => $appointment['mensagem_recusa'] ?? '',
+                'symptoms' => $appointment['symptoms'] ?? '',
+                'phone' => $appointment['phone'] ?? '',
+                'cpf' => $appointment['cpf'] ?? '',
+            ];
+        }, $appointments);
+
+        respondJson($consultas);
         break;
 
     case 'aprovar_consulta':
@@ -85,6 +131,7 @@ switch ($action) {
         foreach ($appointments as &$appointment) {
             if (($appointment['id'] ?? '') === $id) {
                 $appointment['status'] = 'Confirmada';
+                $appointment['mensagem_recusa'] = '';
                 $store['appointments'] = $appointments;
                 save_auth_store($store);
                 respondJson(['success' => true, 'message' => 'Consulta confirmada.']);
@@ -96,16 +143,21 @@ switch ($action) {
 
     case 'recusar_consulta':
         $id = trim((string) ($_POST['id'] ?? ''));
+        $mensagem = trim((string) ($_POST['mensagem'] ?? ''));
         if ($id === '') {
             respondJson(['success' => false, 'message' => 'Consulta não informada.'], 400);
+        }
+        if ($mensagem === '') {
+            respondJson(['success' => false, 'message' => 'Informe a justificativa da recusa.'], 400);
         }
 
         foreach ($appointments as &$appointment) {
             if (($appointment['id'] ?? '') === $id) {
-                $appointment['status'] = 'Cancelada';
+                $appointment['status'] = 'Recusada';
+                $appointment['mensagem_recusa'] = $mensagem;
                 $store['appointments'] = $appointments;
                 save_auth_store($store);
-                respondJson(['success' => true, 'message' => 'Consulta cancelada.']);
+                respondJson(['success' => true, 'message' => 'Consulta recusada com justificativa.']);
             }
         }
 

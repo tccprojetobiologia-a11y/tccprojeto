@@ -46,7 +46,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
                 </div>
             </div>
             <button class="nav-item active" onclick="loadContent('confirmar-consultas')">
-                <i class="fas fa-check-circle"></i> Confirmar Consultas
+                <i class="fas fa-check-circle"></i> Consultas
             </button>
             <button class="nav-item" onclick="loadContent('agenda-medicos')">
                 <i class="fas fa-calendar-alt"></i> Agenda dos Médicos
@@ -66,7 +66,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         </div>
         <div class="main-content">
             <div class="main-header">
-                <h1 class="page-title" id="pageTitle">Confirmar Consultas</h1>
+                <h1 class="page-title" id="pageTitle">Consultas</h1>
             </div>
             <div class="content-area" id="contentArea">
                 <div style="text-align:center;padding:50px;color:#999;">
@@ -83,7 +83,7 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
         // ============================================================
         function loadContent(section) {
             var titles = {
-                'confirmar-consultas': 'Confirmar Consultas',
+                'confirmar-consultas': 'Consultas',
                 'agenda-medicos': 'Agenda dos Médicos',
                 'pacientes': 'Pacientes',
                 'medicos': 'Médicos'

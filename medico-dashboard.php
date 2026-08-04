@@ -302,19 +302,28 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             const name = appointment.patient_name;
             const key = `${name}|${appointment.cpf}`;
             if (!uniquePatients[key]) {
-                uniquePatients[key] = { name, cpf: appointment.cpf, phone: appointment.phone, age: appointment.patient_age, appointments: [] };
+                uniquePatients[key] = {
+                    name,
+                    cpf: appointment.cpf,
+                    phone: appointment.phone,
+                    age: appointment.patient_age,
+                    appointments: []
+                };
             }
             uniquePatients[key].appointments.push(appointment);
         });
+
         const filteredPatients = Object.values(uniquePatients).filter(patient => {
-            return patient.name.toLowerCase().includes(searchTerm) || patient.cpf.toLowerCase().includes(searchTerm);
+            return patient.name.toLowerCase().includes(searchTerm) || (patient.cpf || '').toLowerCase().includes(searchTerm);
         });
+
         if (filteredPatients.length === 0) {
             patientList.innerHTML = '<p class="muted">Nenhum paciente encontrado.</p>';
             selectedPatient = null;
             renderPatientHistory();
             return;
         }
+
         filteredPatients.sort((a, b) => a.name.localeCompare(b.name)).forEach(patient => {
             const item = document.createElement('div');
             item.className = 'patient-list-item';
@@ -331,6 +340,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             item.addEventListener('click', () => selectPatient(patient.name));
             patientList.appendChild(item);
         });
+
         const selectedStillVisible = filteredPatients.some(patient => patient.name === selectedPatient);
         if (!selectedStillVisible) {
             selectedPatient = filteredPatients[0].name;
@@ -349,13 +359,18 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
 
     function renderPatientHistory(appointmentId = '') {
         const historyContainer = document.getElementById('patientHistory');
+        const detailContainer = document.getElementById('patientDetailCard');
+
         if (!selectedPatient) {
             historyContainer.innerHTML = '<p class="muted">Selecione um paciente para ver o histórico.</p>';
+            if (detailContainer) detailContainer.innerHTML = '';
             return;
         }
+
         const patientAppointments = appointments.filter(a => a.patient_name === selectedPatient).sort((a,b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
         if (patientAppointments.length === 0) {
             historyContainer.innerHTML = '<p class="muted">Nenhum histórico encontrado para este paciente.</p>';
+            if (detailContainer) detailContainer.innerHTML = '';
             return;
         }
 
@@ -375,8 +390,8 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         historyContainer.innerHTML = `
             <div style="display:grid; gap:16px;">
                 <div style="padding:20px; border:1px solid #e5e7eb; border-radius:16px; background:#f8fafc;">
-                    <div style="font-weight:700; color:#1e2a3a;">${patient.name}</div>
-                    <div style="margin-top:8px; color:#64748b;">Idade: ${patient.age} anos • CPF: ${patient.cpf} • Tel: ${patient.phone}</div>
+                    <div style="font-weight:700; color:#1e2a3a; font-size:18px;">${patient.patient_name || selectedPatient}</div>
+                    <div style="margin-top:8px; color:#64748b;">Idade: ${patient.patient_age || 0} anos • CPF: ${patient.cpf || 'N/A'} • Tel: ${patient.phone || 'N/A'}</div>
                     <div style="margin-top:12px; color:#475569;">Consultas totais: ${patientAppointments.length}</div>
                 </div>
                 <div>
@@ -385,6 +400,10 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                 </div>
             </div>
         `;
+
+        if (detailContainer) {
+            detailContainer.innerHTML = '';
+        }
 
         if (appointmentId) {
             showAppointmentDetails(appointmentId);
