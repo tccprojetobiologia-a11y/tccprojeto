@@ -121,7 +121,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         <a href="logout.php" style="display:inline-block; margin-top:20px; padding:10px 14px; background:rgba(255,255,255,0.2); color:white; text-decoration:none; border-radius:10px;">Sair</a>
     </aside>
     <main class="main">
-        <h1 style="margin-top:0;">Painel do médico</h1>
         <?php echo $message; ?>
         <div id="dayModal" class="modal hidden" aria-modal="true" role="dialog">
             <div class="modal-card">
