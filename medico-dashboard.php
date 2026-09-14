@@ -144,16 +144,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                     </div>
                     <div class="calendar" id="calendarContainer"></div>
                 </div>
-                <div class="card" style="margin-top:10px; padding:16px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-                        <div>
-                            <h3 id="dayScheduleTitle" style="margin-top:0;">Agenda do dia</h3>
-                            <div id="dayScheduleSubtitle" class="muted">Clique em um dia do calendário para ver os atendimentos.</div>
-                        </div>
-                        <div id="dayScheduleCount" style="font-weight:700; color:#1e2a3a;"></div>
-                    </div>
-                    <div id="dayScheduleList" style="margin-top:16px;"></div>
-                </div>
             </div>
             <div id="pacientesTab" class="tab-view hidden">
                 <div class="card" style="margin-top:10px; padding:16px;">
@@ -201,7 +191,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         });
         renderCalendar();
         renderPatients();
-        selectDate(selectedDate);
     }
 
     function switchTab(tab) {
@@ -311,14 +300,20 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
     }
 
     function renderDaySchedule(dateKey) {
+        const titleEl = document.getElementById('dayScheduleTitle');
+        const subtitleEl = document.getElementById('dayScheduleSubtitle');
+        const countEl = document.getElementById('dayScheduleCount');
+        const list = document.getElementById('dayScheduleList');
+
+        if (!titleEl || !subtitleEl || !countEl || !list) return;
+
         const appointmentsByDate = appointments.filter(a => a.date === dateKey).sort((a,b) => a.time.localeCompare(b.time));
         const title = new Date(`${dateKey}T00:00:00`).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
-        document.getElementById('dayScheduleTitle').innerText = `Agenda de ${title}`;
+        titleEl.innerText = `Agenda de ${title}`;
         const dayStatus = appointmentsByDate.length === 0 ? 'Nenhuma consulta agendada.' : `${appointmentsByDate.length} consulta(s) neste dia.`;
-        document.getElementById('dayScheduleSubtitle').innerText = dayStatus;
-        document.getElementById('dayScheduleCount').innerText = appointmentsByDate.length ? `${appointmentsByDate.length} pacientes` : '';
+        subtitleEl.innerText = dayStatus;
+        countEl.innerText = appointmentsByDate.length ? `${appointmentsByDate.length} pacientes` : '';
 
-        const list = document.getElementById('dayScheduleList');
         list.innerHTML = '';
         if (appointmentsByDate.length === 0) {
             list.innerHTML = '<p class="muted">Nenhuma consulta marcada para este dia.</p>';
