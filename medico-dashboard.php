@@ -86,6 +86,14 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         .calendar-cell.selected { border-color:#851e32; box-shadow:0 0 0 3px rgba(133,30,50,0.08); }
         .calendar-dot { width:10px; height:10px; border-radius:50%; margin-top:8px; }
         .calendar-day-name { font-size:12px; color:#64748b; }
+        .calendar-nav { display:flex; align-items:center; gap:12px; }
+        .calendar-nav button { border:none; background:#f3f4f6; color:#1f2937; width:36px; height:36px; border-radius:10px; cursor:pointer; font-size:18px; }
+        .modal { position:fixed; inset:0; background:rgba(15,23,42,0.56); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px; }
+        .modal.hidden { display:none; }
+        .modal-card { width:min(760px, 100%); max-height:80vh; overflow:auto; background:white; border-radius:18px; padding:24px; box-shadow:0 24px 70px rgba(15,23,42,0.25); }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+        .close-modal { border:none; background:#f3f4f6; border-radius:10px; width:38px; height:38px; font-size:24px; cursor:pointer; }
+        .agenda-modal-item { padding:14px; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:12px; background:#f8fafc; }
         .patient-list-item { padding:14px; border:1px solid #e5e7eb; border-radius:12px; cursor:pointer; transition:background 0.2s; }
         .patient-list-item:hover { background:#f8fafc; }
         .patient-list-item.active { border-color:#851e32; background:#fdf1f4; }
@@ -116,11 +124,26 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         <h1 style="margin-top:0;">Painel do médico</h1>
         <p class="muted">Acompanhe a agenda, os pacientes e atualize o status das consultas.</p>
         <?php echo $message; ?>
+        <div id="dayModal" class="modal hidden" aria-modal="true" role="dialog">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="modalTitle" style="margin:0;">Atendimentos do dia</h3>
+                    <button type="button" class="close-modal" id="closeDayModal" aria-label="Fechar">&times;</button>
+                </div>
+                <div id="dayModalContent"></div>
+            </div>
+        </div>
         <div class="main-tab-content">
             <div id="agendaTab" class="tab-view active">
                 <div class="card" style="margin-top:10px; padding:16px;">
-                    <div style="font-weight:700; margin-bottom:12px;">Agenda</div>
-                    <div id="monthLabel" style="color:#64748b; margin-bottom:10px;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                        <div style="font-weight:700;">Agenda</div>
+                        <div class="calendar-nav">
+                            <button type="button" id="prevMonthBtn" aria-label="Mês anterior">&#8249;</button>
+                            <div id="monthLabel" style="color:#64748b; font-weight:600; min-width:180px; text-align:center;"></div>
+                            <button type="button" id="nextMonthBtn" aria-label="Próximo mês">&#8250;</button>
+                        </div>
+                    </div>
                     <div class="calendar" id="calendarContainer"></div>
                 </div>
                 <div class="card" style="margin-top:10px; padding:16px;">
@@ -156,6 +179,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
     let activeTab = 'agenda';
     let selectedDate = appointments.length > 0 ? appointments[0].date : new Date().toISOString().slice(0, 10);
     let selectedPatient = null;
+    let currentViewDate = new Date();
 
     const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -165,6 +189,18 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
             button.addEventListener('click', () => switchTab(button.dataset.tab));
         });
         document.getElementById('patientSearch')?.addEventListener('input', () => renderPatients());
+        document.getElementById('prevMonthBtn')?.addEventListener('click', () => {
+            currentViewDate = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() - 1, 1);
+            renderCalendar();
+        });
+        document.getElementById('nextMonthBtn')?.addEventListener('click', () => {
+            currentViewDate = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() + 1, 1);
+            renderCalendar();
+        });
+        document.getElementById('closeDayModal')?.addEventListener('click', closeDayModal);
+        document.getElementById('dayModal')?.addEventListener('click', (event) => {
+            if (event.target.id === 'dayModal') closeDayModal();
+        });
         renderCalendar();
         renderPatients();
         selectDate(selectedDate);
@@ -185,9 +221,8 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         const container = document.getElementById('calendarContainer');
         container.innerHTML = '';
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -211,7 +246,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayAppointments = appointments.filter(a => a.date === dateKey);
-            const pending = dayAppointments.some(a => a.status === 'Pendente');
             const allDone = dayAppointments.length > 0 && dayAppointments.every(a => a.status === 'Realizada');
             const dotColor = dayAppointments.length === 0 ? 'transparent' : allDone ? '#22c55e' : '#ef4444';
 
@@ -226,31 +260,61 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                 <div style="flex:1;"></div>
                 <div style="display:flex; justify-content:center;"><span class="calendar-dot" style="background:${dotColor};"></span></div>
             `;
-            cell.addEventListener('click', () => selectDate(dateKey));
+            cell.addEventListener('click', () => openDayModal(dateKey));
             container.appendChild(cell);
         }
     }
 
+    function openDayModal(dateKey) {
+        selectedDate = dateKey;
+        renderCalendar();
+        const modal = document.getElementById('dayModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('dayModalContent');
+        const dateLabel = new Date(`${dateKey}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        modalTitle.innerText = `Atendimentos de ${dateLabel}`;
+
+        const appointmentsByDate = appointments.filter(a => a.date === dateKey).sort((a,b) => a.time.localeCompare(b.time));
+        if (appointmentsByDate.length === 0) {
+            modalContent.innerHTML = '<p class="muted">Nenhuma consulta agendada para este dia.</p>';
+        } else {
+            modalContent.innerHTML = appointmentsByDate.map((appointment) => `
+                <div class="agenda-modal-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-weight:700; color:#1e2a3a; font-size:18px;">${appointment.patient_name}</div>
+                            <div style="font-size:13px; color:#64748b; margin-top:4px;">${appointment.time} • ${appointment.patient_age} anos</div>
+                            <div style="font-size:13px; color:#64748b; margin-top:2px;">CPF: ${appointment.cpf} • ${appointment.phone}</div>
+                        </div>
+                        <div class="status-pill ${appointment.status === 'Realizada' ? 'status-realizada' : appointment.status === 'Cancelada' ? 'status-cancelada' : 'status-pendente'}">${appointment.status}</div>
+                    </div>
+                    <div style="margin-top:12px; color:#475569; font-size:14px;"><strong>Sintomas:</strong> ${appointment.symptoms || 'Nenhuma descrição informada.'}</div>
+                    <div style="margin-top:8px; color:#475569; font-size:14px;"><strong>Exames:</strong> ${appointment.exam_results || 'Nenhum exame registrado.'}</div>
+                    <div style="margin-top:8px; color:#475569; font-size:14px;"><strong>Observações:</strong> ${appointment.doctor_observations || 'Nenhuma observação.'}</div>
+                    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-secondary" type="button" onclick="showAppointmentDetails('${appointment.id}')">Ver ficha</button>
+                        <button class="btn btn-primary" type="button" onclick="selectPatient('${appointment.patient_name}', '${appointment.id}')">Paciente</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeDayModal() {
+        document.getElementById('dayModal').classList.add('hidden');
+    }
+
     function selectDate(dateKey) {
         selectedDate = dateKey;
-        document.querySelectorAll('.calendar-cell').forEach(cell => {
-            cell.classList.remove('selected');
-        });
-        const cells = document.querySelectorAll('#calendarContainer .calendar-cell');
-        cells.forEach(cell => {
-            if (cell.textContent.trim().startsWith(String(Number(dateKey.split('-')[2])))) {
-                const headerText = cell.querySelector('strong');
-                if (headerText && headerText.innerText === String(Number(dateKey.split('-')[2]))) {
-                    cell.classList.add('selected');
-                }
-            }
-        });
+        renderCalendar();
         renderDaySchedule(dateKey);
     }
 
     function renderDaySchedule(dateKey) {
         const appointmentsByDate = appointments.filter(a => a.date === dateKey).sort((a,b) => a.time.localeCompare(b.time));
-        const title = new Date(dateKey).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+        const title = new Date(`${dateKey}T00:00:00`).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
         document.getElementById('dayScheduleTitle').innerText = `Agenda de ${title}`;
         const dayStatus = appointmentsByDate.length === 0 ? 'Nenhuma consulta agendada.' : `${appointmentsByDate.length} consulta(s) neste dia.`;
         document.getElementById('dayScheduleSubtitle').innerText = dayStatus;
