@@ -105,7 +105,32 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
     </style>
 </head>
 <body>
-
+<div class="container">
+    <aside class="sidebar">
+        <h2 style="margin-top:0;">CardioWeb</h2>
+       
+        <div style="margin-top:30px; background:rgba(255,255,255,0.12); padding:16px; border-radius:12px;">
+            <div style="font-weight:700; font-size:18px;">Dr. <?php echo htmlspecialchars($doctorName); ?></div>
+            <div style="font-size:13px; opacity:0.85; margin-top:4px;">Especialidade: <?php echo htmlspecialchars($doctor['specialty'] ?? 'Especialidade'); ?></div>
+            <div style="font-size:13px; opacity:0.85; margin-top:6px;"><?php echo htmlspecialchars($doctor['email'] ?? ''); ?></div>
+        </div>
+        <div class="tab-menu" style="margin-top:24px;">
+            <button class="tab-button active" data-tab="agenda"><i class="fas fa-calendar-alt"></i>Agenda</button>
+            <button class="tab-button" data-tab="pacientes"><i class="fas fa-users"></i>Pacientes</button>
+        </div>
+        <a href="logout.php" style="display:inline-block; margin-top:20px; padding:10px 14px; background:rgba(255,255,255,0.2); color:white; text-decoration:none; border-radius:10px;">Sair</a>
+    </aside>
+    <main class="main">
+        <h1 style="margin-top:0;">Painel do médico</h1>
+        <?php echo $message; ?>
+        <div id="dayModal" class="modal hidden" aria-modal="true" role="dialog">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="modalTitle" style="margin:0;">Atendimentos do dia</h3>
+                    <button type="button" class="close-modal" id="closeDayModal" aria-label="Fechar">&times;</button>
+                </div>
+                <div id="dayModalContent"></div>
+            </div>
         </div>
         <div class="main-tab-content">
             <div id="agendaTab" class="tab-view active">
