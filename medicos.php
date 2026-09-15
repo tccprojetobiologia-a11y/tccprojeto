@@ -174,7 +174,7 @@ $doctors = get_doctors();
 </div>
 
 <script>
-    (function initMedicosPanel() {
+    document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.tab-doctor-button');
         const panels = document.querySelectorAll('.doctor-panel');
 
@@ -208,7 +208,7 @@ $doctors = get_doctors();
                 }
             });
         }
-    })();
+    });
 
     async function openDoctorAgenda(doctorName) {
         if (!doctorName) return;
