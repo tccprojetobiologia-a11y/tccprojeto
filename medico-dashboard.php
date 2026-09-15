@@ -433,12 +433,14 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         const content = document.getElementById('patientModalContent');
         if (!modal || !content || !title) return;
         const patientAppointments = appointments.filter(a => a.patient_name === patientName).sort((a,b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
-        const patientInfo = patientAppointments[0] || { patient_name: patientName, patient_age: '', cpf: '', phone: '' };
+        const patientInfo = patientAppointments[0] || { patient_name: patientName, patient_age: '', cpf: '', phone: '', patient_height: '', patient_weight: '', patient_sex: '' };
         title.innerText = patientInfo.patient_name || patientName;
         const header = `
             <div style="padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; margin-bottom:12px;">
                 <div style="font-weight:700; color:#1e2a3a;">${patientInfo.patient_name || patientName}</div>
-                <div style="color:#64748b; margin-top:6px;">Idade: ${patientInfo.patient_age || '—'} anos • CPF: ${patientInfo.cpf || '—'} • Tel: ${patientInfo.phone || '—'}</div>
+                <div style="color:#64748b; margin-top:6px;">Idade: ${patientInfo.patient_age || '—'} anos • Sexo: ${patientInfo.patient_sex || '—'}</div>
+                <div style="color:#64748b; margin-top:6px;">Altura: ${patientInfo.patient_height || '—'} • Peso: ${patientInfo.patient_weight || '—'}</div>
+                <div style="color:#64748b; margin-top:6px;">CPF: ${patientInfo.cpf || '—'} • Tel: ${patientInfo.phone || '—'}</div>
                 <div style="margin-top:8px; color:#475569;">Consultas totais: ${patientAppointments.length}</div>
             </div>
         `;
