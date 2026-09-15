@@ -92,10 +92,17 @@
             const bgColor = temConsulta ? '#fee2e2' : 'transparent';
             const textColor = temConsulta ? '#991b1b' : '#1e2a3a';
 
-            html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; font-weight:${temConsulta ? '600' : '400'}; cursor:${temConsulta ? 'pointer' : 'default'};" ${temConsulta ? `onclick="abrirModal('${medicoNome}','${dataStr}')"` : ''}>
+            if (temConsulta) {
+                html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; font-weight:600; cursor:pointer;" onclick="abrirModal('${medicoNome}','${dataStr}')">
                 ${dia}
-                ${temConsulta ? `<br><small style="font-size:10px; color:#6b7280;">${consultasDia.length} consulta(s)</small>` : ''}
+                <br><small style="font-size:10px; color:#6b7280;">${consultasDia.length} consulta(s)</small>
             </td>`;
+            } else {
+                // empty slot — allow scheduling
+                html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; cursor:pointer;" onclick="abrirAgendamento('${medicoNome}','${dataStr}')">
+                ${dia}
+            </td>`;
+            }
 
             if ((primeiroDia + dia) % 7 === 0) {
                 html += '</tr><tr>';
@@ -169,6 +176,99 @@
             alert('Erro ao carregar detalhes da agenda.');
         }
     };
+
+    // Abrir formulário de agendamento rápido ao clicar em dia vazio
+    window.abrirAgendamento = function(medico, data) {
+        window.currentAgendaContext = { medico: medico, data: data };
+        document.getElementById('modal-titulo').textContent = 'Agendar para ' + medico + ' • ' + formatarData(data);
+        const html = `
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <label>Nome do paciente</label>
+                <input type="text" id="agend-paciente-nome" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                <label>Idade</label>
+                <input type="number" id="agend-paciente-idade" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                <label>CPF</label>
+                <input type="text" id="agend-paciente-cpf" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                <label>Telefone</label>
+                <input type="text" id="agend-paciente-telefone" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                <label>Horário</label>
+                <input type="time" id="agend-paciente-hora" value="09:00" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                <label>Tipo</label>
+                <select id="agend-tipo" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;"><option value="Consulta">Consulta</option><option value="Reunião">Reunião</option></select>
+                <label>Observações</label>
+                <textarea id="agend-observacoes" rows="3" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;"></textarea>
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                    <button type="button" onclick="fecharModal()" style="padding:10px 14px; background:#e2e8f0; border:none; border-radius:8px;">Cancelar</button>
+                    <button type="button" onclick="submitAgendamento()" style="padding:10px 14px; background:#851e32; color:white; border:none; border-radius:8px;">Agendar</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('modal-conteudo').innerHTML = html;
+        document.getElementById('modal-dia').style.display = 'flex';
+    };
+
+    async function submitAgendamento() {
+        const ctx = window.currentAgendaContext || {};
+        const medico = ctx.medico;
+        const data = ctx.data;
+        const nome = document.getElementById('agend-paciente-nome')?.value || '';
+        const idade = document.getElementById('agend-paciente-idade')?.value || '';
+        const cpf = document.getElementById('agend-paciente-cpf')?.value || '';
+        const tel = document.getElementById('agend-paciente-telefone')?.value || '';
+        const hora = document.getElementById('agend-paciente-hora')?.value || '09:00';
+        const tipo = document.getElementById('agend-tipo')?.value || 'Consulta';
+        const obs = document.getElementById('agend-observacoes')?.value || '';
+
+        if (!medico || !data || !nome) {
+            alert('Preencha pelo menos o nome do paciente.');
+            return;
+        }
+
+        const payload = {
+            id_paciente: '',
+            nome_paciente: nome,
+            medico: medico,
+            especialidade: tipo,
+            data: data,
+            hora: hora,
+            observacoes: obs
+        };
+
+        try {
+            const res = await fetch('../api/solicitar_consulta.php', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result && result.error) {
+                alert('Erro: ' + result.error);
+                return;
+            }
+
+            // Sincronizar com auth_storage local para refletir no painel do médico
+            await fetch('../admin/sync_appointment.php', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                    doctor_name: medico,
+                    patient_name: nome,
+                    patient_age: idade,
+                    cpf: cpf,
+                    phone: tel,
+                    date: data,
+                    time: hora,
+                    status: 'Confirmada',
+                    symptoms: obs
+                })
+            });
+
+            alert('Agendamento criado com sucesso.');
+            if (window.currentAgendaContext && window.currentAgendaContext.medico && window.currentAgendaContext.data) {
+                window.abrirModal(window.currentAgendaContext.medico, window.currentAgendaContext.data);
+            }
+            window.renderAgenda();
+        } catch (error) {
+            console.error('Erro ao criar agendamento:', error);
+            alert('Erro ao criar agendamento. Veja console.');
+        }
+    }
 
     document.addEventListener('click', async function(event) {
         const actionButton = event.target.closest('[data-agenda-action]');
