@@ -251,8 +251,8 @@
         return d.toLocaleDateString('pt-BR');
     }
 
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', function() {
-        window.renderPacientes();
-    });
+    // Inicializar imediatamente (funciona também quando carregado via AJAX)
+    (function() {
+        if (typeof window.renderPacientes === 'function') window.renderPacientes();
+    })();
 </script>

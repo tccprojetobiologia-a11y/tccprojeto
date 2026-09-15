@@ -346,11 +346,13 @@
         return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('modal-dia').addEventListener('click', function(e) {
-            if (e.target === this) fecharModal();
-        });
-
-        window.renderAgenda();
-    });
+    (function() {
+        var md = document.getElementById('modal-dia');
+        if (md) {
+            md.addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+        }
+        if (typeof window.renderAgenda === 'function') {
+            window.renderAgenda();
+        }
+    })();
 </script>
