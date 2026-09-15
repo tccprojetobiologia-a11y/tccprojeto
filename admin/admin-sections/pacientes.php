@@ -41,8 +41,8 @@
             pacientes.forEach((p, index) => {
                 const nome = p.nome_criptografado || 'Sem nome';
                 html += `
-                    <div onclick="selecionarPaciente('${p.id_usuario}', ${index})" style="padding: 12px 16px; margin-bottom: 8px; background: #f8fafc; border-radius: 10px; cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent;" 
-                        id="paciente-${index}">
+                        <div onclick="selecionarPaciente('${p.id}', ${index})" style="padding: 12px 16px; margin-bottom: 8px; background: #f8fafc; border-radius: 10px; cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent;" 
+                            id="paciente-${index}">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; background: #851e32; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px;">
                                 ${nome.charAt(0)}
@@ -181,6 +181,64 @@
                     </div>
                 </div>
             `;
+            // add edit button handler
+            (function() {
+                const fichaDiv = document.getElementById('ficha-paciente');
+                const editBtn = document.createElement('button');
+                editBtn.id = 'editar-paciente-inline-btn';
+                editBtn.textContent = 'Editar paciente';
+                editBtn.style.cssText = 'padding:8px 12px; background:#e2e8f0; border:none; border-radius:8px; cursor:pointer; margin-top:8px;';
+                const header = fichaDiv.querySelector('div > div > div:nth-child(2)');
+                if (header) header.appendChild(editBtn);
+                editBtn.addEventListener('click', function() {
+                    // build edit form
+                    fichaDiv.innerHTML = `
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <label>Nome</label>
+                            <input id="edit-nome" type="text" value="${p.nome_criptografado || ''}" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                            <label>E-mail</label>
+                            <input id="edit-email" type="email" value="${p.email || ''}" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                            <label>Sexo</label>
+                            <select id="edit-sexo" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;"><option value="">—</option><option value="M" ${p.sexo_biologico==='M'?'selected':''}>Masculino</option><option value="F" ${p.sexo_biologico==='F'?'selected':''}>Feminino</option></select>
+                            <label>Altura (m)</label>
+                            <input id="edit-altura" type="text" value="${p.altura || ''}" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                            <label>Peso (kg)</label>
+                            <input id="edit-peso" type="text" value="${p.peso || ''}" style="padding:10px; border:1px solid #e5e7eb; border-radius:8px;">
+                            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                                <button type="button" id="cancel-edit" style="padding:8px 12px; background:#e2e8f0; border:none; border-radius:8px;">Cancelar</button>
+                                <button type="button" id="save-edit" style="padding:8px 12px; background:#851e32; color:white; border:none; border-radius:8px;">Salvar</button>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('cancel-edit').addEventListener('click', function(){
+                        selecionarPaciente(id, index);
+                    });
+                    document.getElementById('save-edit').addEventListener('click', async function(){
+                        const payload = {
+                            id: id,
+                            nome: document.getElementById('edit-nome').value,
+                            email: document.getElementById('edit-email').value,
+                            sexo: document.getElementById('edit-sexo').value,
+                            altura: document.getElementById('edit-altura').value,
+                            peso: document.getElementById('edit-peso').value
+                        };
+                        try {
+                            const res = await fetch('../api/admin_api.php?action=update_paciente', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                            const json = await res.json();
+                            if (json && json.success) {
+                                alert('Paciente atualizado com sucesso');
+                                window.renderPacientes();
+                                selecionarPaciente(id, index);
+                            } else {
+                                alert('Erro ao atualizar paciente');
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            alert('Erro ao atualizar paciente');
+                        }
+                    });
+                });
+            })();
         } catch (error) {
             console.error('Erro ao carregar detalhes do paciente:', error);
             document.getElementById('ficha-paciente').innerHTML = '<p style="color: #c00; text-align: center; padding: 20px 0;">Erro ao carregar detalhes do paciente.</p>';

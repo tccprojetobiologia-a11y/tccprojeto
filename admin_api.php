@@ -42,6 +42,10 @@ try {
         case 'get_paciente_detalhes':
             getPacienteDetalhes($pdo);
             break;
+        case 'update_paciente':
+            if ($method === 'POST') updatePaciente($pdo);
+            else sendError('Método não permitido', 405);
+            break;
             
         // ========== MÉDICOS ==========
         case 'get_medicos':
@@ -304,6 +308,53 @@ function getPacienteDetalhes($pdo) {
         'exames' => $exames,
         'consultas' => $consultas
     ]);
+}
+
+function updatePaciente($pdo) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($data)) {
+        sendError('Payload inválido');
+        return;
+    }
+    $id = $data['id'] ?? '';
+    if (empty($id)) {
+        sendError('ID do paciente obrigatório');
+        return;
+    }
+
+    // Atualiza tabela usuarios (nome codificado, email)
+    $nome = $data['nome'] ?? null;
+    $email = $data['email'] ?? null;
+    $peso = $data['peso'] ?? null;
+    $altura = $data['altura'] ?? null;
+    $sexo = $data['sexo'] ?? null;
+
+    try {
+        if ($nome !== null) {
+            $stmt = $pdo->prepare("UPDATE usuarios SET nome_criptografado = ? WHERE id_usuario = ?");
+            $stmt->execute([base64_encode($nome), $id]);
+        }
+        if ($email !== null) {
+            $stmt = $pdo->prepare("UPDATE usuarios SET email = ? WHERE id_usuario = ?");
+            $stmt->execute([$email, $id]);
+        }
+
+        // dados_paciente
+        $stmt = $pdo->prepare("SELECT id_paciente FROM dados_paciente WHERE id_paciente = ?");
+        $stmt->execute([$id]);
+        $exists = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($exists) {
+            $stmt = $pdo->prepare("UPDATE dados_paciente SET peso = ?, altura = ?, sexo_biologico = ? WHERE id_paciente = ?");
+            $stmt->execute([$peso, $altura, $sexo, $id]);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO dados_paciente (id_paciente, peso, altura, sexo_biologico) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$id, $peso, $altura, $sexo]);
+        }
+
+        sendSuccess(null, 'Paciente atualizado com sucesso');
+    } catch (Exception $e) {
+        sendError($e->getMessage());
+    }
 }
 
 // ========== FUNÇÕES DE MÉDICOS ==========

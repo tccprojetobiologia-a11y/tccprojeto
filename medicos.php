@@ -158,6 +158,7 @@ $doctors = get_doctors();
                     </div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button type="button" data-doctor-agenda="<?php echo htmlspecialchars($doctor['name'] ?? ''); ?>" style="padding:10px 14px; background:#851e32; color:white; border:none; border-radius:9px; cursor:pointer; font-weight:600;">Ver agenda</button>
+                        <button type="button" data-doctor-edit="<?php echo htmlspecialchars($doctor['id'] ?? ''); ?>" data-doctor-json="<?php echo htmlspecialchars(json_encode($doctor, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE)); ?>" style="padding:10px 14px; background:#0ea5a4; color:white; border:none; border-radius:9px; cursor:pointer; font-weight:600;">Editar</button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -170,6 +171,42 @@ $doctors = get_doctors();
         <button type="button" id="doctor-agenda-close" style="position:absolute; top:18px; right:18px; width:32px; height:32px; border:none; border-radius:999px; background:#e2e8f0; cursor:pointer; font-size:22px; color:#1e2a3a;">×</button>
         <h4 id="doctor-agenda-title" style="margin:0 0 18px; color:#1e2a3a; font-size:22px;">Agenda do médico</h4>
         <div id="doctor-agenda-content"></div>
+    </div>
+</div>
+
+<div id="doctor-edit-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:white; border-radius:18px; width:min(820px, 96vw); max-height:86vh; overflow-y:auto; padding:20px; position:relative;">
+        <button type="button" id="doctor-edit-close" style="position:absolute; top:12px; right:12px; width:34px; height:34px; border:none; border-radius:999px; background:#e2e8f0; cursor:pointer; font-size:22px; color:#1e2a3a;">×</button>
+        <h4 style="margin:0 0 12px; color:#1e2a3a;">Editar médico</h4>
+        <form id="doctor-edit-form" style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px;">
+            <input type="hidden" name="doctor_id" id="edit-doctor-id">
+            <label style="grid-column:1 / -1; color:#475569; font-size:13px;">Nome</label>
+            <input type="text" name="name" id="edit-name" required style="padding:10px; border:1px solid #ddd; border-radius:8px; grid-column:1 / -1;">
+            <label style="color:#475569; font-size:13px;">E-mail</label>
+            <input type="email" name="email" id="edit-email" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">Especialidade</label>
+            <input type="text" name="specialty" id="edit-specialty" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">Telefone</label>
+            <input type="text" name="phone" id="edit-phone" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">CPF</label>
+            <input type="text" name="cpf" id="edit-cpf" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">CRM</label>
+            <input type="text" name="crm" id="edit-crm" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">Idade</label>
+            <input type="number" name="age" id="edit-age" min="0" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">Altura (cm)</label>
+            <input type="text" name="height" id="edit-height" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="color:#475569; font-size:13px;">Peso (kg)</label>
+            <input type="text" name="weight" id="edit-weight" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="grid-column:1 / -1; color:#475569; font-size:13px;">Endereço</label>
+            <input type="text" name="address" id="edit-address" style="grid-column:1 / -1; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <label style="grid-column:1 / -1; color:#475569; font-size:13px;">Observações / currículo</label>
+            <textarea name="notes" id="edit-notes" rows="4" style="grid-column:1 / -1; padding:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
+            <div style="grid-column:1 / -1; display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" id="doctor-edit-cancel" style="padding:10px 14px; background:#e2e8f0; color:#1e2a3a; border:none; border-radius:8px; cursor:pointer;">Cancelar</button>
+                <button type="submit" id="doctor-edit-save" style="padding:10px 14px; background:#0ea5a4; color:white; border:none; border-radius:8px; cursor:pointer;">Salvar</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -324,4 +361,66 @@ $doctors = get_doctors();
             openDoctorAgendaDay(dayButton.dataset.doctorName, dayButton.dataset.dayDate);
         }
     });
+
+    // Handle edit button clicks (delegated)
+    document.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('[data-doctor-edit]');
+        if (!editBtn) return;
+        const json = editBtn.getAttribute('data-doctor-json') || '{}';
+        let doctor = {};
+        try { doctor = JSON.parse(json); } catch (e) { doctor = {}; }
+
+        // populate form
+        document.getElementById('edit-doctor-id').value = doctor.id || '';
+        document.getElementById('edit-name').value = doctor.name || '';
+        document.getElementById('edit-email').value = doctor.email || '';
+        document.getElementById('edit-specialty').value = doctor.specialty || '';
+        document.getElementById('edit-phone').value = doctor.phone || '';
+        document.getElementById('edit-cpf').value = doctor.cpf || '';
+        document.getElementById('edit-crm').value = doctor.crm || '';
+        document.getElementById('edit-age').value = doctor.age || '';
+        document.getElementById('edit-height').value = doctor.height || '';
+        document.getElementById('edit-weight').value = doctor.weight || '';
+        document.getElementById('edit-address').value = doctor.address || '';
+        document.getElementById('edit-notes').value = doctor.notes || doctor.description || '';
+
+        document.getElementById('doctor-edit-modal').style.display = 'flex';
+    });
+
+    // Close / cancel handlers for edit modal
+    const editClose = document.getElementById('doctor-edit-close');
+    const editCancel = document.getElementById('doctor-edit-cancel');
+    if (editClose) editClose.addEventListener('click', function () { document.getElementById('doctor-edit-modal').style.display = 'none'; });
+    if (editCancel) editCancel.addEventListener('click', function () { document.getElementById('doctor-edit-modal').style.display = 'none'; });
+
+    // Submit edit form via AJAX
+    const editForm = document.getElementById('doctor-edit-form');
+    if (editForm) {
+        editForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(editForm);
+            const payload = {};
+            formData.forEach(function (value, key) { if (key !== 'doctor_id') payload[key] = value; });
+            const doctorId = formData.get('doctor_id') || '';
+            if (!doctorId) return alert('ID do médico não informado.');
+
+            try {
+                const res = await fetch('../api/admin_api.php?action=update_doctor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ doctor_id: doctorId, updates: payload })
+                });
+                const data = await res.json();
+                if (data && data.success) {
+                    document.getElementById('doctor-edit-modal').style.display = 'none';
+                    // reload to reflect changes simply
+                    window.location.reload();
+                } else {
+                    alert((data && data.message) ? data.message : 'Falha ao salvar.');
+                }
+            } catch (err) {
+                alert('Erro ao salvar alterações.');
+            }
+        });
+    }
 </script>

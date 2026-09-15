@@ -213,6 +213,31 @@ if (!function_exists('get_doctors')) {
     }
 }
 
+if (!function_exists('update_doctor_profile')) {
+    function update_doctor_profile($doctor_id, $updates)
+    {
+        $store = get_auth_store();
+        $users = $store['users'] ?? [];
+        $found = false;
+        foreach ($users as &$user) {
+            if (($user['id'] ?? '') === $doctor_id) {
+                foreach ($updates as $k => $v) {
+                    if ($k === 'id' || $k === 'password') continue;
+                    $user[$k] = $v;
+                }
+                $found = true;
+                break;
+            }
+        }
+        if ($found) {
+            $store['users'] = $users;
+            save_auth_store($store);
+            return true;
+        }
+        return false;
+    }
+}
+
 if (!function_exists('find_doctor_by_name')) {
     function find_doctor_by_name($doctor_name)
     {

@@ -72,52 +72,43 @@
     function renderCalendario(medicoNome, containerId, consultas) {
         const container = document.getElementById(containerId);
         if (!container) return;
+        const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+        const year = anoAtual;
+        const month = mesAtual;
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        const primeiroDia = new Date(anoAtual, mesAtual, 1).getDay();
-        const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+        let html = '<div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px;">';
+        // headers
+        dayNames.forEach(function(d) {
+            html += `<div style="padding:8px; text-align:center; background:#f8fafc; border-radius:10px; font-weight:700;">${d}</div>`;
+        });
 
-        let html = '<table style="width:100%; border-collapse:collapse; font-size:14px;">';
-        html += '<thead><tr><th style="padding:8px; text-align:center; background:#f8fafc;">Dom</th><th style="padding:8px; text-align:center; background:#f8fafc;">Seg</th><th style="padding:8px; text-align:center; background:#f8fafc;">Ter</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qua</th><th style="padding:8px; text-align:center; background:#f8fafc;">Qui</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sex</th><th style="padding:8px; text-align:center; background:#f8fafc;">Sáb</th></tr></thead><tbody><tr>';
-
-        for (let i = 0; i < primeiroDia; i++) {
-            html += '<td style="padding:8px; text-align:center; color:#cbd5e1;"></td>';
+        // empty cells
+        for (let i = 0; i < firstDay; i++) {
+            html += `<div style="padding:12px; min-height:80px; background:transparent;"></div>`;
         }
 
-        for (let dia = 1; dia <= diasNoMes; dia++) {
-            const dataStr = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-            const consultasDia = consultas.filter(function(c) {
-                return (c.data_consulta || '') === dataStr;
-            });
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dataStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const consultasDia = consultas.filter(function(c) { return (c.data_consulta || '') === dataStr; });
             const temConsulta = consultasDia.length > 0;
-            const bgColor = temConsulta ? '#fee2e2' : 'transparent';
-            const textColor = temConsulta ? '#991b1b' : '#1e2a3a';
+            const dotColor = temConsulta ? (consultasDia.every(a => a.status === 'Realizada') ? '#22c55e' : '#ef4444') : 'transparent';
 
             if (temConsulta) {
-                html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; font-weight:600; cursor:pointer;" onclick="abrirModal('${medicoNome}','${dataStr}')">
-                ${dia}
-                <br><small style="font-size:10px; color:#6b7280;">${consultasDia.length} consulta(s)</small>
-            </td>`;
+                html += `<div style="padding:12px; min-height:80px; background:#fff7f7; border-radius:10px; cursor:pointer; border:1px solid #fee2e2;" onclick="abrirModal('${medicoNome}','${dataStr}')">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;"><strong>${day}</strong><span style="font-size:11px;color:#64748b;">${consultasDia.length} consulta(s)</span></div>
+                    <div style="flex:1;"></div>
+                    <div style="display:flex; justify-content:center;"><span style="width:10px;height:10px;border-radius:50%;background:${dotColor};"></span></div>
+                </div>`;
             } else {
-                // empty slot — allow scheduling
-                html += `<td style="padding:8px; text-align:center; background:${bgColor}; color:${textColor}; border-radius:4px; cursor:pointer;" onclick="abrirAgendamento('${medicoNome}','${dataStr}')">
-                ${dia}
-            </td>`;
-            }
-
-            if ((primeiroDia + dia) % 7 === 0) {
-                html += '</tr><tr>';
+                html += `<div style="padding:12px; min-height:80px; background:transparent; border-radius:10px; cursor:pointer; border:1px dashed transparent;" onclick="abrirAgendamento('${medicoNome}','${dataStr}')">
+                    <div><strong>${day}</strong></div>
+                </div>`;
             }
         }
 
-        const totalDias = primeiroDia + diasNoMes;
-        const resto = totalDias % 7;
-        if (resto > 0) {
-            for (let i = 0; i < (7 - resto); i++) {
-                html += '<td style="padding:8px; text-align:center; color:#cbd5e1;"></td>';
-            }
-        }
-
-        html += '</tr></tbody></table>';
+        html += '</div>';
         container.innerHTML = html;
     }
 

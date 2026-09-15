@@ -278,6 +278,30 @@ switch ($action) {
         respondJson($doctors);
         break;
 
+    case 'update_doctor':
+        $doctor_id = trim((string) ($_POST['doctor_id'] ?? ''));
+        $updates = $_POST['updates'] ?? [];
+        if (is_string($updates)) {
+            $decoded = json_decode($updates, true);
+            if (is_array($decoded)) $updates = $decoded;
+        }
+
+        if ($doctor_id === '') {
+            respondJson(['success' => false, 'message' => 'doctor_id não informado.'], 400);
+        }
+
+        $ok = false;
+        if (function_exists('update_doctor_profile')) {
+            $ok = update_doctor_profile($doctor_id, is_array($updates) ? $updates : []);
+        }
+
+        if ($ok) {
+            respondJson(['success' => true, 'message' => 'Médico atualizado com sucesso.']);
+        }
+
+        respondJson(['success' => false, 'message' => 'Falha ao atualizar médico.'], 500);
+        break;
+
     case 'get_pacientes':
         $pacientes = [];
         foreach ($appointments as $appointment) {
@@ -290,6 +314,82 @@ switch ($action) {
             ];
         }
         respondJson($pacientes);
+        break;
+
+    case 'get_paciente_detalhes':
+        $id = trim((string) ($_GET['id'] ?? ''));
+        if ($id === '') {
+            respondJson(['error' => 'ID do paciente não informado.'], 400);
+        }
+
+        $found = null;
+        foreach ($appointments as $appt) {
+            if (($appt['id'] ?? '') === $id) {
+                $found = $appt;
+                break;
+            }
+        }
+
+        if (!$found) {
+            respondJson(['error' => 'Paciente/consulta não encontrada.'], 404);
+        }
+
+        $cpf = $found['cpf'] ?? '';
+        $patientName = $found['patient_name'] ?? '';
+
+        $consultas = array_values(array_filter($appointments, function ($a) use ($cpf, $patientName) {
+            return ($a['cpf'] ?? '') === $cpf || ($a['patient_name'] ?? '') === $patientName;
+        }));
+
+        $paciente = [
+            'id' => $found['id'] ?? '',
+            'nome_criptografado' => $found['patient_name'] ?? '',
+            'email' => $found['email'] ?? '',
+            'idade' => $found['patient_age'] ?? null,
+            'peso' => $found['weight'] ?? null,
+            'altura' => $found['height'] ?? null,
+            'sexo_biologico' => $found['sex'] ?? null,
+            'cpf' => $cpf,
+            'telefone' => $found['phone'] ?? '',
+        ];
+
+        respondJson([
+            'paciente' => $paciente,
+            'historico' => [],
+            'exames' => [],
+            'consultas' => $consultas,
+        ]);
+        break;
+
+    case 'update_paciente':
+        $id = trim((string) ($_POST['id'] ?? ''));
+        $updates = $_POST;
+        if (is_string($updates) && trim($updates) !== '') {
+            $decoded = json_decode($updates, true);
+            if (is_array($decoded)) $updates = $decoded;
+        }
+
+        if ($id === '') {
+            respondJson(['success' => false, 'message' => 'ID da consulta/paciente não informado.'], 400);
+        }
+
+        // Allowed update keys for appointment/patient
+        $allowed = ['patient_name','patient_age','cpf','phone','symptoms','status','date','time','height','weight','sex'];
+        $toApply = [];
+        foreach ($allowed as $k) {
+            if (isset($updates[$k])) $toApply[$k] = $updates[$k];
+        }
+
+        if (empty($toApply)) {
+            respondJson(['success' => false, 'message' => 'Nenhum campo válido para atualizar.'], 400);
+        }
+
+        $ok = update_appointment_record($id, $toApply);
+        if ($ok) {
+            respondJson(['success' => true, 'message' => 'Paciente/consulta atualizada com sucesso.']);
+        }
+
+        respondJson(['success' => false, 'message' => 'Falha ao atualizar.'], 500);
         break;
 
     default:
