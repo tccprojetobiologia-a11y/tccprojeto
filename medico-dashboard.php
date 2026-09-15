@@ -131,6 +131,15 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                 <div id="dayModalContent"></div>
             </div>
         </div>
+        <div id="patientModal" class="modal hidden" aria-modal="true" role="dialog">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="patientModalTitle" style="margin:0;">Dados do paciente</h3>
+                    <button type="button" class="close-modal" id="closePatientModal" aria-label="Fechar">&times;</button>
+                </div>
+                <div id="patientModalContent"></div>
+            </div>
+        </div>
         <div class="main-tab-content">
             <div id="agendaTab" class="tab-view active">
                 <div class="card" style="margin-top:10px; padding:16px;">
@@ -188,6 +197,10 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         document.getElementById('closeDayModal')?.addEventListener('click', closeDayModal);
         document.getElementById('dayModal')?.addEventListener('click', (event) => {
             if (event.target.id === 'dayModal') closeDayModal();
+        });
+        document.getElementById('closePatientModal')?.addEventListener('click', closePatientModal);
+        document.getElementById('patientModal')?.addEventListener('click', (event) => {
+            if (event.target.id === 'patientModal') closePatientModal();
         });
         renderCalendar();
         renderPatients();
@@ -394,15 +407,10 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                     <div style="font-size:12px; color:#64748b;">${patient.cpf}</div>
                 </div>
             `;
-            item.addEventListener('click', () => selectPatient(patient.name));
+            item.addEventListener('click', () => openPatientModal(patient.name));
             patientList.appendChild(item);
         });
-
-        const selectedStillVisible = filteredPatients.some(patient => patient.name === selectedPatient);
-        if (!selectedStillVisible) {
-            selectedPatient = filteredPatients[0].name;
-        }
-        renderPatientHistory();
+        // Do not auto-select a patient here; history opens only when user clicks a patient.
     }
 
     function selectPatient(name, appointmentId = '') {
@@ -467,10 +475,51 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         }
     }
 
-    function showAppointmentDetails(appointmentId) {
+    // Open patient modal with details and history
+    function openPatientModal(patientName) {
+        const modal = document.getElementById('patientModal');
+        const title = document.getElementById('patientModalTitle');
+        const content = document.getElementById('patientModalContent');
+        if (!modal || !content || !title) return;
+        const patientAppointments = appointments.filter(a => a.patient_name === patientName).sort((a,b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+        const patientInfo = patientAppointments[0] || { patient_name: patientName, patient_age: '', cpf: '', phone: '' };
+        title.innerText = patientInfo.patient_name || patientName;
+        const header = `
+            <div style="padding:12px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; margin-bottom:12px;">
+                <div style="font-weight:700; color:#1e2a3a;">${patientInfo.patient_name || patientName}</div>
+                <div style="color:#64748b; margin-top:6px;">Idade: ${patientInfo.patient_age || '—'} anos • CPF: ${patientInfo.cpf || '—'} • Tel: ${patientInfo.phone || '—'}</div>
+                <div style="margin-top:8px; color:#475569;">Consultas totais: ${patientAppointments.length}</div>
+            </div>
+        `;
+
+        const rows = patientAppointments.length === 0 ? '<p class="muted">Nenhum histórico encontrado para este paciente.</p>' : patientAppointments.map(app => `
+            <div style="padding:12px; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:10px; background:#ffffff; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:700; color:#1e2a3a;">${app.date} • ${app.time}</div>
+                    <div style="color:#64748b; font-size:13px; margin-top:4px;">Status: ${app.status}</div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" type="button" onclick="showAppointmentDetails('${app.id}','patientModalContent')">Ver detalhes</button>
+                </div>
+            </div>
+        `).join('');
+
+        content.innerHTML = header + '<h4 style="margin-top:0;">Consultas atuais e passadas</h4>' + rows;
+        modal.classList.remove('hidden');
+    }
+
+    function closePatientModal() {
+        const modal = document.getElementById('patientModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+    }
+
+    function showAppointmentDetails(appointmentId, targetId) {
         const appointment = appointments.find(a => a.id === appointmentId);
         if (!appointment) return;
-        const target = activeTab === 'pacientes' ? document.getElementById('patientDetailCard') : document.getElementById('dayScheduleList');
+        let target = null;
+        if (targetId) target = document.getElementById(targetId);
+        if (!target) target = activeTab === 'pacientes' ? document.getElementById('patientDetailCard') : document.getElementById('dayScheduleList');
         if (!target) return;
         target.innerHTML = `
             <div style="padding:18px; border:1px solid #e5e7eb; border-radius:16px; background:#ffffff; margin-top:12px;">
