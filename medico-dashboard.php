@@ -160,11 +160,7 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
                     <input id="patientSearch" class="search-input" type="text" placeholder="Pesquisar paciente...">
                     <div id="patientList" style="display:grid; gap:12px; margin-top:12px;"></div>
                 </div>
-                <div class="card" style="margin-top:10px; padding:16px;">
-                    <div style="font-weight:700; margin-bottom:12px;">Histórico médico</div>
-                    <div id="patientHistory"></div>
-                    <div id="patientDetailCard" style="margin-top:16px;"></div>
-                </div>
+                <!-- Histórico médico movido para o modal; removido da visualização inline -->
             </div>
         </div>
     </main>
@@ -390,7 +386,6 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
         if (filteredPatients.length === 0) {
             patientList.innerHTML = '<p class="muted">Nenhum paciente encontrado.</p>';
             selectedPatient = null;
-            renderPatientHistory();
             return;
         }
 
@@ -414,65 +409,21 @@ $appointmentsJson = json_encode($appointments, JSON_HEX_TAG | JSON_HEX_APOS | JS
     }
 
     function selectPatient(name, appointmentId = '') {
-        selectedPatient = name;
-        document.querySelectorAll('.patient-list-item').forEach(item => {
-            item.classList.toggle('active', item.dataset.patientName === name);
-        });
-        renderPatientHistory(appointmentId);
-        switchTab('pacientes');
+        // Close day modal if open and open patient modal instead of showing inline history
+        try { closeDayModal(); } catch (e) {}
+        openPatientModal(name);
+        if (appointmentId) {
+            // show details for the specific appointment inside the modal
+            showAppointmentDetails(appointmentId, 'patientModalContent');
+        }
     }
 
     function renderPatientHistory(appointmentId = '') {
+        // Histórico removido do layout inline — a visualização ocorre apenas no modal.
         const historyContainer = document.getElementById('patientHistory');
         const detailContainer = document.getElementById('patientDetailCard');
-
-        if (!selectedPatient) {
-            historyContainer.innerHTML = '<p class="muted">Selecione um paciente para ver o histórico.</p>';
-            if (detailContainer) detailContainer.innerHTML = '';
-            return;
-        }
-
-        const patientAppointments = appointments.filter(a => a.patient_name === selectedPatient).sort((a,b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
-        if (patientAppointments.length === 0) {
-            historyContainer.innerHTML = '<p class="muted">Nenhum histórico encontrado para este paciente.</p>';
-            if (detailContainer) detailContainer.innerHTML = '';
-            return;
-        }
-
-        const patient = patientAppointments[0];
-        const appointmentRows = patientAppointments.map(app => `
-            <div style="padding:14px; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:12px; background:#ffffff;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-                    <div>
-                        <div style="font-weight:700; color:#1e2a3a;">${app.date} • ${app.time}</div>
-                        <div style="font-size:13px; color:#64748b; margin-top:4px;">Status: ${app.status}</div>
-                    </div>
-                    <button class="btn btn-primary" type="button" onclick="showAppointmentDetails('${app.id}')">Ver detalhes</button>
-                </div>
-            </div>
-        `).join('');
-
-        historyContainer.innerHTML = `
-            <div style="display:grid; gap:16px;">
-                <div style="padding:20px; border:1px solid #e5e7eb; border-radius:16px; background:#f8fafc;">
-                    <div style="font-weight:700; color:#1e2a3a; font-size:18px;">${patient.patient_name || selectedPatient}</div>
-                    <div style="margin-top:8px; color:#64748b;">Idade: ${patient.patient_age || 0} anos • CPF: ${patient.cpf || 'N/A'} • Tel: ${patient.phone || 'N/A'}</div>
-                    <div style="margin-top:12px; color:#475569;">Consultas totais: ${patientAppointments.length}</div>
-                </div>
-                <div>
-                    <h4 style="margin-top:0;">Consultas atuais e passadas</h4>
-                    ${appointmentRows}
-                </div>
-            </div>
-        `;
-
-        if (detailContainer) {
-            detailContainer.innerHTML = '';
-        }
-
-        if (appointmentId) {
-            showAppointmentDetails(appointmentId);
-        }
+        if (historyContainer) historyContainer.innerHTML = '';
+        if (detailContainer) detailContainer.innerHTML = '';
     }
 
     // Open patient modal with details and history
