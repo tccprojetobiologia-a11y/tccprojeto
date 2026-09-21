@@ -119,6 +119,45 @@
             if (result.success) {
                 alert('✓ Consulta confirmada!');
                 window.renderConsultas();
+
+                // after confirming, open the agenda view and highlight the appointment
+                (async function() {
+                    try {
+                        // fetch all consultas to find the confirmed one
+                        const resp = await fetch('../api/admin_api.php?action=get_consultas');
+                        const all = await resp.json();
+                        const found = all.find(function(x){ return String(x.id_consulta || x.id) === String(id); });
+                        if (!found) return;
+                        const doctorName = found.medico || found.nome_medico || '';
+                        const date = found.data_consulta || found.date || '';
+
+                        // load agenda section
+                        if (typeof carregar === 'function') carregar('agenda-medicos');
+
+                        // wait for the agenda to render and set selection
+                        const waitFor = (selector, timeout = 3000) => new Promise((resolve) => {
+                            const start = Date.now();
+                            const iv = setInterval(() => {
+                                const el = document.querySelector(selector);
+                                if (el) { clearInterval(iv); resolve(el); }
+                                if (Date.now() - start > timeout) { clearInterval(iv); resolve(null); }
+                            }, 200);
+                        });
+
+                        const select = await waitFor('#doctorSelect', 4000);
+                        if (!select) return;
+                        // choose option by name if possible
+                        let opt = Array.from(select.options).find(o => (o.textContent || '').includes(doctorName));
+                        if (!opt) opt = select.options[0];
+                        select.value = opt.value;
+                        select.dispatchEvent(new Event('change'));
+
+                        // wait a bit then open modal for the day
+                        setTimeout(function(){ if (typeof abrirModal === 'function') abrirModal(doctorName, date); }, 700);
+                    } catch (err) {
+                        console.warn('Não foi possível abrir agenda automaticamente:', err);
+                    }
+                })();
             } else {
                 alert('❌ ' + result.error);
             }
