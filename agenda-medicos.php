@@ -83,7 +83,11 @@ $doctors = get_doctors();
         for (let dia = 1; dia <= diasDoMes; dia++) {
             const data = `${window.agendaState.ano}-${String(window.agendaState.mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
             const consultasDoDia = consultasDoMedico.filter(item => item.data_consulta === data);
-            html += `<td style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px; background:${consultasDoDia.length ? '#fff7f7' : '#fff'};">`;
+            if (consultasDoDia.length > 0) {
+                html += `<td style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px; background:#fff7f7;">`;
+            } else {
+                html += `<td data-empty-day="${data}" style="padding: 10px; border:1px solid #e2e8f0; vertical-align: top; min-height:120px; background:#fff; cursor:pointer;">`;
+            }
             html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
             html += `<span style="font-weight:700; color:#1e2a3a;">${dia}</span>`;
             if (consultasDoDia.length > 0) {
@@ -149,6 +153,7 @@ $doctors = get_doctors();
                     html += '<div style="display:flex; gap:10px; flex-wrap:wrap;">';
                     html += '<button type="button" data-agenda-action="Concluída" data-appointment-id="' + (slot.appointment_id || '') + '" style="padding:10px 14px; background:#16a34a; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Consulta concluída</button>';
                     html += '<button type="button" data-agenda-action="Não concluída" data-appointment-id="' + (slot.appointment_id || '') + '" style="padding:10px 14px; background:#ef4444; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Não concluída</button>';
+                    html += '<button type="button" data-edit-appointment-id="' + (slot.appointment_id || '') + '" style="padding:10px 14px; background:#0ea5a4; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Editar</button>';
                     html += '</div>';
                     html += '<div class="motivo-box" style="margin-top:12px; display:none;">';
                     html += '<label style="display:block; margin-bottom:8px; font-weight:600; color:#1e2a3a;">Motivo da não conclusão</label>';
@@ -223,6 +228,86 @@ $doctors = get_doctors();
             }
         } catch (error) {
             alert('Erro ao atualizar a consulta: ' + error.message);
+        }
+    });
+
+    // Click on empty day cell to quick-create an appointment
+    document.addEventListener('click', async function(e) {
+        const emptyCell = e.target.closest('[data-empty-day]');
+        if (!emptyCell) return;
+        const date = emptyCell.getAttribute('data-empty-day');
+        const doctor = getSelectedDoctor();
+        if (!doctor) return alert('Selecione um médico primeiro.');
+
+        const time = prompt('Informe o horário (HH:MM):', '09:00');
+        if (!time) return;
+        const patient = prompt('Nome do paciente:', 'Paciente');
+        if (!patient) return;
+
+        const payload = {
+            doctor_id: doctor.id || '',
+            patient_name: patient,
+            patient_age: 0,
+            cpf: '',
+            phone: '',
+            date: date,
+            time: time,
+            status: 'Pendente',
+            symptoms: 'Agendamento rápido pelo admin.'
+        };
+
+        try {
+            const res = await fetch('../api/admin_api.php?action=create_appointment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data && data.success) {
+                alert('Consulta criada com sucesso.');
+                carregarAgenda();
+            } else {
+                alert((data && data.message) ? data.message : 'Falha ao criar consulta.');
+            }
+        } catch (err) {
+            alert('Erro ao criar consulta: ' + err.message);
+        }
+    });
+
+    // Edit appointment (change time/date)
+    document.addEventListener('click', async function(e) {
+        const editBtn = e.target.closest('[data-edit-appointment-id]');
+        if (!editBtn) return;
+        const appointmentId = editBtn.getAttribute('data-edit-appointment-id');
+        if (!appointmentId) return alert('ID da consulta não encontrado.');
+
+        const newTime = prompt('Informe novo horário (HH:MM):', '09:00');
+        if (!newTime) return;
+        const newDate = prompt('Informe nova data (AAAA-MM-DD) ou deixe em branco para manter:', '');
+
+        const payload = { id: appointmentId };
+        if (newTime) payload.time = newTime;
+        if (newDate) payload.date = newDate;
+
+        try {
+            const res = await fetch('../api/admin_api.php?action=update_paciente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result && result.success) {
+                alert('Consulta atualizada.');
+                if (window.currentAgendaContext && window.currentAgendaContext.medico && window.currentAgendaContext.data) {
+                    abrirModal(window.currentAgendaContext.medico, window.currentAgendaContext.data);
+                } else {
+                    carregarAgenda();
+                }
+            } else {
+                alert((result && result.message) || 'Falha ao atualizar.');
+            }
+        } catch (err) {
+            alert('Erro ao atualizar: ' + err.message);
         }
     });
 

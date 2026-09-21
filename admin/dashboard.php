@@ -93,7 +93,8 @@ $user_email = $_SESSION['user_email'] ?? 'admin@cardioweb.com';
             document.querySelectorAll('.nav-item').forEach(function(el) {
                 el.classList.remove('active');
             });
-            document.querySelector('.nav-item[onclick="loadContent(\'' + section + '\')"]').classList.add('active');
+            var navBtn = document.querySelector('.nav-item[onclick="loadContent(\'' + section + '\')"]');
+            if (navBtn) navBtn.classList.add('active');
             
             var contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = '<div style="text-align:center;padding:50px;color:#999;"><i class="fas fa-spinner fa-spin" style="font-size:30px;color:#851e32;"></i><p>Carregando...</p></div>';
