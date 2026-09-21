@@ -82,9 +82,9 @@ $doctors = get_doctors();
 <?php echo $message; ?>
 
 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px;">
-    <button type="button" class="tab-doctor-button active" data-tab="agendar" style="padding:12px 18px; background:#851e32; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Agendar consulta</button>
-    <button type="button" class="tab-doctor-button" data-tab="cadastro" style="padding:12px 18px; background:#e2e8f0; color:#1e2a3a; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Cadastro médico</button>
-    <button type="button" class="tab-doctor-button" data-tab="listagem" style="padding:12px 18px; background:#e2e8f0; color:#1e2a3a; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Médicos cadastrados</button>
+    <button type="button" class="tab-doctor-button active" data-tab="agendar" onclick="switchDoctorTab('agendar')" style="padding:12px 18px; background:#851e32; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Agendar consulta</button>
+    <button type="button" class="tab-doctor-button" data-tab="cadastro" onclick="switchDoctorTab('cadastro')" style="padding:12px 18px; background:#e2e8f0; color:#1e2a3a; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Cadastro médico</button>
+    <button type="button" class="tab-doctor-button" data-tab="listagem" onclick="switchDoctorTab('listagem')" style="padding:12px 18px; background:#e2e8f0; color:#1e2a3a; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Médicos cadastrados</button>
 </div>
 
 <div id="doctor-panel-agendar" class="doctor-panel" style="display:block; background:white; padding:24px; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
@@ -211,6 +211,20 @@ $doctors = get_doctors();
 </div>
 
 <script>
+    function switchDoctorTab(section) {
+        const buttons = document.querySelectorAll('.tab-doctor-button');
+        const panels = document.querySelectorAll('.doctor-panel');
+        buttons.forEach(function (item) {
+            const active = item.dataset.tab === section;
+            item.classList.toggle('active', active);
+            item.style.background = active ? '#851e32' : '#e2e8f0';
+            item.style.color = active ? '#fff' : '#1e2a3a';
+        });
+        panels.forEach(function (panel) {
+            panel.style.display = panel.id === 'doctor-panel-' + section ? 'block' : 'none';
+        });
+    }
+
     (function () {
         const buttons = document.querySelectorAll('.tab-doctor-button');
         const panels = document.querySelectorAll('.doctor-panel');

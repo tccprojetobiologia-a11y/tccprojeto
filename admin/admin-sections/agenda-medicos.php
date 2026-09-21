@@ -78,38 +78,52 @@
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        let html = '<div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px;">';
-        // headers
-        dayNames.forEach(function(d) {
-            html += `<div style="padding:8px; text-align:center; background:#f8fafc; border-radius:10px; font-weight:700;">${d}</div>`;
-        });
 
-        // empty cells
-        for (let i = 0; i < firstDay; i++) {
-            html += `<div style="padding:12px; min-height:80px; background:transparent;"></div>`;
-        }
 
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dataStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const consultasDia = consultas.filter(function(c) { return (c.data_consulta || '') === dataStr; });
-            const temConsulta = consultasDia.length > 0;
-            const dotColor = temConsulta ? (consultasDia.every(a => a.status === 'Realizada') ? '#22c55e' : '#ef4444') : 'transparent';
 
-            if (temConsulta) {
-                html += `<div style="padding:12px; min-height:80px; background:#fff7f7; border-radius:10px; cursor:pointer; border:1px solid #fee2e2;" onclick="abrirModal('${medicoNome}','${dataStr}')">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;"><strong>${day}</strong><span style="font-size:11px;color:#64748b;">${consultasDia.length} consulta(s)</span></div>
-                    <div style="flex:1;"></div>
-                    <div style="display:flex; justify-content:center;"><span style="width:10px;height:10px;border-radius:50%;background:${dotColor};"></span></div>
-                </div>`;
-            } else {
-                html += `<div style="padding:12px; min-height:80px; background:transparent; border-radius:10px; cursor:pointer; border:1px dashed transparent;" onclick="abrirAgendamento('${medicoNome}','${dataStr}')">
-                    <div><strong>${day}</strong></div>
-                </div>`;
+
+            let html = '';
+            html += '<div style="background: white; border-radius: 12px; padding: 12px;">';
+            html += '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:8px;">';
+            dayNames.forEach(d => { html += `<div style="text-align:center; padding:8px; background:#f8fafc; border-radius:10px; font-weight:700;">${d}</div>`; });
+            html += '</div>';
+
+            html += '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px;">';
+
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-cell disabled" style="min-height:90px; padding:12px; border-radius:12px; background:#f8fafc;"></div>';
             }
-        }
 
-        html += '</div>';
-        container.innerHTML = html;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dataStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const consultasDia = consultas.filter(function(c) { return (c.data_consulta || '') === dataStr; });
+                const allDone = consultasDia.length > 0 && consultasDia.every(a => a.status === 'Realizada');
+                const dotColor = consultasDia.length === 0 ? 'transparent' : allDone ? '#22c55e' : '#ef4444';
+
+                let cellHtml = '';
+                cellHtml += `<div class="calendar-cell" style="min-height:90px; padding:12px; border-radius:12px; background:white; cursor:pointer;border:1px solid #e5e7eb; display:flex; flex-direction:column; justify-content:space-between;" data-date="${dataStr}" data-medico="${medicoNome}">`;
+                cellHtml += `<div style="display:flex; justify-content:space-between; align-items:flex-start;"><strong>${day}</strong><span style="font-size:11px;color:#64748b;">${dayNames[new Date(dataStr + 'T00:00:00').getDay()]}</span></div>`;
+                cellHtml += '<div style="flex:1;"></div>';
+                cellHtml += `<div style="display:flex; justify-content:center;"><span class="calendar-dot" style="width:10px;height:10px;border-radius:50%;background:${dotColor};"></span></div>`;
+                cellHtml += `</div>`;
+
+                html += cellHtml;
+            }
+
+            html += '</div></div>';
+
+            container.innerHTML = html;
+
+            // Attach click handlers to cells
+            container.querySelectorAll('.calendar-cell').forEach(function(cell) {
+                const date = cell.getAttribute('data-date');
+                const hasAppointments = consultas.some(c => (c.data_consulta || '') === date);
+                if (hasAppointments) {
+                    cell.addEventListener('click', function() { abrirModal(medicoNome, date); });
+                } else {
+                    cell.addEventListener('click', function() { abrirAgendamento(medicoNome, date); });
+                }
+            });
     }
 
     window.abrirModal = async function(medico, data) {
