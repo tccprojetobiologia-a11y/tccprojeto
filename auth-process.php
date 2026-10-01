@@ -202,17 +202,8 @@ if ($success && $userData) {
     $_SESSION['logado'] = true;
     
     // Definir role
-    $role = strtolower($userData['role'] ?? $userData['tipo_perfil'] ?? 'paciente');
-    if ($role === 'admin') {
-        $_SESSION['user_role'] = 'admin';
-        header('Location: admin/dashboard.php');
-    } elseif ($role === 'doctor') {
-        $_SESSION['user_role'] = 'doctor';
-        header('Location: medico-dashboard.php');
-    } else {
-        $_SESSION['user_role'] = 'paciente';
-        header('Location: dashboard.php');
-    }
+    $_SESSION['user_role'] = 'paciente';
+    header('Location: dashboard.php');
     exit();
 } else {
     // Retornar erro

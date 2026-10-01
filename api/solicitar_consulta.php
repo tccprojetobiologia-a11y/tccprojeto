@@ -28,7 +28,7 @@ try {
     // Verificar se já existe consulta nesse horário
     $stmt = $pdo->prepare("
         SELECT COUNT(*) FROM consultas 
-        WHERE nome_medico = ? AND data_consulta = ? AND hora_consulta = ? AND status != 'Recusada'
+        WHERE nome_medico = ? AND data_consulta = ? AND hora_consulta = ?
     ");
     $stmt->execute([$medico, $data_consulta, $hora_consulta]);
     $existe = $stmt->fetchColumn();
@@ -38,14 +38,14 @@ try {
         exit;
     }
     
-    // Inserir consulta
+    // Inserir consulta auto-confirmada
     $stmt = $pdo->prepare("
         INSERT INTO consultas (id_paciente, nome_medico, especialidade, data_consulta, hora_consulta, status, observacoes)
-        VALUES (?, ?, ?, ?, ?, 'Pendente', ?)
+        VALUES (?, ?, ?, ?, ?, 'Confirmada', ?)
     ");
     $stmt->execute([$id_paciente, $medico, $especialidade, $data_consulta, $hora_consulta, $observacoes]);
     
-    echo json_encode(['success' => true, 'message' => 'Consulta solicitada com sucesso!']);
+    echo json_encode(['success' => true, 'message' => 'Consulta confirmada com sucesso!']);
     
 } catch (Exception $e) {
     echo json_encode(['error' => 'Erro ao salvar: ' . $e->getMessage()]);

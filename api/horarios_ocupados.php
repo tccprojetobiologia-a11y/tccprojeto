@@ -17,7 +17,7 @@ try {
     
     $stmt = $pdo->prepare("
         SELECT hora_consulta FROM consultas 
-        WHERE nome_medico = ? AND data_consulta = ? AND status != 'Recusada'
+        WHERE nome_medico = ? AND data_consulta = ?
     ");
     $stmt->execute([$medico, $data]);
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);

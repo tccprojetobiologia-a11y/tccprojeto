@@ -145,11 +145,14 @@ require_once __DIR__ . '/informacoes.php';
                 <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" onclick="changePage('blog')">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'consultas' ? 'active' : ''; ?>" onclick="changePage('consultas')">
-                    <i class="fas fa-calendar-check"></i><span>Consultas</span>
+                <div class="nav-item <?php echo $page == 'agenda' ? 'active' : ''; ?>" onclick="changePage('agenda')">
+                    <i class="fas fa-calendar-alt"></i><span>Agenda</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" onclick="changePage('exames')">
-                    <i class="fas fa-flask"></i><span>Exames</span>
+                    <i class="fas fa-flask"></i><span>Meus Exames</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'monitoramento' ? 'active' : ''; ?>" onclick="changePage('monitoramento')">
+                    <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" onclick="changePage('informacoes')">
                     <i class="fas fa-info-circle"></i><span>Informações</span>
@@ -261,8 +264,10 @@ require_once __DIR__ . '/informacoes.php';
             const titles = {
                 'inicio': 'Início',
                 'blog': 'Blog',
-                'consultas': 'Consultas',
-                'exames': 'Exames',
+                'agenda': 'Agenda',
+                'consultas': 'Agenda',
+                'exames': 'Meus Exames',
+                'monitoramento': 'Monitoramento',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
             };
@@ -317,10 +322,17 @@ require_once __DIR__ . '/informacoes.php';
                 });
                 html += `</div>`;
                 contentArea.innerHTML = html;
-            } else if (page === 'consultas') {
+            } else if (page === 'consultas' || page === 'agenda') {
                 contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;
             } else if (page === 'exames') {
                 contentArea.innerHTML = <?php echo json_encode(getExamesHtml()); ?>;
+            } else if (page === 'monitoramento') {
+                contentArea.innerHTML = `
+                    <div class="info-card">
+                        <h3><i class="fas fa-heartbeat"></i> Monitoramento</h3>
+                        <p>Esta área será utilizada para registrar sinais vitais, evolução e gráficos cardíacos no próximo módulo.</p>
+                    </div>
+                `;
             } else if (page === 'informacoes') {
                 contentArea.innerHTML = <?php echo json_encode(getInformacoesHtml()); ?>;
             } else if (page === 'suporte') {
