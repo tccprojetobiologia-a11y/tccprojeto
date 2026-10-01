@@ -140,19 +140,13 @@ require_once __DIR__ . '/informacoes.php';
             </div>
             <div class="nav-menu">
                 <div class="nav-item <?php echo $page == 'inicio' ? 'active' : ''; ?>" onclick="changePage('inicio')">
-                    <i class="fas fa-home"></i><span>Início</span>
+                    <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" onclick="changePage('blog')">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'agenda' ? 'active' : ''; ?>" onclick="changePage('agenda')">
-                    <i class="fas fa-calendar-alt"></i><span>Agenda</span>
-                </div>
                 <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" onclick="changePage('exames')">
-                    <i class="fas fa-flask"></i><span>Meus Exames</span>
-                </div>
-                <div class="nav-item <?php echo $page == 'monitoramento' ? 'active' : ''; ?>" onclick="changePage('monitoramento')">
-                    <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
+                    <i class="fas fa-flask"></i><span>Exames</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" onclick="changePage('informacoes')">
                     <i class="fas fa-info-circle"></i><span>Informações</span>
@@ -262,11 +256,11 @@ require_once __DIR__ . '/informacoes.php';
             url.searchParams.set('page', page);
             window.history.pushState({}, '', url);
             const titles = {
-                'inicio': 'Início',
+                'inicio': 'Monitoramento',
                 'blog': 'Blog',
                 'agenda': 'Agenda',
                 'consultas': 'Agenda',
-                'exames': 'Meus Exames',
+                'exames': 'Exames',
                 'monitoramento': 'Monitoramento',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
@@ -309,9 +303,21 @@ require_once __DIR__ . '/informacoes.php';
                         <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f0f0f0;"><span>Colesterol Total</span><span><strong>180 mg/dL</strong></span><span style="color:#10b981;">Normal</span></div>
                         <div style="display:flex; justify-content:space-between; padding:12px 0;"><span>Glicemia</span><span><strong>95 mg/dL</strong></span><span style="color:#10b981;">Normal</span></div>
                     </div>
-                    <div class="info-card"><h3><i class="fas fa-calendar-alt"></i> Próximas Consultas</h3>
-                        <div style="display:flex; align-items:center; gap:15px; padding:12px 0;"><div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">15</div><div style="font-size:11px; color:#666;">ABR</div></div><div style="flex:1;"><div style="font-weight:600;">Cardiologista - Dr. Carlos</div><div style="font-size:12px; color:#666;">10:00 - Consulta presencial</div></div><div style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:4px 10px; border-radius:20px;">Confirmado</div></div>
-                        <div style="display:flex; align-items:center; gap:15px; padding:12px 0;"><div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">22</div><div style="font-size:11px; color:#666;">ABR</div></div><div style="flex:1;"><div style="font-weight:600;">Exame de Rotina</div><div style="font-size:12px; color:#666;">08:30 - Laboratório</div></div><div style="font-size:11px; background:#fff3e0; color:#ff9800; padding:4px 10px; border-radius:20px;">Pendente</div></div>
+                    <div class="info-card"><h3><i class="fas fa-calendar-alt"></i> Agenda</h3>
+                        <div style="display:flex; align-items:center; gap:15px; padding:12px 0;">
+                            <div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">15</div><div style="font-size:11px; color:#666;">ABR</div></div>
+                            <div style="flex:1;"><div style="font-weight:600;">Cardiologista - Dr. Carlos</div><div style="font-size:12px; color:#666;">10:00 - Consulta presencial</div></div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button type="button" style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:4px 10px; border:none; border-radius:20px; cursor:pointer;" onclick="editarConsulta(1)">Editar</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:15px; padding:12px 0;">
+                            <div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">22</div><div style="font-size:11px; color:#666;">ABR</div></div>
+                            <div style="flex:1;"><div style="font-weight:600;">Exame de Rotina</div><div style="font-size:12px; color:#666;">08:30 - Laboratório</div></div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button type="button" style="font-size:11px; background:#fff3e0; color:#ff9800; padding:4px 10px; border:none; border-radius:20px; cursor:pointer;" onclick="editarConsulta(2)">Editar</button>
+                            </div>
+                        </div>
                     </div>
                 `;
             } else if (page === 'blog') {
@@ -379,6 +385,18 @@ require_once __DIR__ . '/informacoes.php';
             if (m.includes('consulta')) return 'Para agendar uma consulta, acesse o menu "Consultas" ou ligue para (11) 4002-8922.';
             if (m.includes('exame')) return 'Seus exames ficam disponíveis na seção "Exames" após liberação médica.';
             return 'Entendi! Para mais informações, leia nossos artigos no blog ou acesse o suporte. 💙';
+        }
+
+        function editarConsulta(id) {
+            const texto = prompt('Anote o que você precisa lembrar sobre essa consulta:', 'Consulta agendada');
+            if (texto === null) return;
+            const item = document.querySelectorAll('.info-card button[onclick^="editarConsulta"]')[id - 1];
+            if (item) {
+                item.textContent = 'Editado';
+                item.style.background = '#dbeafe';
+                item.style.color = '#1d4ed8';
+            }
+            console.log('Consulta ' + id + ' anotada:', texto);
         }
 
         // ============================================================

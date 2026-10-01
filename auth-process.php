@@ -10,7 +10,6 @@ session_start();
 
 // ========== INCLUIR CONFIGURAÇÃO DO BANCO ==========
 require_once 'config/database.php';
-require_once 'config/auth_storage.php';
 
 // Detectar tipo de login
 $login_type = isset($_POST['login_type']) ? $_POST['login_type'] : '';
@@ -35,32 +34,30 @@ try {
             $error = 'E-mail e senha são obrigatórios';
         } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = 'E-mail inválido';
-        } else {
-            $localUser = authenticate_local_user($email, $password);
-            if ($localUser) {
-                $userData = $localUser;
-                $success = true;
-            } else if ($pdo) {
-                // Buscar usuário no banco
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-                $stmt->execute([$email]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($user) {
-                    // Verificar senha (em produção use password_verify)
-                    // Por enquanto, comparação simples (hash em produção)
-                    if ($user['senha_hash'] === $password) {
-                        $userData = $user;
-                        $success = true;
-                    } else {
-                        $error = 'Senha incorreta';
-                    }
+        } else if ($pdo) {
+            // Login apenas com usuário já cadastrado no banco de dados
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                $storedHash = (string) ($user['senha_hash'] ?? '');
+
+                if ($storedHash !== '' && password_verify($password, $storedHash)) {
+                    $userData = $user;
+                    $success = true;
+                } else if ($storedHash !== '' && $storedHash === $password) {
+                    // Compatibilidade com senhas legadas em texto puro
+                    $userData = $user;
+                    $success = true;
                 } else {
-                    $error = 'Usuário não encontrado';
+                    $error = 'Senha incorreta';
                 }
             } else {
-                $error = 'Usuário não encontrado';
+                $error = 'Este e-mail não está cadastrado no sistema.';
             }
+        } else {
+            $error = 'Não foi possível conectar ao banco de dados.';
         }
     }
 
@@ -72,33 +69,16 @@ try {
         if (empty($email)) {
             $error = 'Erro na autenticação do Google';
         } else {
-            // Verificar se usuário existe, senão criar
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+            // Login Google apenas com e-mail já cadastrado no banco
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$user) {
-                // Criar usuário novo para login social
-                $nomeCriptografado = base64_encode($name ?: explode('@', $email)[0]);
-                $senhaHash = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                
-                $stmt = $pdo->prepare("
-                    INSERT INTO usuarios (id_usuario, nome_criptografado, email, senha_hash, tipo_perfil, data_nascimento, sexo_biologico, consentimento_lgpd)
-                    VALUES (UUID(), ?, ?, ?, 'Paciente', CURDATE(), 'M', 1)
-                ");
-                $stmt->execute([$nomeCriptografado, $email, $senhaHash]);
-                
-                // Buscar o usuário criado
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-                $stmt->execute([$email]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            }
-            
+
             if ($user) {
                 $userData = $user;
                 $success = true;
             } else {
-                $error = 'Erro ao criar/validar usuário Google';
+                $error = 'Este e-mail do Google não está cadastrado no sistema.';
             }
         }
     }
@@ -110,31 +90,16 @@ try {
         if (empty($email)) {
             $error = 'Erro na autenticação da Apple';
         } else {
-            // Verificar se usuário existe, senão criar
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+            // Login Apple apenas com e-mail já cadastrado no banco
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$user) {
-                $nomeCriptografado = base64_encode(explode('@', $email)[0]);
-                $senhaHash = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                
-                $stmt = $pdo->prepare("
-                    INSERT INTO usuarios (id_usuario, nome_criptografado, email, senha_hash, tipo_perfil, data_nascimento, sexo_biologico, consentimento_lgpd)
-                    VALUES (UUID(), ?, ?, ?, 'Paciente', CURDATE(), 'M', 1)
-                ");
-                $stmt->execute([$nomeCriptografado, $email, $senhaHash]);
-                
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-                $stmt->execute([$email]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            }
-            
+
             if ($user) {
                 $userData = $user;
                 $success = true;
             } else {
-                $error = 'Erro ao criar/validar usuário Apple';
+                $error = 'Este e-mail da Apple não está cadastrado no sistema.';
             }
         }
     }
@@ -151,34 +116,16 @@ try {
         } else if ($code !== '123456') {
             $error = 'Código inválido! Use o código enviado por SMS (teste: 123456)';
         } else {
-            // Buscar usuário pelo telefone (usando email como fallback para telefone)
-            // Nota: Em produção, crie uma coluna 'telefone' na tabela usuarios
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email LIKE ?");
-            $stmt->execute(['%' . $phone . '%']);
+            // SMS só pode entrar se houver um usuário já cadastrado no banco de dados
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email LIKE ? LIMIT 1");
+            $stmt->execute(['%' . preg_replace('/[^0-9]/', '', $phone) . '%']);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$user) {
-                // Criar usuário para SMS
-                $nomeCriptografado = base64_encode('Usuário SMS ' . $phone);
-                $senhaHash = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                $emailSms = 'sms_' . preg_replace('/[^0-9]/', '', $phone) . '@cardioweb.com';
-                
-                $stmt = $pdo->prepare("
-                    INSERT INTO usuarios (id_usuario, nome_criptografado, email, senha_hash, tipo_perfil, data_nascimento, sexo_biologico, consentimento_lgpd)
-                    VALUES (UUID(), ?, ?, ?, 'Paciente', CURDATE(), 'M', 1)
-                ");
-                $stmt->execute([$nomeCriptografado, $emailSms, $senhaHash]);
-                
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-                $stmt->execute([$emailSms]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            }
-            
+
             if ($user) {
                 $userData = $user;
                 $success = true;
             } else {
-                $error = 'Erro ao validar SMS';
+                $error = 'Este telefone não está cadastrado no sistema.';
             }
         }
     }
