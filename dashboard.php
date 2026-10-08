@@ -846,7 +846,22 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
             loadContent(page);
         }
 
+        function bindBlogCardClicks() {
+            const cards = document.querySelectorAll('[data-article-id]');
+            cards.forEach((card) => {
+                card.onclick = function (event) {
+                    if (event) event.preventDefault();
+                    if (event) event.stopPropagation();
+                    const articleId = this.getAttribute('data-article-id');
+                    if (articleId) {
+                        openArticle(articleId);
+                    }
+                };
+            });
+        }
+
         function openArticle(articleId, event) {
+            if (event) event.preventDefault();
             if (event) event.stopPropagation();
             const article = articlesData[articleId];
             if (!article) return;
@@ -905,6 +920,7 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
                 `;
             } else if (page === 'blog') {
                 contentArea.innerHTML = getDashboardBlogHtml();
+                bindBlogCardClicks();
             } else if (page === 'consultas' || page === 'agenda') {
                 contentArea.innerHTML = getDashboardAgendaHtml();
             } else if (page === 'exames') {
