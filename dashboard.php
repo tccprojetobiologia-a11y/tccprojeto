@@ -54,33 +54,38 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f6ecee; overflow: hidden; height: 100vh; }
-        .app-container { display: flex; height: 100vh; width: 100%; }
-        .sidebar { width: 280px; background: linear-gradient(180deg, #4c0719 0%, #7e1b31 100%); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.12); overflow-y: auto; }
-        .logo-area { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 30px; }
+        body { font-family: 'Inter', sans-serif; background: #f4f0f1; overflow: hidden; height: 100vh; }
+        .app-container { display: flex; height: 100vh; width: 100%; background: #f5f0f1; }
+        .sidebar { width: 290px; background: linear-gradient(180deg, #4d0617 0%, #781a2b 100%); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.12); }
+        .logo-area { padding: 26px 24px 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
         .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { background: rgba(255,255,255,0.2); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        .logo-text h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-        .logo-text p { font-size: 10px; opacity: 0.8; margin-top: 4px; }
-        .nav-menu { flex: 1; padding: 0 20px; }
-        .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.8); }
-        .nav-item:hover { background: rgba(255,255,255,0.12); color: white; }
-        .nav-item.active { background: rgba(255,255,255,0.18); color: white; font-weight: 500; }
-        .nav-item i { width: 24px; font-size: 20px; }
+        .logo-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; background: rgba(255,255,255,0.08); }
+        .logo-text h2 { font-size: 17px; letter-spacing: -0.06em; font-weight: 800; margin: 0; }
+        .logo-text p { font-size: 9px; opacity: 0.9; margin-top: 2px; letter-spacing: 0.12em; text-transform: uppercase; }
+        .nav-menu { flex: 1; padding: 18px 18px 0; }
+        .nav-item { display: flex; align-items: center; gap: 14px; padding: 15px 18px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.8); }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.18); color: white; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+        .nav-item i { width: 20px; font-size: 18px; text-align: center; }
         .nav-item span { font-size: 15px; }
-        .user-section { padding: 20px; margin: 20px; background: linear-gradient(135deg, #7a1d34 0%, #5c1230 100%); border-radius: 16px; margin-top: auto; margin-bottom: 20px; }
-        .user-avatar { width: 50px; height: 50px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
-        .user-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-        .user-email { font-size: 11px; opacity: 0.8; margin-bottom: 12px; word-break: break-all; }
-        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 8px; justify-content: center; transition: all 0.3s; }
-        .logout-btn:hover { background: rgba(255,255,255,0.3); }
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
-        .main-header { background: white; padding: 20px 30px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .page-title { font-size: 24px; font-weight: 700; color: #1e2a3a; }
-        .header-actions { display: flex; gap: 15px; }
-        .header-icon { width: 40px; height: 40px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
-        .header-icon:hover { background: #e2e8f0; }
-        .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+        .user-section { padding: 20px 18px 18px; margin: 0 10px 18px; background: rgba(255,255,255,0.03); border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); }
+        .user-avatar { width: 48px; height: 48px; background: rgba(255,255,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .user-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+        .user-email { font-size: 11px; opacity: 0.76; margin-bottom: 14px; word-break: break-all; }
+        .logout-btn { background: rgba(255,255,255,0.08); color: white; padding: 10px 12px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .logout-btn:hover { background: rgba(255,255,255,0.14); }
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .main-header { background: rgba(255,255,255,0.5); padding: 18px 18px 14px 18px; border-bottom: 1px solid #ecdfe1; display: flex; justify-content: space-between; align-items: center; }
+        .page-title { display: none; }
+        .header-search { flex: 1; display: flex; justify-content: center; }
+        .search-box { width: min(740px, 100%); background: rgba(255,255,255,0.8); border: 1px solid rgba(118, 84, 92, 0.12); border-radius: 18px; padding: 13px 18px; display: flex; align-items: center; gap: 12px; color: #8b7a7d; box-shadow: 0 5px 14px rgba(66, 26, 35, 0.04); }
+        .search-box i { font-size: 18px; }
+        .search-box span { font-size: 15px; color: #876d74; }
+        .header-actions { display: flex; align-items: center; gap: 12px; margin-left: 18px; }
+        .header-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.8); border: 1px solid rgba(118,84,92,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f2a33; }
+        .user-mini { display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; background: rgba(255,255,255,0.5); border-radius: 999px; color: #4d2a33; font-weight: 600; }
+        .mini-avatar { width: 30px; height: 30px; border-radius: 50%; background: #8d1e36; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .content-area { flex: 1; overflow-y: auto; padding: 24px 22px 18px; }
         .welcome-card { background: linear-gradient(135deg, #851e32 0%, #5a1e2c 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 30px; }
         .welcome-card h2 { font-size: 28px; margin-bottom: 10px; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
@@ -383,23 +388,23 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         .blog-card-actions { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .blog-link { display: inline-flex; align-items: center; gap: 8px; color: #851e32; font-weight: 800; text-decoration: none; font-size: 0.82rem; }
         .blog-link:hover { opacity: 0.85; }
-        .chat-sidebar { width: 350px; background: #fff5f6; border-left: 1px solid #f3d8de; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.05); }
-        .chat-header { padding: 20px; border-bottom: 1px solid #f3d8de; background: linear-gradient(135deg, #7a1e31 0%, #a22a44 100%); color: white; }
+        .chat-sidebar { width: 360px; background: #f2efee; border-left: 1px solid #f1dfe2; display: flex; flex-direction: column; box-shadow: -2px 0 18px rgba(0,0,0,0.04); }
+        .chat-header { padding: 18px 16px 14px; border-bottom: 1px solid #efdde0; background: #f3efef; color: #421f2d; }
         .chat-header h3 { font-size: 18px; display: flex; align-items: center; gap: 10px; }
         .chat-header p { font-size: 12px; opacity: 0.9; margin-top: 5px; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { display: flex; gap: 12px; max-width: 90%; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 15px; }
+        .message { display: flex; gap: 12px; max-width: 94%; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         .message-avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
         .message.user .message-avatar { background: #851e32; color: white; }
-        .message.bot .message-avatar { background: #10b981; color: white; }
-        .message-bubble { background: #f1f5f9; padding: 10px 15px; border-radius: 18px; font-size: 13px; line-height: 1.4; color: #1e2a3a; }
-        .message.user .message-bubble { background: #851e32; color: white; }
-        .chat-input-area { padding: 15px 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
-        .chat-input { flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; font-family: inherit; }
+        .message.bot .message-avatar { background: #6f1d32; color: white; }
+        .message-bubble { background: #f1f5f9; padding: 12px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; color: #1e2a3a; box-shadow: 0 6px 16px rgba(15,23,42,0.02); }
+        .message.user .message-bubble { background: #f1e9eb; color: #3d1824; }
+        .chat-input-area { padding: 14px 14px 18px; border-top: 1px solid #e9dfe2; display: flex; gap: 10px; background: #f2efee; }
+        .chat-input { flex: 1; padding: 12px 14px; border: 1px solid #e5d7db; border-radius: 999px; outline: none; font-family: inherit; background: rgba(255,255,255,0.8); }
         .chat-input:focus { border-color: #851e32; }
-        .chat-send { width: 45px; height: 45px; background: #851e32; border: none; border-radius: 50%; color: white; cursor: pointer; transition: all 0.3s; }
-        .chat-send:hover { background: #5a1e2c; }
+        .chat-send { width: 42px; height: 42px; background: #7d1628; border: none; border-radius: 50%; color: white; cursor: pointer; transition: all 0.3s; }
+        .chat-send:hover { background: #5d1022; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
@@ -464,11 +469,22 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="main-content">
             <div class="main-header">
-                <h1 class="page-title" id="pageTitle">Monitoramento</h1>
+                <div class="header-search">
+                    <div class="search-box">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span>Buscar exames, consultas, informações...</span>
+                    </div>
+                </div>
                 <div class="header-actions">
                     <div class="header-icon"><i class="fas fa-bell"></i></div>
-                    <div class="header-icon"><i class="fas fa-cog"></i></div>
+                    <div class="header-icon"><i class="fas fa-gear"></i></div>
+                    <div class="user-mini">
+                        <div class="mini-avatar">A</div>
+                        <span>Ana Silva</span>
+                        <i class="fas fa-chevron-down" style="font-size:12px; opacity:.75;"></i>
+                    </div>
                 </div>
+                <h1 class="page-title" id="pageTitle">Monitoramento</h1>
             </div>
             <div class="content-area" id="contentArea">
                 <!-- Conteúdo dinâmico -->
@@ -526,8 +542,13 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         <!-- CHAT -->
         <div class="chat-sidebar">
             <div class="chat-header">
-                <h3><i class="fas fa-comment-dots"></i> Assistente CardioWeb</h3>
-                <p>💬 Converse comigo sobre sua saúde!</p>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-heartbeat"></i></div>
+                    <div>
+                        <div style="font-size: 18px; font-weight:700;">Assistente CardioWeb</div>
+                        <div style="font-size:12px; opacity:.85; margin-top:2px;">Converse comigo sobre sua saúde!</div>
+                    </div>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
