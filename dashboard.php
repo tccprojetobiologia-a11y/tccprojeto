@@ -314,6 +314,146 @@ require_once __DIR__ . '/informacoes.php';
             border: 1px solid #edf2f7;
             box-shadow: 0 10px 20px rgba(15,23,42,0.03);
         }
+        .blog-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+        }
+        .blog-hero {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            align-items: center;
+            gap: 24px;
+            background: linear-gradient(135deg, #fff7d9 0%, #f2b807 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 46px rgba(133, 30, 50, 0.12);
+            border: 1px solid rgba(133, 30, 50, 0.08);
+        }
+        .blog-hero-copy {
+            padding: 34px 30px 30px 34px;
+            color: #21170c;
+        }
+        .blog-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #851e32;
+            margin-bottom: 12px;
+        }
+        .blog-hero h2 {
+            margin: 0 0 12px;
+            font-size: clamp(2.1rem, 3vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.06em;
+            color: #1c1917;
+        }
+        .blog-hero p {
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 560px;
+            color: rgba(28,25,23,0.8);
+        }
+        .blog-hero-media {
+            position: relative;
+            min-height: 420px;
+            background: linear-gradient(135deg, #f5c9d1, #f2f4f8);
+        }
+        .blog-hero-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .blog-mini {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            background: rgba(133, 30, 50, 0.88);
+            color: white;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-weight: 700;
+            box-shadow: 0 12px 28px rgba(133, 30, 50, 0.18);
+        }
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+        .blog-card {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid rgba(148,163,184,0.16);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 18px 34px rgba(15,23,42,0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+        }
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 42px rgba(15,23,42,0.1);
+        }
+        .blog-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            background: #e2e8f0;
+        }
+        .blog-card-body {
+            padding: 22px 20px 18px;
+        }
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .blog-badge {
+            background: rgba(133, 30, 50, 0.08);
+            color: #851e32;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+        .blog-card h3 {
+            font-size: 1.65rem;
+            line-height: 1.1;
+            color: #1e2a3a;
+            margin: 0 0 10px;
+            letter-spacing: -0.04em;
+        }
+        .blog-card p {
+            color: #475569;
+            line-height: 1.65;
+            margin: 0;
+        }
+        .blog-card-actions {
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .blog-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #851e32;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .blog-link:hover { opacity: 0.85; }
         .article-container {
             max-width: 900px;
             margin: 0 auto;
@@ -322,6 +462,14 @@ require_once __DIR__ . '/informacoes.php';
             padding: 32px 30px;
             box-shadow: 0 14px 34px rgba(15,23,42,0.07);
             border: 1px solid rgba(148,163,184,0.15);
+        }
+        .article-hero-image {
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+            border-radius: 18px;
+            margin: 20px 0 26px;
+            display: block;
         }
         .article-back-btn {
             display: inline-flex;
@@ -648,7 +796,14 @@ require_once __DIR__ . '/informacoes.php';
             contentArea.innerHTML = `
                 <div class="article-container">
                     <div class="article-back-btn" onclick="changePage('blog')"><i class="fas fa-arrow-left"></i> Voltar aos artigos</div>
-                    <div class="article-header"><h1 class="article-title">${article.title}</h1><div class="article-meta"><div class="article-meta-item"><i class="fas fa-calendar"></i> ${article.date}</div></div></div>
+                    <div class="article-header">
+                        <h1 class="article-title">${article.title}</h1>
+                        <div class="article-meta">
+                            <div class="article-meta-item"><i class="fas fa-calendar"></i> ${article.date}</div>
+                            <div class="article-meta-item"><i class="fas fa-heartbeat"></i> Cardiologia</div>
+                        </div>
+                    </div>
+                    ${article.image ? `<img class="article-hero-image" src="${article.image}" alt="${article.title}">` : ''}
                     <div class="article-content">${article.content}</div>
                     <div style="margin-top:40px; padding-top:20px; border-top:2px solid #f0f0f0;"><div class="article-back-btn" onclick="changePage('blog')"><i class="fas fa-arrow-left"></i> Voltar aos artigos</div></div>
                 </div>
@@ -691,12 +846,48 @@ require_once __DIR__ . '/informacoes.php';
                     </div>
                 `;
             } else if (page === 'blog') {
-                let html = `<div class="info-card"><h3><i class="fas fa-newspaper"></i> Artigos Recentes</h3>`;
-                Object.keys(articlesData).forEach(id => {
-                    const a = articlesData[id];
-                    html += `<div class="blog-post cursor-pointer" onclick="openArticle('${id}', event)"><div class="blog-title">${a.title}</div><div class="blog-date">${a.date}</div></div>`;
+                const articles = Object.entries(articlesData);
+                const heroArticle = articles[0];
+                const rest = articles.slice(1);
+                const hero = heroArticle ? heroArticle[1] : null;
+
+                let html = `
+                    <div class="blog-shell">
+                        <section class="blog-hero">
+                            <div class="blog-hero-copy">
+                                <div class="blog-kicker"><i class="fas fa-heartbeat"></i> Saúde cardiovascular</div>
+                                <h2>Conhecimento que protege o coração.</h2>
+                                <p>${hero ? hero.summary : 'Conteúdos atualizados sobre pressão, ritmo, colesterol e prevenção de doenças cardiovasculares.'}</p>
+                            </div>
+                            <div class="blog-hero-media">
+                                <img src="${hero ? hero.image : 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80'}" alt="Saúde cardiovascular" />
+                                <div class="blog-mini">CardioWeb • Conteúdo médico</div>
+                            </div>
+                        </section>
+
+                        <section class="blog-grid">
+                `;
+
+                rest.forEach(([id, article]) => {
+                    html += `
+                        <article class="blog-card" onclick="openArticle('${id}', event)">
+                            <img src="${article.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${article.title}">
+                            <div class="blog-card-body">
+                                <div class="blog-card-meta">
+                                    <span class="blog-badge">Cardio</span>
+                                    <span>${article.date}</span>
+                                </div>
+                                <h3>${article.title}</h3>
+                                <p>${article.summary}</p>
+                                <div class="blog-card-actions">
+                                    <span class="blog-link">Ler artigo <i class="fas fa-arrow-right"></i></span>
+                                </div>
+                            </div>
+                        </article>
+                    `;
                 });
-                html += `</div>`;
+
+                html += `</section></div>`;
                 contentArea.innerHTML = html;
             } else if (page === 'consultas' || page === 'agenda') {
                 contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;
