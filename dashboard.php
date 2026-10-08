@@ -711,8 +711,11 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
                 </div>
             </div>
             <div class="nav-menu">
-                <div class="nav-item <?php echo $page == 'inicio' ? 'active' : ''; ?>" data-page="inicio" onclick="changePage('inicio')">
+                <div class="nav-item <?php echo $page == 'inicio' || $page == 'monitoramento' ? 'active' : ''; ?>" data-page="inicio" onclick="changePage('inicio')">
                     <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'agenda' || $page == 'consultas' ? 'active' : ''; ?>" data-page="agenda" onclick="changePage('agenda')">
+                    <i class="fas fa-calendar-alt"></i><span>Agenda</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" data-page="blog" onclick="changePage('blog')">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
@@ -823,27 +826,40 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
         // ============================================================
         // FUNÇÕES DE NAVEGAÇÃO
         // ============================================================
+        function normalizePage(page) {
+            const aliases = {
+                'inicio': 'inicio',
+                'monitoramento': 'inicio',
+                'agenda': 'agenda',
+                'consultas': 'agenda',
+                'blog': 'blog',
+                'exames': 'exames',
+                'informacoes': 'informacoes',
+                'suporte': 'suporte'
+            };
+            return aliases[page] || 'inicio';
+        }
+
         function changePage(page) {
+            const normalizedPage = normalizePage(page);
             const url = new URL(window.location.href);
-            url.searchParams.set('page', page);
+            url.searchParams.set('page', normalizedPage);
             window.history.pushState({}, '', url);
             const titles = {
                 'inicio': 'Monitoramento',
                 'blog': 'Blog',
                 'agenda': 'Agenda',
-                'consultas': 'Agenda',
                 'exames': 'Exames',
-                'monitoramento': 'Monitoramento',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
             };
-            document.getElementById('pageTitle').innerText = titles[page] || 'Monitoramento';
+            document.getElementById('pageTitle').innerText = titles[normalizedPage] || 'Monitoramento';
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            const activeItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+            const activeItem = document.querySelector(`.nav-item[data-page="${normalizedPage}"]`);
             if (activeItem) {
                 activeItem.classList.add('active');
             }
-            loadContent(page);
+            loadContent(normalizedPage);
         }
 
         function bindBlogCardClicks() {
@@ -886,7 +902,9 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
 
         function loadContent(page) {
             const contentArea = document.getElementById('contentArea');
-            if (page === 'inicio') {
+            const normalizedPage = normalizePage(page);
+
+            if (normalizedPage === 'inicio') {
                 contentArea.innerHTML = `
                     <div class="welcome-card">
                         <h2>Bem-vindo de volta, <?php echo htmlspecialchars($user_name); ?>! 👋</h2>
@@ -918,19 +936,19 @@ require_once __DIR__ . '/dashboard-sections/suporte.php';
                         </div>
                     </div>
                 `;
-            } else if (page === 'blog') {
+            } else if (normalizedPage === 'blog') {
                 contentArea.innerHTML = getDashboardBlogHtml();
                 bindBlogCardClicks();
-            } else if (page === 'consultas' || page === 'agenda') {
+            } else if (normalizedPage === 'agenda') {
                 contentArea.innerHTML = getDashboardAgendaHtml();
-            } else if (page === 'exames') {
+            } else if (normalizedPage === 'exames') {
                 contentArea.innerHTML = getDashboardExamesHtml();
-            } else if (page === 'monitoramento') {
-                contentArea.innerHTML = getDashboardMonitoramentoHtml();
-            } else if (page === 'informacoes') {
+            } else if (normalizedPage === 'informacoes') {
                 contentArea.innerHTML = getDashboardInformacoesHtml();
-            } else if (page === 'suporte') {
+            } else if (normalizedPage === 'suporte') {
                 contentArea.innerHTML = getDashboardSuporteHtml();
+            } else {
+                contentArea.innerHTML = getDashboardMonitoramentoHtml();
             }
         }
 
