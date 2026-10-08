@@ -919,9 +919,7 @@ if (!function_exists('getDashboardSuporteHtml')) {
 
         function changePage(page) {
             const normalizedPage = normalizePage(page);
-            const url = new URL(window.location.href);
-            url.searchParams.set('page', normalizedPage);
-            window.history.pushState({}, '', url);
+            const pageTitle = document.getElementById('pageTitle');
             const titles = {
                 'inicio': 'Monitoramento',
                 'blog': 'Blog',
@@ -929,25 +927,35 @@ if (!function_exists('getDashboardSuporteHtml')) {
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
             };
-            document.getElementById('pageTitle').innerText = titles[normalizedPage] || 'Monitoramento';
+
+            if (pageTitle) {
+                pageTitle.innerText = titles[normalizedPage] || 'Monitoramento';
+            }
+
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             const activeItem = document.querySelector(`.nav-item[data-page="${normalizedPage}"]`);
             if (activeItem) {
                 activeItem.classList.add('active');
             }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', normalizedPage);
+            window.history.pushState({}, '', url);
             loadContent(normalizedPage);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.nav-item').forEach(function (item) {
-                item.addEventListener('click', function () {
-                    const page = this.getAttribute('data-page');
-                    if (page) {
-                        changePage(page);
-                    }
-                });
-            });
+        document.addEventListener('click', function (event) {
+            const navItem = event.target.closest('.nav-item');
+            if (navItem) {
+                const page = navItem.getAttribute('data-page');
+                if (page) {
+                    event.preventDefault();
+                    changePage(page);
+                }
+            }
+        });
 
+        document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('chatFileInput');
             if (fileInput) {
                 fileInput.addEventListener('change', function () {
