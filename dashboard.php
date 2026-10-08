@@ -318,85 +318,135 @@ require_once __DIR__ . '/informacoes.php';
             display: flex;
             flex-direction: column;
             gap: 26px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .blog-hero {
+        .blog-feature-grid {
             display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            align-items: center;
+            grid-template-columns: 1.45fr 1fr 1fr;
             gap: 24px;
-            background: linear-gradient(135deg, #fff7d9 0%, #f2b807 100%);
-            border-radius: 30px;
-            overflow: hidden;
-            box-shadow: 0 20px 46px rgba(133, 30, 50, 0.12);
-            border: 1px solid rgba(133, 30, 50, 0.08);
+            align-items: stretch;
         }
-        .blog-hero-copy {
-            padding: 34px 30px 30px 34px;
-            color: #21170c;
-        }
-        .blog-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: #851e32;
-            margin-bottom: 12px;
-        }
-        .blog-hero h2 {
-            margin: 0 0 12px;
-            font-size: clamp(2.1rem, 3vw, 4rem);
-            line-height: 0.95;
-            letter-spacing: -0.06em;
-            color: #1c1917;
-        }
-        .blog-hero p {
-            font-size: 1rem;
-            line-height: 1.7;
-            max-width: 560px;
-            color: rgba(28,25,23,0.8);
-        }
-        .blog-hero-media {
+        .blog-brand-panel {
             position: relative;
-            min-height: 420px;
-            background: linear-gradient(135deg, #f5c9d1, #f2f4f8);
+            display: flex;
+            align-items: flex-end;
+            min-height: 350px;
+            padding: 34px 26px 30px;
+            background: linear-gradient(135deg, #f9dd17 0%, #f2d000 100%);
+            clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%);
+            box-shadow: 0 18px 32px rgba(133, 30, 50, 0.12);
+            border: 1px solid rgba(133, 30, 50, 0.05);
+            overflow: hidden;
+            cursor: pointer;
         }
-        .blog-hero-media img {
+        .blog-brand-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.18));
+            pointer-events: none;
+        }
+        .brand-copy {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #1a1a1a;
+        }
+        .brand-kicker {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #1b1b1b;
+        }
+        .brand-name {
+            font-size: clamp(3rem, 5vw, 5.5rem);
+            font-weight: 900;
+            line-height: 0.88;
+            letter-spacing: -0.08em;
+            color: #0d0d0d;
+        }
+        .blog-feature-card,
+        .blog-side-card {
+            background: rgba(255,255,255,0.94);
+            border: 1px solid rgba(148,163,184,0.15);
+            box-shadow: 0 12px 26px rgba(15,23,42,0.06);
+            overflow: hidden;
+            border-radius: 0;
+        }
+        .blog-feature-card {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .blog-feature-card img,
+        .blog-side-card img {
             width: 100%;
-            height: 100%;
+            height: 215px;
             object-fit: cover;
             display: block;
+            background: #e2e8f0;
         }
-        .blog-mini {
+        .blog-feature-card .feature-badge,
+        .blog-side-card .feature-badge {
             position: absolute;
             left: 18px;
             bottom: 18px;
-            background: rgba(133, 30, 50, 0.88);
+            background: rgba(133, 30, 50, 0.9);
             color: white;
-            border-radius: 14px;
-            padding: 12px 14px;
-            font-weight: 700;
-            box-shadow: 0 12px 28px rgba(133, 30, 50, 0.18);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-weight: 800;
         }
-        .blog-grid {
+        .blog-feature-card .feature-copy,
+        .blog-side-card .feature-copy {
+            padding: 19px 18px 16px;
+        }
+        .blog-feature-card h3,
+        .blog-side-card h3 {
+            margin: 0 0 10px;
+            font-size: 1.3rem;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+            color: #1e2a3a;
+        }
+        .blog-feature-card p,
+        .blog-side-card p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .blog-side-card {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .blog-side-card img {
+            height: 180px;
+        }
+        .blog-bottom-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
         }
         .blog-card {
             background: rgba(255,255,255,0.96);
-            border: 1px solid rgba(148,163,184,0.16);
-            border-radius: 24px;
+            border: 1px solid rgba(148,163,184,0.14);
+            box-shadow: 0 12px 26px rgba(15,23,42,0.05);
             overflow: hidden;
-            box-shadow: 0 18px 34px rgba(15,23,42,0.06);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
             cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
         .blog-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 24px 42px rgba(15,23,42,0.1);
+            box-shadow: 0 20px 32px rgba(15,23,42,0.08);
         }
         .blog-card img {
             width: 100%;
@@ -406,40 +456,41 @@ require_once __DIR__ . '/informacoes.php';
             background: #e2e8f0;
         }
         .blog-card-body {
-            padding: 22px 20px 18px;
+            padding: 18px 15px 16px;
         }
         .blog-card-meta {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #6b7280;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
         .blog-badge {
             background: rgba(133, 30, 50, 0.08);
             color: #851e32;
-            padding: 6px 10px;
+            padding: 6px 9px;
             border-radius: 999px;
             font-weight: 800;
         }
         .blog-card h3 {
-            font-size: 1.65rem;
-            line-height: 1.1;
+            font-size: 1.05rem;
+            line-height: 1.2;
             color: #1e2a3a;
-            margin: 0 0 10px;
+            margin: 0 0 6px;
             letter-spacing: -0.04em;
         }
         .blog-card p {
             color: #475569;
-            line-height: 1.65;
+            line-height: 1.5;
             margin: 0;
+            font-size: 0.86rem;
         }
         .blog-card-actions {
-            margin-top: 18px;
+            margin-top: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -452,6 +503,7 @@ require_once __DIR__ . '/informacoes.php';
             color: #851e32;
             font-weight: 800;
             text-decoration: none;
+            font-size: 0.82rem;
         }
         .blog-link:hover { opacity: 0.85; }
         .article-container {
@@ -846,29 +898,45 @@ require_once __DIR__ . '/informacoes.php';
                     </div>
                 `;
             } else if (page === 'blog') {
-                const articles = Object.entries(articlesData);
-                const heroArticle = articles[0];
-                const rest = articles.slice(1);
-                const hero = heroArticle ? heroArticle[1] : null;
+                const entries = Object.entries(articlesData);
+                const [firstId, firstArticle] = entries[0] || [];
+                const secondary = entries.slice(1, 3);
+                const bottomCards = entries.slice(3, 7);
 
                 let html = `
                     <div class="blog-shell">
-                        <section class="blog-hero">
-                            <div class="blog-hero-copy">
-                                <div class="blog-kicker"><i class="fas fa-heartbeat"></i> Saúde cardiovascular</div>
-                                <h2>Conhecimento que protege o coração.</h2>
-                                <p>${hero ? hero.summary : 'Conteúdos atualizados sobre pressão, ritmo, colesterol e prevenção de doenças cardiovasculares.'}</p>
+                        <div class="blog-feature-grid">
+                            <div class="blog-brand-panel" onclick="openArticle('${firstId}', event)">
+                                <div class="brand-copy">
+                                    <span class="brand-kicker">CardioWeb</span>
+                                    <span class="brand-name">Cardio</span>
+                                </div>
                             </div>
-                            <div class="blog-hero-media">
-                                <img src="${hero ? hero.image : 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80'}" alt="Saúde cardiovascular" />
-                                <div class="blog-mini">CardioWeb • Conteúdo médico</div>
-                            </div>
-                        </section>
 
-                        <section class="blog-grid">
+                            <div class="blog-feature-card" onclick="openArticle('${firstId}', event)">
+                                <div style="position:relative;">
+                                    <img src="${firstArticle.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${firstArticle.title}">
+                                    <span class="feature-badge">Cardio</span>
+                                </div>
+                                <div class="feature-copy">
+                                    <h3>${firstArticle.title}</h3>
+                                    <p>${firstArticle.summary}</p>
+                                </div>
+                            </div>
+
+                            <div class="blog-side-card" onclick="openArticle('${secondary[0]?.[0] || firstId}', event)">
+                                <img src="${(secondary[0]?.[1]?.image) || 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'}" alt="${(secondary[0]?.[1]?.title) || 'Saúde cardiovascular'}">
+                                <div class="feature-copy">
+                                    <h3>Nosso foco</h3>
+                                    <p>${(secondary[0]?.[1]?.summary) || 'Ações preventivas e acompanhamento clínico para reduzir riscos cardíacos e melhorar a qualidade de vida.'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="blog-bottom-grid">
                 `;
 
-                rest.forEach(([id, article]) => {
+                bottomCards.forEach(([id, article]) => {
                     html += `
                         <article class="blog-card" onclick="openArticle('${id}', event)">
                             <img src="${article.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${article.title}">
@@ -887,7 +955,7 @@ require_once __DIR__ . '/informacoes.php';
                     `;
                 });
 
-                html += `</section></div>`;
+                html += `</div></div>`;
                 contentArea.innerHTML = html;
             } else if (page === 'consultas' || page === 'agenda') {
                 contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;
