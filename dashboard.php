@@ -160,12 +160,12 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
             z-index: 2;
         }
         .cardio-yellow-panel {
-            background: linear-gradient(135deg, #f4d400 0%, #f5dc1a 100%);
-            color: #111827;
+            background: linear-gradient(135deg, rgba(130, 18, 35, 0.96) 0%, rgba(157, 30, 50, 0.96) 100%);
+            color: #fdf2f5;
             padding: 42px 28px 22px;
             clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
             border-radius: 0;
-            box-shadow: 0 26px 42px rgba(0,0,0,0.16);
+            box-shadow: 0 26px 42px rgba(62, 11, 20, 0.2);
         }
         .cardio-yellow-panel .line {
             display: block;
@@ -175,7 +175,7 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
             line-height: 0.92;
             text-transform: uppercase;
             text-align: center;
-            color: #111827;
+            color: #fdf2f5;
         }
         .cardio-yellow-panel .line + .line {
             margin-top: 6px;
@@ -190,7 +190,7 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
             content: "";
             position: absolute;
             inset: 0;
-            border-bottom: 6px solid rgba(17, 24, 39, 0.9);
+            border-bottom: 6px solid rgba(255,255,255,0.65);
             bottom: -10px;
             left: 0;
             width: 100%;
@@ -226,6 +226,9 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
             stroke: rgba(255,255,255,0.35);
             stroke-width: 3;
         }
+        #heartGradient stop:first-child { stop-color: #ffd7db; }
+        #heartGradient stop:nth-child(2) { stop-color: #c51c3c; }
+        #heartGradient stop:last-child { stop-color: #6b0d1a; }
         .cardio-section {
             display: grid;
             grid-template-columns: 1.15fr 1fr 0.9fr;
