@@ -109,107 +109,249 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         .article-image-inline { max-width: 300px; height: auto; border-radius: 12px; margin: 15px 15px 15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .article-image-inline.right { float: right; margin-left: 15px; margin-right: 0; }
         .cursor-pointer { cursor: pointer; }
-        .blog-shell { display: flex; flex-direction: column; gap: 28px; }
-        .ad3-layout {
-            display: grid;
-            grid-template-columns: 1.6fr 1.2fr 0.8fr;
-            gap: 26px;
-            align-items: stretch;
+        .blog-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            min-height: 100%;
         }
-        .ad3-hero {
-            min-height: 420px;
-            background: linear-gradient(135deg, #f0d90a 0%, #f5dd12 100%);
-            clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
+        .cardio-hero {
+            position: relative;
+            min-height: 560px;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.54) 100%),
+                url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1800&q=80') center/cover no-repeat;
+            border-radius: 0;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+        }
+        .cardio-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(248, 214, 0, 0.35), transparent 46%);
+        }
+        .cardio-hero-controls {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 18px 34px rgba(15,23,42,0.08);
-            overflow: hidden;
+            background: rgba(17, 17, 17, 0.42);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            z-index: 2;
         }
-        .ad3-hero-inner {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
+        .cardio-hero-controls i {
+            font-size: 22px;
+            color: white;
+        }
+        .cardio-hero-content {
+            position: absolute;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            width: min(980px, 80%);
+            z-index: 2;
+        }
+        .cardio-yellow-panel {
+            background: linear-gradient(135deg, #f4d400 0%, #f5dc1a 100%);
             color: #111827;
-            padding-left: 52px;
+            padding: 42px 28px 22px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            border-radius: 0;
+            box-shadow: 0 26px 42px rgba(0,0,0,0.16);
         }
-        .ad3-kicker {
+        .cardio-yellow-panel .line {
             display: block;
-            font-size: 1.1rem;
+            font-size: clamp(2.1rem, 3vw, 4.0rem);
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: -0.08em;
+            line-height: 0.92;
             text-transform: uppercase;
+            text-align: center;
             color: #111827;
         }
-        .ad3-main-word {
-            display: block;
-            font-size: clamp(4rem, 7vw, 8rem);
-            font-weight: 900;
-            line-height: 0.9;
-            letter-spacing: -0.12em;
-            color: #111827;
+        .cardio-yellow-panel .line + .line {
+            margin-top: 6px;
         }
-        .ad3-story {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .ad3-image-card, .ad3-side-photo, .ad3-side-bottom {
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 12px 20px rgba(15,23,42,0.08);
-            border: 1px solid rgba(148,163,184,0.12);
-        }
-        .ad3-image-card { height: 290px; }
-        .ad3-side-photo { height: 280px; }
-        .ad3-side-bottom { height: 210px; }
-        .ad3-image-card img, .ad3-side-photo img, .ad3-side-bottom img {
-            display: block;
+        .cardio-yellow-panel .line.black-outline {
+            display: inline-block;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            position: relative;
+            padding: 0 2px;
         }
-        .ad3-copy-block, .ad3-side-text {
-            background: rgba(255,255,255,0.92);
-            border: 1px solid rgba(148,163,184,0.12);
-            padding: 20px 18px;
-            box-shadow: 0 10px 22px rgba(15,23,42,0.05);
+        .cardio-yellow-panel .line.black-outline::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-bottom: 6px solid rgba(17, 24, 39, 0.9);
+            bottom: -10px;
+            left: 0;
+            width: 100%;
         }
-        .ad3-copy-block h3, .ad3-side-text h4 {
-            margin: 0 0 12px;
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: -0.06em;
-            color: #111827;
+        .cardio-heart-stage {
+            position: relative;
+            padding: 26px 24px 0;
         }
-        .ad3-copy-block p, .ad3-side-text p, .ad3-info-card p {
-            margin: 0;
-            line-height: 1.7;
-            color: #4b5563;
-            font-size: 0.96rem;
-        }
-        .ad3-side-column {
+        .heart-orbit {
+            position: relative;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: min(330px, 70vw);
+            height: 330px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.10), rgba(244,212,0,0.10) 44%, rgba(255,255,255,0.02) 72%);
+            box-shadow: inset 0 0 50px rgba(244,212,0,0.15);
+            animation: heartPulse 2.6s ease-in-out infinite;
+        }
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+        .heart-svg {
+            width: 60%;
+            height: 60%;
+            filter: drop-shadow(0 16px 28px rgba(244,212,0,0.28));
+        }
+        .heart-svg path {
+            fill: url(#heartGradient);
+            stroke: rgba(255,255,255,0.35);
+            stroke-width: 3;
+        }
+        .cardio-section {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr 0.9fr;
+            gap: 26px;
+            align-items: start;
+        }
+        .cardio-card {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid rgba(148,163,184,0.12);
+            box-shadow: 0 12px 24px rgba(15,23,42,0.05);
+            padding: 24px 22px;
+        }
+        .cardio-card h3 {
+            font-size: clamp(1.8rem, 2vw, 2.4rem);
+            letter-spacing: -0.06em;
+            font-weight: 900;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+        .cardio-card p {
+            color: #4b5563;
+            line-height: 1.75;
+            font-size: 1rem;
+        }
+        .cardio-card .mini-tag {
+            display: inline-block;
+            background: rgba(244,212,0,0.16);
+            color: #7a6300;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .cardio-stack {
+            display: grid;
             gap: 18px;
         }
-        .ad3-info-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
+        .pill-info {
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,250,251,1));
+            border: 1px solid rgba(148,163,184,0.12);
+            padding: 18px 18px;
+            box-shadow: 0 10px 20px rgba(15,23,42,0.04);
         }
-        .ad3-info-card {
+        .pill-info h4 {
+            margin: 0 0 8px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #111827;
+        }
+        .pill-info p {
+            margin: 0;
+            color: #4b5563;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .cardio-lists {
+            display: grid;
+            gap: 18px;
+            margin-top: 30px;
+        }
+        .cardio-list-item {
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            gap: 18px;
+            align-items: center;
             background: rgba(255,255,255,0.94);
             border: 1px solid rgba(148,163,184,0.12);
-            box-shadow: 0 10px 20px rgba(15,23,42,0.04);
             padding: 18px 16px;
+            box-shadow: 0 10px 20px rgba(15,23,42,0.04);
         }
-        .ad3-info-card h5 {
-            margin: 0 0 10px;
-            font-size: 1rem;
+        .cardio-list-badge {
+            width: 92px;
+            height: 92px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(244,212,0,0.18), rgba(254,243,195,0.65));
+            border: 1px solid rgba(244,212,0,0.4);
+            color: #a26900;
+            font-size: 38px;
+            font-weight: 900;
+        }
+        .cardio-list-item h4 {
+            margin: 0 0 8px;
+            color: #111827;
             font-weight: 800;
-            color: #1e2a3a;
+            font-size: 1.2rem;
+        }
+        .cardio-list-item p {
+            margin: 0;
+            color: #4b5563;
+            line-height: 1.6;
+            font-size: 0.96rem;
+        }
+        .cardio-video-fallback {
+            position: absolute;
+            right: 28px;
+            bottom: 26px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2;
+            color: white;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        .cardio-video-fallback .circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.30);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        @media (max-width: 900px) {
+            .cardio-section {
+                grid-template-columns: 1fr;
+            }
+            .cardio-hero { min-height: 440px; }
         }
         .blog-feature-grid { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 24px; align-items: stretch; }
         .blog-brand-panel { position: relative; display: flex; align-items: flex-end; min-height: 350px; padding: 34px 26px 30px; background: linear-gradient(135deg, #f9dd17 0%, #f2d000 100%); clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%); box-shadow: 0 18px 32px rgba(133, 30, 50, 0.12); overflow: hidden; cursor: pointer; }
@@ -406,51 +548,88 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
             'monitoramento': <?php echo json_encode($inicioHtml, JSON_UNESCAPED_UNICODE); ?>,
             'blog':         `
                 <div class="blog-shell">
-                    <div class="ad3-layout">
-                        <div class="ad3-hero">
-                            <div class="ad3-hero-inner">
-                                <span class="ad3-kicker">ACADEMIA</span>
-                                <span class="ad3-main-word">AD3</span>
+                    <section class="cardio-hero">
+                        <div class="cardio-hero-controls"><i class="fas fa-pause"></i></div>
+                        <div class="cardio-hero-content">
+                            <div class="cardio-yellow-panel">
+                                <span class="line">VIVA MELHOR</span>
+                                <span class="line black-outline">SEU CORAÇÃO</span>
                             </div>
                         </div>
-                        <div class="ad3-story">
-                            <div class="ad3-image-card">
-                                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80" alt="Academia AD3">
-                            </div>
-                            <div class="ad3-copy-block">
-                                <h3>O COMEÇO</h3>
-                                <p>A academia AD3 nasceu no mercado desde 1992, oferecendo um conceito inovador de treinamento que promove a saúde e cria uma conexão harmoniosa entre corpo e mente.</p>
-                            </div>
+                        <div class="cardio-video-fallback">
+                            <span class="circle"><i class="fas fa-play"></i></span>
+                            <span>Mais vídeos</span>
                         </div>
-                        <div class="ad3-side-column">
-                            <div class="ad3-side-photo">
-                                <img src="https://images.unsplash.com/photo-1541534401786-2077eed87a74?auto=format&fit=crop&w=900&q=80" alt="Alunos da academia">
-                            </div>
-                            <div class="ad3-side-text">
-                                <h4>NOSSA MISSÃO</h4>
-                                <p>Nossa principal meta é garantir bem-estar e satisfação dos nossos alunos, permitindo que alcancem seus objetivos com total segurança.</p>
-                            </div>
-                            <div class="ad3-side-bottom">
-                                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80" alt="Equipe da academia">
-                            </div>
+                    </section>
+
+                    <div class="cardio-heart-stage">
+                        <div class="heart-orbit">
+                            <svg class="heart-svg" viewBox="0 0 512 512" aria-label="Coração cardiologia">
+                                <defs>
+                                    <linearGradient id="heartGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#fff6b8" />
+                                        <stop offset="36%" stop-color="#f5d40b" />
+                                        <stop offset="100%" stop-color="#d49500" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M256 448l-32-29C91 311 48 270 48 181c0-47 38-88 84-88 35 0 65 17 86 46 21-29 51-46 86-46 46 0 84 41 84 88 0 89-43 130-176 238l-32 29z"/>
+                            </svg>
                         </div>
                     </div>
-                    <div class="ad3-info-grid">
-                        <div class="ad3-info-card">
-                            <h5>Treinamento</h5>
-                            <p>Programas sob medida para força, resistência e performance com acompanhamento profissional.</p>
+
+                    <div class="cardio-section">
+                        <div class="cardio-card">
+                            <div class="mini-tag">Cardiologia</div>
+                            <h3>Cuide do seu coração com informação e prevenção.</h3>
+                            <p>O coração é o centro da saúde do corpo. Quando ele funciona bem, a circulação, a energia e a qualidade de vida melhoram de forma visível. Cuidar da pressão, do colesterol, do sono e da atividade física faz diferença todos os dias.</p>
                         </div>
-                        <div class="ad3-info-card">
-                            <h5>Comunidade</h5>
-                            <p>Ambiente acolhedor e motivador para que cada pessoa evolua com apoio e disciplina.</p>
+
+                        <div class="cardio-stack">
+                            <div class="pill-info">
+                                <h4>Prevenção</h4>
+                                <p>Hábitos simples e consistentes reduzem muito o risco de problemas cardiovasculares ao longo dos anos.</p>
+                            </div>
+                            <div class="pill-info">
+                                <h4>Diagnóstico</h4>
+                                <p>Exames regulares ajudam a identificar alterações precocemente, antes que se tornem complicações.</p>
+                            </div>
                         </div>
-                        <div class="ad3-info-card">
-                            <h5>Resultado</h5>
-                            <p>Foco em transformação real, com evolução constante e hábitos mais saudáveis no dia a dia.</p>
+
+                        <div class="cardio-card">
+                            <div class="mini-tag">Saúde</div>
+                            <h3>O seu ritmo importa.</h3>
+                            <p>Uma rotina com alimentação equilibrada, controle do estresse e acompanhamento médico fortalece o bem-estar cardiovascular e melhora a autonomia do paciente.</p>
                         </div>
-                        <div class="ad3-info-card">
-                            <h5>Bem-estar</h5>
-                            <p>Atendimento completo para saúde física, mental e autoestima, sempre com segurança e qualidade.</p>
+                    </div>
+
+                    <div class="cardio-lists">
+                        <div class="cardio-list-item">
+                            <div class="cardio-list-badge"><i class="fas fa-heartbeat"></i></div>
+                            <div>
+                                <h4>Hipertensão arterial</h4>
+                                <p>A pressão alta costuma ser silenciosa, mas pode danificar vasos, rins e cérebro ao longo do tempo. O controle pode evitar complicações sérias.</p>
+                            </div>
+                        </div>
+                        <div class="cardio-list-item">
+                            <div class="cardio-list-badge"><i class="fas fa-wave-square"></i></div>
+                            <div>
+                                <h4>Arritmias</h4>
+                                <p>Alterações no ritmo podem causar palpitações, tontura e sensação de aperto. O diagnóstico precoce ajuda a reduzir riscos e orientar o tratamento certo.</p>
+                            </div>
+                        </div>
+                        <div class="cardio-list-item">
+                            <div class="cardio-list-badge"><i class="fas fa-stethoscope"></i></div>
+                            <div>
+                                <h4>Colesterol e circulação</h4>
+                                <p>O acúmulo de placas nas artérias pode diminuir o fluxo sanguíneo e aumentar as chances de AVC e infarto. O cuidado diário faz diferença.</p>
+                            </div>
+                        </div>
+                        <div class="cardio-list-item">
+                            <div class="cardio-list-badge"><i class="fas fa-file-medical"></i></div>
+                            <div>
+                                <h4>Exames e acompanhamento</h4>
+                                <p>Eletrocardiograma, ecocardiograma e exames laboratoriais ajudam a identificar riscos e acompanhar a evolução do tratamento de forma segura.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
