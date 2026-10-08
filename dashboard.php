@@ -49,6 +49,41 @@ if (!function_exists('getDashboardBlogHtml')) {
         return $html;
     }
 }
+
+if (!function_exists('getDashboardAgendaHtml')) {
+    function getDashboardAgendaHtml()
+    {
+        return getConsultasHtml();
+    }
+}
+
+if (!function_exists('getDashboardExamesHtml')) {
+    function getDashboardExamesHtml()
+    {
+        return getExamesHtml();
+    }
+}
+
+if (!function_exists('getDashboardInformacoesHtml')) {
+    function getDashboardInformacoesHtml()
+    {
+        return getInformacoesHtml();
+    }
+}
+
+if (!function_exists('getDashboardMonitoramentoHtml')) {
+    function getDashboardMonitoramentoHtml()
+    {
+        return '<div class="welcome-card"><h2>Bem-vindo de volta, ' . htmlspecialchars($_SESSION['user_name'] ?? 'Usuário') . '! 👋</h2><p>Monitore sua saúde cardiológica em tempo real e mantenha seus exames em dia.</p></div><div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><h3>12</h3><p>Registros de saúde</p></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-heartbeat"></i></div><h3>72</h3><p>Batimentos/min</p></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><h3>2</h3><p>Consultas agendadas</p></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-trophy"></i></div><h3>85%</h3><p>Meta de saúde</p></div></div><div class="info-card"><h3><i class="fas fa-heart"></i> Últimos Registros</h3><div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f0f0f0;"><span>Pressão Arterial</span><span><strong>120/80 mmHg</strong></span><span style="color:#10b981;">Normal</span></div><div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f0f0f0;"><span>Colesterol Total</span><span><strong>180 mg/dL</strong></span><span style="color:#10b981;">Normal</span></div><div style="display:flex; justify-content:space-between; padding:12px 0;"><span>Glicemia</span><span><strong>95 mg/dL</strong></span><span style="color:#10b981;">Normal</span></div></div><div class="info-card"><h3><i class="fas fa-calendar-alt"></i> Agenda</h3><div style="display:flex; align-items:center; gap:15px; padding:12px 0;"><div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">15</div><div style="font-size:11px; color:#666;">ABR</div></div><div style="flex:1;"><div style="font-weight:600;">Cardiologista - Dr. Carlos</div><div style="font-size:12px; color:#666;">10:00 - Consulta presencial</div></div><div style="display:flex; align-items:center; gap:8px;"><button type="button" style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:4px 10px; border:none; border-radius:20px; cursor:pointer;" onclick="editarConsulta(1)">Editar</button></div></div><div style="display:flex; align-items:center; gap:15px; padding:12px 0;"><div style="min-width:50px; text-align:center;"><div style="font-size:20px; font-weight:700; color:#851e32;">22</div><div style="font-size:11px; color:#666;">ABR</div></div><div style="flex:1;"><div style="font-weight:600;">Exame de Rotina</div><div style="font-size:12px; color:#666;">08:30 - Laboratório</div></div><div style="display:flex; align-items:center; gap:8px;"><button type="button" style="font-size:11px; background:#fff3e0; color:#ff9800; padding:4px 10px; border:none; border-radius:20px; cursor:pointer;" onclick="editarConsulta(2)">Editar</button></div></div></div>';
+    }
+}
+
+if (!function_exists('getDashboardSuporteHtml')) {
+    function getDashboardSuporteHtml()
+    {
+        return '<div class="info-card"><h3><i class="fas fa-headset"></i> Central de Suporte</h3><p>Estamos aqui para ajudar! Escolha uma opção abaixo:</p></div><div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#e8f5e9; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-phone" style="color:#2e7d32; font-size:24px;"></i></div><div><div style="font-weight:600;">Atendimento Telefônico</div><div style="font-size:12px; color:#666;">Segunda a Sexta, 8h às 18h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">(11) 4002-8922</div></div></div></div><div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#e3f2fd; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-envelope" style="color:#1976d2; font-size:24px;"></i></div><div><div style="font-weight:600;">E-mail</div><div style="font-size:12px; color:#666;">Respondemos em até 24h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">suporte@cardioweb.com</div></div></div></div><div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#fff3e0; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fab fa-whatsapp" style="color:#25d366; font-size:28px;"></i></div><div><div style="font-weight:600;">WhatsApp</div><div style="font-size:12px; color:#666;">Atendimento 24h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">(11) 9 9999-9999</div></div></div></div><div class="info-card"><h3><i class="fas fa-question-circle"></i> Perguntas Frequentes</h3><details style="margin-bottom:10px;"><summary style="cursor:pointer; font-weight:500; padding:10px; background:#f8fafc; border-radius:8px;">Como agendar uma consulta?</summary><p style="padding:10px; color:#666;">Acesse o menu "Consultas" e clique em "Agendar nova consulta". Escolha o médico e horário disponível.</p></details><details style="margin-bottom:10px;"><summary style="cursor:pointer; font-weight:500; padding:10px; background:#f8fafc; border-radius:8px;">Como acessar meus exames?</summary><p style="padding:10px; color:#666;">Os exames ficam disponíveis na seção "Exames" após liberação do médico responsável.</p></details></div>';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
