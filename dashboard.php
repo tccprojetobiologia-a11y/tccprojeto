@@ -12,7 +12,7 @@ $user_name = $_SESSION['user_name'] ?? 'Usuário';
 $user_email = $_SESSION['user_email'] ?? $_SESSION['user_telefone'] ?? 'usuario@email.com';
 $login_type = $_SESSION['login_type'] ?? 'Padrão';
 
-$page = $_GET['page'] ?? 'inicio';
+$page = $_GET['page'] ?? 'monitoramento';
 
 // Incluir arquivos de seções
 require_once __DIR__ . '/blog.php';
@@ -109,7 +109,108 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         .article-image-inline { max-width: 300px; height: auto; border-radius: 12px; margin: 15px 15px 15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .article-image-inline.right { float: right; margin-left: 15px; margin-right: 0; }
         .cursor-pointer { cursor: pointer; }
-        .blog-shell { display: flex; flex-direction: column; gap: 20px; }
+        .blog-shell { display: flex; flex-direction: column; gap: 28px; }
+        .ad3-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1.2fr 0.8fr;
+            gap: 26px;
+            align-items: stretch;
+        }
+        .ad3-hero {
+            min-height: 420px;
+            background: linear-gradient(135deg, #f0d90a 0%, #f5dd12 100%);
+            clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 18px 34px rgba(15,23,42,0.08);
+            overflow: hidden;
+        }
+        .ad3-hero-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            color: #111827;
+            padding-left: 52px;
+        }
+        .ad3-kicker {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #111827;
+        }
+        .ad3-main-word {
+            display: block;
+            font-size: clamp(4rem, 7vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.12em;
+            color: #111827;
+        }
+        .ad3-story {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .ad3-image-card, .ad3-side-photo, .ad3-side-bottom {
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 12px 20px rgba(15,23,42,0.08);
+            border: 1px solid rgba(148,163,184,0.12);
+        }
+        .ad3-image-card { height: 290px; }
+        .ad3-side-photo { height: 280px; }
+        .ad3-side-bottom { height: 210px; }
+        .ad3-image-card img, .ad3-side-photo img, .ad3-side-bottom img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ad3-copy-block, .ad3-side-text {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(148,163,184,0.12);
+            padding: 20px 18px;
+            box-shadow: 0 10px 22px rgba(15,23,42,0.05);
+        }
+        .ad3-copy-block h3, .ad3-side-text h4 {
+            margin: 0 0 12px;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.06em;
+            color: #111827;
+        }
+        .ad3-copy-block p, .ad3-side-text p, .ad3-info-card p {
+            margin: 0;
+            line-height: 1.7;
+            color: #4b5563;
+            font-size: 0.96rem;
+        }
+        .ad3-side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .ad3-info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .ad3-info-card {
+            background: rgba(255,255,255,0.94);
+            border: 1px solid rgba(148,163,184,0.12);
+            box-shadow: 0 10px 20px rgba(15,23,42,0.04);
+            padding: 18px 16px;
+        }
+        .ad3-info-card h5 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1e2a3a;
+        }
         .blog-feature-grid { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 24px; align-items: stretch; }
         .blog-brand-panel { position: relative; display: flex; align-items: flex-end; min-height: 350px; padding: 34px 26px 30px; background: linear-gradient(135deg, #f9dd17 0%, #f2d000 100%); clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%); box-shadow: 0 18px 32px rgba(133, 30, 50, 0.12); overflow: hidden; cursor: pointer; }
         .blog-brand-panel::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.18)); pointer-events: none; }
@@ -191,14 +292,11 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
                 </div>
             </div>
             <div class="nav-menu">
-                <div class="nav-item <?php echo $page == 'inicio' ? 'active' : ''; ?>" onclick="changePage('inicio')">
-                    <i class="fas fa-home"></i><span>Início</span>
+                <div class="nav-item <?php echo $page == 'monitoramento' ? 'active' : ''; ?>" onclick="changePage('monitoramento')">
+                    <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" onclick="changePage('blog')">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
-                </div>
-                <div class="nav-item <?php echo $page == 'consultas' ? 'active' : ''; ?>" onclick="changePage('consultas')">
-                    <i class="fas fa-calendar-check"></i><span>Consultas</span>
                 </div>
                 <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" onclick="changePage('exames')">
                     <i class="fas fa-flask"></i><span>Exames</span>
@@ -221,7 +319,7 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="main-content">
             <div class="main-header">
-                <h1 class="page-title" id="pageTitle">Início</h1>
+                <h1 class="page-title" id="pageTitle">Monitoramento</h1>
                 <div class="header-actions">
                     <div class="header-icon"><i class="fas fa-bell"></i></div>
                     <div class="header-icon"><i class="fas fa-cog"></i></div>
@@ -305,9 +403,58 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
 
         // ========== HTML DAS SEÇÕES (vindos do PHP) ==========
         const sectionHtml = {
-            'inicio':       <?php echo json_encode($inicioHtml, JSON_UNESCAPED_UNICODE); ?>,
-            'blog':         <?php echo json_encode($blogHtml, JSON_UNESCAPED_UNICODE); ?>,
-            'consultas':    <?php echo json_encode($consultasHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'monitoramento': <?php echo json_encode($inicioHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'blog':         `
+                <div class="blog-shell">
+                    <div class="ad3-layout">
+                        <div class="ad3-hero">
+                            <div class="ad3-hero-inner">
+                                <span class="ad3-kicker">ACADEMIA</span>
+                                <span class="ad3-main-word">AD3</span>
+                            </div>
+                        </div>
+                        <div class="ad3-story">
+                            <div class="ad3-image-card">
+                                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80" alt="Academia AD3">
+                            </div>
+                            <div class="ad3-copy-block">
+                                <h3>O COMEÇO</h3>
+                                <p>A academia AD3 nasceu no mercado desde 1992, oferecendo um conceito inovador de treinamento que promove a saúde e cria uma conexão harmoniosa entre corpo e mente.</p>
+                            </div>
+                        </div>
+                        <div class="ad3-side-column">
+                            <div class="ad3-side-photo">
+                                <img src="https://images.unsplash.com/photo-1541534401786-2077eed87a74?auto=format&fit=crop&w=900&q=80" alt="Alunos da academia">
+                            </div>
+                            <div class="ad3-side-text">
+                                <h4>NOSSA MISSÃO</h4>
+                                <p>Nossa principal meta é garantir bem-estar e satisfação dos nossos alunos, permitindo que alcancem seus objetivos com total segurança.</p>
+                            </div>
+                            <div class="ad3-side-bottom">
+                                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80" alt="Equipe da academia">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ad3-info-grid">
+                        <div class="ad3-info-card">
+                            <h5>Treinamento</h5>
+                            <p>Programas sob medida para força, resistência e performance com acompanhamento profissional.</p>
+                        </div>
+                        <div class="ad3-info-card">
+                            <h5>Comunidade</h5>
+                            <p>Ambiente acolhedor e motivador para que cada pessoa evolua com apoio e disciplina.</p>
+                        </div>
+                        <div class="ad3-info-card">
+                            <h5>Resultado</h5>
+                            <p>Foco em transformação real, com evolução constante e hábitos mais saudáveis no dia a dia.</p>
+                        </div>
+                        <div class="ad3-info-card">
+                            <h5>Bem-estar</h5>
+                            <p>Atendimento completo para saúde física, mental e autoestima, sempre com segurança e qualidade.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
             'exames':       <?php echo json_encode($examesHtml, JSON_UNESCAPED_UNICODE); ?>,
             'informacoes':  <?php echo json_encode($informacoesHtml, JSON_UNESCAPED_UNICODE); ?>,
             'suporte':      <?php echo json_encode($suporteHtml, JSON_UNESCAPED_UNICODE); ?>
@@ -317,22 +464,22 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         // FUNÇÕES DE NAVEGAÇÃO
         // ============================================================
         function changePage(page) {
+            const normalizedPage = page === 'inicio' ? 'monitoramento' : page;
             const url = new URL(window.location.href);
-            url.searchParams.set('page', page);
+            url.searchParams.set('page', normalizedPage);
             window.history.pushState({}, '', url);
             const titles = {
-                'inicio': 'Início',
+                'monitoramento': 'Monitoramento',
                 'blog': 'Blog',
-                'consultas': 'Consultas',
                 'exames': 'Exames',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
             };
-            document.getElementById('pageTitle').innerText = titles[page] || 'Início';
+            document.getElementById('pageTitle').innerText = titles[normalizedPage] || 'Monitoramento';
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            const activeItem = document.querySelector(`.nav-item[onclick="changePage('${page}')"]`);
+            const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.getAttribute('onclick') === `changePage('${normalizedPage}')`);
             if (activeItem) activeItem.classList.add('active');
-            loadContent(page);
+            loadContent(normalizedPage);
         }
 
         function openArticle(articleId, event) {
@@ -353,18 +500,9 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
 
         function loadContent(page) {
             const contentArea = document.getElementById('contentArea');
-            const html = sectionHtml[page] || sectionHtml['inicio'];
+            const normalizedPage = page === 'inicio' ? 'monitoramento' : page;
+            const html = sectionHtml[normalizedPage] || sectionHtml['monitoramento'];
             contentArea.innerHTML = html;
-
-            // Se for blog, reativar cliques nos cards
-            if (page === 'blog') {
-                document.querySelectorAll('[data-article-id]').forEach(card => {
-                    card.onclick = function(e) {
-                        e.preventDefault();
-                        openArticle(this.getAttribute('data-article-id'));
-                    };
-                });
-            }
         }
 
         // ============================================================
@@ -508,7 +646,7 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         // ============================================================
         // CARREGAR CONTEÚDO INICIAL
         // ============================================================
-        loadContent('<?php echo $page; ?>');
+        loadContent('<?php echo htmlspecialchars($page, ENT_QUOTES); ?>');
     </script>
 </body>
 </html>
