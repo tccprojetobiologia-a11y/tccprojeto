@@ -18,6 +18,12 @@ require_once __DIR__ . '/blog.php';
 require_once __DIR__ . '/consultas.php';
 require_once __DIR__ . '/exames.php';
 require_once __DIR__ . '/informacoes.php';
+require_once __DIR__ . '/dashboard-sections/blog.php';
+require_once __DIR__ . '/dashboard-sections/agenda.php';
+require_once __DIR__ . '/dashboard-sections/exames.php';
+require_once __DIR__ . '/dashboard-sections/monitoramento.php';
+require_once __DIR__ . '/dashboard-sections/informacoes.php';
+require_once __DIR__ . '/dashboard-sections/suporte.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -898,86 +904,17 @@ require_once __DIR__ . '/informacoes.php';
                     </div>
                 `;
             } else if (page === 'blog') {
-                const entries = Object.entries(articlesData).slice(0, 5);
-
-                let html = `
-                    <div class="blog-shell">
-                        <div class="blog-feature-grid">
-                            <div class="blog-brand-panel" onclick="openArticle('${entries[0][0]}', event)">
-                                <div class="brand-copy">
-                                    <span class="brand-kicker">CardioWeb</span>
-                                    <span class="brand-name">Cardio</span>
-                                </div>
-                            </div>
-
-                            <div class="blog-feature-card" onclick="openArticle('${entries[0][0]}', event)">
-                                <div style="position:relative;">
-                                    <img src="${entries[0][1].image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${entries[0][1].title}">
-                                    <span class="feature-badge">Cardio</span>
-                                </div>
-                                <div class="feature-copy">
-                                    <h3>${entries[0][1].title}</h3>
-                                    <p>${entries[0][1].summary}</p>
-                                </div>
-                            </div>
-
-                            <div class="blog-side-card" onclick="openArticle('${entries[1][0]}', event)">
-                                <img src="${entries[1][1].image || 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'}" alt="${entries[1][1].title}">
-                                <div class="feature-copy">
-                                    <h3>${entries[1][1].title}</h3>
-                                    <p>${entries[1][1].summary}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="blog-bottom-grid">
-                `;
-
-                entries.slice(2, 5).forEach(([id, article]) => {
-                    html += `
-                        <article class="blog-card" onclick="openArticle('${id}', event)">
-                            <img src="${article.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${article.title}">
-                            <div class="blog-card-body">
-                                <div class="blog-card-meta">
-                                    <span class="blog-badge">Cardio</span>
-                                    <span>${article.date}</span>
-                                </div>
-                                <h3>${article.title}</h3>
-                                <p>${article.summary}</p>
-                                <div class="blog-card-actions">
-                                    <span class="blog-link">Ler artigo <i class="fas fa-arrow-right"></i></span>
-                                </div>
-                            </div>
-                        </article>
-                    `;
-                });
-
-                html += `</div></div>`;
-                contentArea.innerHTML = html;
+                contentArea.innerHTML = getDashboardBlogHtml();
             } else if (page === 'consultas' || page === 'agenda') {
-                contentArea.innerHTML = <?php echo json_encode(getConsultasHtml()); ?>;
+                contentArea.innerHTML = getDashboardAgendaHtml();
             } else if (page === 'exames') {
-                contentArea.innerHTML = <?php echo json_encode(getExamesHtml()); ?>;
+                contentArea.innerHTML = getDashboardExamesHtml();
             } else if (page === 'monitoramento') {
-                contentArea.innerHTML = `
-                    <div class="info-card">
-                        <h3><i class="fas fa-heartbeat"></i> Monitoramento</h3>
-                        <p>Esta área será utilizada para registrar sinais vitais, evolução e gráficos cardíacos no próximo módulo.</p>
-                    </div>
-                `;
+                contentArea.innerHTML = getDashboardMonitoramentoHtml();
             } else if (page === 'informacoes') {
-                contentArea.innerHTML = <?php echo json_encode(getInformacoesHtml()); ?>;
+                contentArea.innerHTML = getDashboardInformacoesHtml();
             } else if (page === 'suporte') {
-                contentArea.innerHTML = `
-                    <div class="info-card"><h3><i class="fas fa-headset"></i> Central de Suporte</h3><p>Estamos aqui para ajudar! Escolha uma opção abaixo:</p></div>
-                    <div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#e8f5e9; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-phone" style="color:#2e7d32; font-size:24px;"></i></div><div><div style="font-weight:600;">Atendimento Telefônico</div><div style="font-size:12px; color:#666;">Segunda a Sexta, 8h às 18h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">(11) 4002-8922</div></div></div></div>
-                    <div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#e3f2fd; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-envelope" style="color:#1976d2; font-size:24px;"></i></div><div><div style="font-weight:600;">E-mail</div><div style="font-size:12px; color:#666;">Respondemos em até 24h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">suporte@cardioweb.com</div></div></div></div>
-                    <div class="support-card"><div style="display:flex; align-items:center; gap:15px;"><div style="width:50px; height:50px; background:#fff3e0; border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fab fa-whatsapp" style="color:#25d366; font-size:28px;"></i></div><div><div style="font-weight:600;">WhatsApp</div><div style="font-size:12px; color:#666;">Atendimento 24h</div><div style="font-size:14px; color:#851e32; margin-top:5px;">(11) 9 9999-9999</div></div></div></div>
-                    <div class="info-card"><h3><i class="fas fa-question-circle"></i> Perguntas Frequentes</h3>
-                        <details style="margin-bottom:10px;"><summary style="cursor:pointer; font-weight:500; padding:10px; background:#f8fafc; border-radius:8px;">Como agendar uma consulta?</summary><p style="padding:10px; color:#666;">Acesse o menu "Consultas" e clique em "Agendar nova consulta". Escolha o médico e horário disponível.</p></details>
-                        <details style="margin-bottom:10px;"><summary style="cursor:pointer; font-weight:500; padding:10px; background:#f8fafc; border-radius:8px;">Como acessar meus exames?</summary><p style="padding:10px; color:#666;">Os exames ficam disponíveis na seção "Exames" após liberação do médico responsável.</p></details>
-                    </div>
-                `;
+                contentArea.innerHTML = getDashboardSuporteHtml();
             }
         }
 
