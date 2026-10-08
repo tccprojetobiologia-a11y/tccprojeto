@@ -648,6 +648,24 @@ if (!function_exists('getDashboardSuporteHtml')) {
         .chat-input-area {
             padding: 16px 18px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;
             background: rgba(255,255,255,0.7);
+            align-items: center;
+        }
+        .chat-file-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #851e32;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .chat-file-button:hover {
+            background: #fdf2f4;
+            transform: translateY(-1px);
         }
         .chat-input {
             flex: 1;
@@ -771,22 +789,19 @@ if (!function_exists('getDashboardSuporteHtml')) {
                 </div>
             </div>
             <div class="nav-menu">
-                <div class="nav-item <?php echo $page == 'inicio' || $page == 'monitoramento' ? 'active' : ''; ?>" data-page="inicio" onclick="changePage('inicio')">
+                <div class="nav-item <?php echo $page == 'inicio' || $page == 'monitoramento' ? 'active' : ''; ?>" data-page="inicio">
                     <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'agenda' || $page == 'consultas' ? 'active' : ''; ?>" data-page="agenda" onclick="changePage('agenda')">
-                    <i class="fas fa-calendar-alt"></i><span>Agenda</span>
-                </div>
-                <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" data-page="blog" onclick="changePage('blog')">
+                <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" data-page="blog">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" data-page="exames" onclick="changePage('exames')">
+                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" data-page="exames">
                     <i class="fas fa-flask"></i><span>Exames</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" data-page="informacoes" onclick="changePage('informacoes')">
+                <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" data-page="informacoes">
                     <i class="fas fa-info-circle"></i><span>Informações</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" data-page="suporte" onclick="changePage('suporte')">
+                <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" data-page="suporte">
                     <i class="fas fa-headset"></i><span>Suporte</span>
                 </div>
             </div>
@@ -873,6 +888,8 @@ if (!function_exists('getDashboardSuporteHtml')) {
                 </div>
             </div>
             <div class="chat-input-area">
+                <label class="chat-file-button" for="chatFileInput" title="Anexar arquivo"><i class="fas fa-paperclip"></i></label>
+                <input type="file" id="chatFileInput" hidden>
                 <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key === 'Enter') sendMessage()">
                 <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -890,12 +907,12 @@ if (!function_exists('getDashboardSuporteHtml')) {
             const aliases = {
                 'inicio': 'inicio',
                 'monitoramento': 'inicio',
-                'agenda': 'agenda',
-                'consultas': 'agenda',
                 'blog': 'blog',
                 'exames': 'exames',
                 'informacoes': 'informacoes',
-                'suporte': 'suporte'
+                'suporte': 'suporte',
+                'agenda': 'inicio',
+                'consultas': 'inicio'
             };
             return aliases[page] || 'inicio';
         }
@@ -908,7 +925,6 @@ if (!function_exists('getDashboardSuporteHtml')) {
             const titles = {
                 'inicio': 'Monitoramento',
                 'blog': 'Blog',
-                'agenda': 'Agenda',
                 'exames': 'Exames',
                 'informacoes': 'Informações',
                 'suporte': 'Suporte'
@@ -921,6 +937,24 @@ if (!function_exists('getDashboardSuporteHtml')) {
             }
             loadContent(normalizedPage);
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.nav-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    changePage(this.getAttribute('data-page'));
+                });
+            });
+
+            const fileInput = document.getElementById('chatFileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    const file = this.files && this.files[0];
+                    if (!file) return;
+                    addMessage('Arquivo anexado: ' + file.name, 'user');
+                    this.value = '';
+                });
+            }
+        });
 
         function bindBlogCardClicks() {
             const cards = document.querySelectorAll('[data-article-id]');
@@ -999,8 +1033,6 @@ if (!function_exists('getDashboardSuporteHtml')) {
             } else if (normalizedPage === 'blog') {
                 contentArea.innerHTML = getDashboardBlogHtml();
                 bindBlogCardClicks();
-            } else if (normalizedPage === 'agenda') {
-                contentArea.innerHTML = getDashboardAgendaHtml();
             } else if (normalizedPage === 'exames') {
                 contentArea.innerHTML = getDashboardExamesHtml();
             } else if (normalizedPage === 'informacoes') {
