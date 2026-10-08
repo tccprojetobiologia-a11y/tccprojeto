@@ -1,124 +1,111 @@
 <?php
 function getInicioHtml($user_name) {
     return <<<HTML
-                <div class="monitoring-shell">
-                    <div class="welcome-card" style="background: linear-gradient(135deg, rgba(98, 13, 28, 0.96) 0%, rgba(62, 8, 18, 0.98) 100%); color: white; padding: 20px 24px 18px; border-radius: 18px; margin-bottom: 22px; position: relative; overflow: hidden; box-shadow: 0 22px 40px rgba(81, 16, 30, 0.12);">
-                        <div style="position:absolute; inset:0; background: radial-gradient(circle at 72% 30%, rgba(255,255,255,0.10), transparent 23%);"></div>
-                        <div style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 18px;">
-                            <div style="flex:1; min-width:0;">
-                                <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
-                                    <span style="width: 4px; height: 24px; background: rgba(255,255,255,0.9); border-radius: 12px; display:inline-block;"></span>
-                                    <h2 style="display:inline-block; font-size: 2rem; margin:0; letter-spacing:-0.06em; font-weight:800;">Olá, {$user_name}!</h2>
-                                </div>
-                                <p style="margin: 0; color: rgba(255,255,255,0.86); font-size: 1rem; line-height: 1.5; max-width: 510px;">Cuidar de você e do seu coração começa com exames, consultas e orientação personalizadas.</p>
-                            </div>
-                            <div style="flex-shrink:0; display:flex; align-items:center; justify-content:center; width: 220px; height: 94px; position:relative;">
-                                <svg viewBox="0 0 260 140" width="200" height="90" aria-label="Coração com estetoscópio" style="overflow:visible;">
-                                    <g transform="translate(20,8)">
-                                        <path d="M70 90 C 50 80, 20 70, 18 45 C 16 19, 40 10, 58 20 C 70 28, 74 34, 82 42 C 90 34, 94 28, 106 20 C 124 10, 148 19, 146 45 C 144 70, 114 80, 94 90" fill="rgba(255,255,255,0.96)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                                        <path d="M0 30 L42 30 M16 16 L16 44" stroke="rgba(255,255,255,0.94)" stroke-width="7" stroke-linecap="round"/>
-                                        <path d="M42 30 C62 30, 70 16, 86 30" stroke="rgba(255,255,255,0.94)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                                        <path d="M122 30 L180 30" stroke="rgba(255,255,255,0.94)" stroke-width="7" stroke-linecap="round"/>
-                                        <path d="M146 18 L146 42" stroke="rgba(255,255,255,0.94)" stroke-width="7" stroke-linecap="round"/>
-                                        <path d="M106 30 Q132 42 162 30" stroke="rgba(255,255,255,0.94)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                                        <path d="M146 62 C154 54, 180 46, 183 56 C186 66, 178 74, 166 78" stroke="rgba(255,255,255,0.94)" stroke-width="4" fill="none" stroke-linecap="round"/>
-                                        <path d="M108 68 L128 92" stroke="rgba(255,255,255,0.94)" stroke-width="4" stroke-linecap="round"/>
-                                        <path d="M128 92 L154 92" stroke="rgba(255,255,255,0.94)" stroke-width="4" stroke-linecap="round"/>
-                                    </g>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+    <div class="welcome-card" style="background: linear-gradient(135deg, #7d1628 0%, #4d0617 100%); color: white; padding: 26px 30px; border-radius: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(77,6,23,0.25);">
+        <div style="position:relative; z-index:1;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                <span style="display:inline-block; width:4px; height:26px; background:#f0c14b; border-radius:4px;"></span>
+                <h2 style="font-size:1.9rem; font-weight:800; letter-spacing:-0.04em; margin:0;">Olá, {$user_name}!</h2>
+            </div>
+            <p style="margin:0; color:rgba(255,255,255,0.85); font-size:0.95rem; max-width:420px; line-height:1.5;">Cuidar de você é nossa essência. Aqui você encontra seus exames, consultas e orientações personalizadas.</p>
+        </div>
+        <div style="position:relative; z-index:1; text-align:right;">
+            <svg width="140" height="100" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M70 88 C40 75, 10 60, 10 35 C10 18, 25 10, 40 15 C55 20, 65 32, 70 40 C75 32, 85 20, 100 15 C115 10, 130 18, 130 35 C130 60, 100 75, 70 88 Z" fill="#c9243f" stroke="#fff" stroke-width="2"/>
+                <path d="M15 50 L35 50 L42 38 L52 62 L60 50 L90 50" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.7); font-style:italic; margin-top:6px;">Sua saúde em boas mãos</div>
+        </div>
+    </div>
 
-                    <div class="stats-grid" style="display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; margin-bottom: 22px;">
-                        <div class="stat-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:16px 18px; box-shadow:none;">
-                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                                <div style="width:42px;height:42px;border-radius:12px;background:#f1e2e5;color:#7f1a2d;display:flex;align-items:center;justify-content:center;"><i class="fas fa-heartbeat"></i></div>
-                                <i class="fas fa-chevron-right" style="color:#8b6a70; font-size:13px;"></i>
-                            </div>
-                            <div style="font-size: 2.1rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">12</div>
-                            <div style="font-size:0.96rem; color:#6a5c60;">Registros de saúde</div>
-                        </div>
-                        <div class="stat-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:16px 18px; box-shadow:none;">
-                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                                <div style="width:42px;height:42px;border-radius:12px;background:#f1e2e5;color:#7f1a2d;display:flex;align-items:center;justify-content:center;"><i class="fas fa-wave-square"></i></div>
-                                <i class="fas fa-chevron-right" style="color:#8b6a70; font-size:13px;"></i>
-                            </div>
-                            <div style="font-size: 2.1rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">72</div>
-                            <div style="font-size:0.96rem; color:#6a5c60;">Batimentos/min</div>
-                        </div>
-                        <div class="stat-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:16px 18px; box-shadow:none;">
-                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                                <div style="width:42px;height:42px;border-radius:12px;background:#f1e2e5;color:#7f1a2d;display:flex;align-items:center;justify-content:center;"><i class="fas fa-calendar-days"></i></div>
-                                <i class="fas fa-chevron-right" style="color:#8b6a70; font-size:13px;"></i>
-                            </div>
-                            <div style="font-size: 2.1rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">2</div>
-                            <div style="font-size:0.96rem; color:#6a5c60;">Consultas agendadas</div>
-                        </div>
-                        <div class="stat-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:16px 18px; box-shadow:none;">
-                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                                <div style="width:42px;height:42px;border-radius:12px;background:#f1e2e5;color:#7f1a2d;display:flex;align-items:center;justify-content:center;"><i class="fas fa-trophy"></i></div>
-                                <i class="fas fa-chevron-right" style="color:#8b6a70; font-size:13px;"></i>
-                            </div>
-                            <div style="font-size: 2.1rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">85%</div>
-                            <div style="font-size:0.96rem; color:#6a5c60;">Meta de saúde</div>
-                        </div>
-                    </div>
+    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; margin-bottom:22px;">
+        <div class="stat-card" style="background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="width:44px; height:44px; border-radius:12px; background:#fdeef0; display:flex; align-items:center; justify-content:center; color:#8d1e36; font-size:20px;"><i class="fas fa-heartbeat"></i></div>
+                <i class="fas fa-chevron-right" style="color:#c9b8bc; font-size:13px;"></i>
+            </div>
+            <div style="font-size:2rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">12</div>
+            <div style="font-size:0.9rem; color:#6a5c60;">Registros de saúde</div>
+        </div>
+        <div class="stat-card" style="background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="width:44px; height:44px; border-radius:12px; background:#fdeef0; display:flex; align-items:center; justify-content:center; color:#8d1e36; font-size:20px;"><i class="fas fa-heart"></i></div>
+                <i class="fas fa-chevron-right" style="color:#c9b8bc; font-size:13px;"></i>
+            </div>
+            <div style="font-size:2rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">72</div>
+            <div style="font-size:0.9rem; color:#6a5c60;">Batimentos/min</div>
+        </div>
+        <div class="stat-card" style="background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="width:44px; height:44px; border-radius:12px; background:#fdeef0; display:flex; align-items:center; justify-content:center; color:#8d1e36; font-size:20px;"><i class="fas fa-calendar-check"></i></div>
+                <i class="fas fa-chevron-right" style="color:#c9b8bc; font-size:13px;"></i>
+            </div>
+            <div style="font-size:2rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">2</div>
+            <div style="font-size:0.9rem; color:#6a5c60;">Consultas agendadas</div>
+        </div>
+        <div class="stat-card" style="background:#fff; border-radius:16px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="width:44px; height:44px; border-radius:12px; background:#fdeef0; display:flex; align-items:center; justify-content:center; color:#8d1e36; font-size:20px;"><i class="fas fa-trophy"></i></div>
+                <i class="fas fa-chevron-right" style="color:#c9b8bc; font-size:13px;"></i>
+            </div>
+            <div style="font-size:2rem; font-weight:800; color:#1f1f23; letter-spacing:-0.04em;">85%</div>
+            <div style="font-size:0.9rem; color:#6a5c60;">Meta de saúde</div>
+        </div>
+    </div>
 
-                    <div class="info-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:18px 18px 12px; margin-bottom: 18px; box-shadow:none;">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px;">
-                            <h3 style="margin:0; font-size: 1.05rem; display:flex; align-items:center; gap:8px; color:#371b22; font-weight:800;"><i class="fas fa-heartbeat" style="color:#7f1a2d;"></i> Últimos Registros</h3>
-                            <span style="font-size: 0.82rem; font-weight:700; color:#8a6770; cursor:pointer;">Ver todos <i class="fas fa-chevron-right" style="font-size:11px;"></i></span>
-                        </div>
-                        <div style="display:grid; gap:0; background:transparent;">
-                            <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:12px; padding: 12px 0; border-bottom: 1px solid #f1e4e6; align-items:center;">
-                                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:30px; height:30px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:15px;"><i class="fas fa-heart" style="font-size:14px;"></i></span>Pressão Arterial</div>
-                                <div style="font-weight:700; color:#1d1d21; text-align:center;">120/80 mmHg</div>
-                                <div style="padding: 5px 10px; border-radius: 999px; background: rgba(110,180,120,0.12); color:#3d8f51; font-weight:700; font-size: 0.76rem; text-align:center;">Normal</div>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:12px; padding: 12px 0; border-bottom: 1px solid #f1e4e6; align-items:center;">
-                                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:30px; height:30px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:15px;"><i class="fas fa-droplet" style="font-size:13px;"></i></span>Colesterol Total</div>
-                                <div style="font-weight:700; color:#1d1d21; text-align:center;">180 mg/dL</div>
-                                <div style="padding: 5px 10px; border-radius: 999px; background: rgba(110,180,120,0.12); color:#3d8f51; font-weight:700; font-size: 0.76rem; text-align:center;">Normal</div>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:12px; padding: 12px 0; align-items:center;">
-                                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:30px; height:30px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:15px;"><i class="fas fa-vial" style="font-size:13px;"></i></span>Glicemia</div>
-                                <div style="font-weight:700; color:#1d1d21; text-align:center;">95 mg/dL</div>
-                                <div style="padding: 5px 10px; border-radius: 999px; background: rgba(110,180,120,0.12); color:#3d8f51; font-weight:700; font-size: 0.76rem; text-align:center;">Normal</div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="info-card" style="background:#fff; border-radius:16px; padding:22px 24px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+            <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:10px; color:#371b22; font-weight:800;"><i class="fas fa-heartbeat" style="color:#7f1a2d;"></i> Últimos Registros</h3>
+            <span style="font-size:0.82rem; font-weight:700; color:#8a6770; cursor:pointer;">Ver todos <i class="fas fa-chevron-right" style="font-size:11px;"></i></span>
+        </div>
+        <div style="display:grid; gap:0;">
+            <div style="display:grid; grid-template-columns:1.5fr 1fr auto; gap:12px; padding:14px 0; border-bottom:1px solid #f1e4e6; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:32px; height:32px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:14px;"><i class="fas fa-heart"></i></span>Pressão Arterial</div>
+                <div style="font-weight:700; color:#1d1d21;">120/80 mmHg</div>
+                <div style="padding:5px 12px; border-radius:999px; background:#e8f5e9; color:#3d8f51; font-weight:700; font-size:0.76rem;">Normal</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1.5fr 1fr auto; gap:12px; padding:14px 0; border-bottom:1px solid #f1e4e6; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:32px; height:32px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:14px;"><i class="fas fa-droplet"></i></span>Colesterol Total</div>
+                <div style="font-weight:700; color:#1d1d21;">180 mg/dL</div>
+                <div style="padding:5px 12px; border-radius:999px; background:#e8f5e9; color:#3d8f51; font-weight:700; font-size:0.76rem;">Normal</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1.5fr 1fr auto; gap:12px; padding:14px 0; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px; color:#341a22; font-weight:600;"><span style="display:inline-flex; width:32px; height:32px; border-radius:50%; background:#f7e5e8; align-items:center; justify-content:center; color:#8d1e36; font-size:14px;"><i class="fas fa-vial"></i></span>Glicemia</div>
+                <div style="font-weight:700; color:#1d1d21;">95 mg/dL</div>
+                <div style="padding:5px 12px; border-radius:999px; background:#e8f5e9; color:#3d8f51; font-weight:700; font-size:0.76rem;">Normal</div>
+            </div>
+        </div>
+    </div>
 
-                    <div class="info-card" style="background:#f8f5f5; border:1px solid rgba(120,26,43,0.08); border-radius:16px; padding:18px 18px 10px; box-shadow:none;">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px;">
-                            <h3 style="margin:0; font-size: 1.05rem; display:flex; align-items:center; gap:8px; color:#371b22; font-weight:800;"><i class="fas fa-calendar-alt" style="color:#7f1a2d;"></i> Agenda</h3>
-                            <span style="font-size: 0.82rem; font-weight:700; color:#8a6770; cursor:pointer;">Ver todas <i class="fas fa-chevron-right" style="font-size:11px;"></i></span>
-                        </div>
-                        <div style="display:grid; gap:12px;">
-                            <div style="display:grid; grid-template-columns: 66px 1fr auto; align-items:center; gap:14px; padding: 8px 0;">
-                                <div style="text-align:center; border-radius:12px; background:#f6eaec; padding:10px 0; color:#7d1b2d;">
-                                    <div style="font-size: 1.5rem; font-weight:800; line-height:1;">15</div>
-                                    <div style="font-size: 0.7rem; letter-spacing:0.08em; font-weight:700; margin-top:4px;">ABR</div>
-                                </div>
-                                <div>
-                                    <div style="font-weight:700; color:#2d2024;">Cardiologista - Dr. Carlos</div>
-                                    <div style="font-size:0.82rem; color:#827176; margin-top:4px;">10:00 - Consulta presencial</div>
-                                </div>
-                                <div style="padding:5px 10px; border-radius:999px; background:rgba(115,185,120,0.12); color:#3d8f51; font-size:0.74rem; font-weight:700;">Confirmada</div>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 66px 1fr auto; align-items:center; gap:14px; padding: 8px 0;">
-                                <div style="text-align:center; border-radius:12px; background:#f6eaec; padding:10px 0; color:#7d1b2d;">
-                                    <div style="font-size: 1.5rem; font-weight:800; line-height:1;">22</div>
-                                    <div style="font-size: 0.7rem; letter-spacing:0.08em; font-weight:700; margin-top:4px;">ABR</div>
-                                </div>
-                                <div>
-                                    <div style="font-weight:700; color:#2d2024;">Exame de Rotina</div>
-                                    <div style="font-size:0.82rem; color:#827176; margin-top:4px;">08:30 - Laboratório</div>
-                                </div>
-                                <div style="padding:5px 10px; border-radius:999px; background:rgba(255,195,66,0.14); color:#b77812; font-size:0.74rem; font-weight:700;">Pendente</div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="info-card" style="background:#fff; border-radius:16px; padding:22px 24px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+            <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:10px; color:#371b22; font-weight:800;"><i class="fas fa-calendar-alt" style="color:#7f1a2d;"></i> Agenda</h3>
+            <span style="font-size:0.82rem; font-weight:700; color:#8a6770; cursor:pointer;">Ver todas <i class="fas fa-chevron-right" style="font-size:11px;"></i></span>
+        </div>
+        <div style="display:grid; gap:14px;">
+            <div style="display:grid; grid-template-columns:64px 1fr auto; align-items:center; gap:16px;">
+                <div style="text-align:center; border-radius:12px; background:#f6eaec; padding:10px 0; color:#7d1b2d;">
+                    <div style="font-size:1.4rem; font-weight:800; line-height:1;">15</div>
+                    <div style="font-size:0.7rem; letter-spacing:0.08em; font-weight:700; margin-top:4px;">ABR</div>
                 </div>
+                <div>
+                    <div style="font-weight:700; color:#2d2024;">Cardiologista - Dr. Carlos</div>
+                    <div style="font-size:0.82rem; color:#827176; margin-top:4px;"><i class="fas fa-clock" style="font-size:11px;"></i> 10:00 - Consulta presencial</div>
+                </div>
+                <div style="padding:5px 12px; border-radius:999px; background:#e8f5e9; color:#3d8f51; font-size:0.74rem; font-weight:700;">Confirmada</div>
+            </div>
+            <div style="display:grid; grid-template-columns:64px 1fr auto; align-items:center; gap:16px;">
+                <div style="text-align:center; border-radius:12px; background:#f6eaec; padding:10px 0; color:#7d1b2d;">
+                    <div style="font-size:1.4rem; font-weight:800; line-height:1;">22</div>
+                    <div style="font-size:0.7rem; letter-spacing:0.08em; font-weight:700; margin-top:4px;">ABR</div>
+                </div>
+                <div>
+                    <div style="font-weight:700; color:#2d2024;">Exame de Rotina</div>
+                    <div style="font-size:0.82rem; color:#827176; margin-top:4px;"><i class="fas fa-clock" style="font-size:11px;"></i> 08:30 - Laboratório</div>
+                </div>
+                <div style="padding:5px 12px; border-radius:999px; background:#fff3e0; color:#b77812; font-size:0.74rem; font-weight:700;">Agendada</div>
+            </div>
+        </div>
+    </div>
 HTML;
 }

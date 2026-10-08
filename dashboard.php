@@ -243,7 +243,256 @@ if (empty($blogHtml) && function_exists('getBlogArticles')) {
         .cardio-card {
             background: rgba(255,255,255,0.96);
             border: 1px solid rgba(148,163,184,0.12);
-            box-shadow: 0 12px 24px rgba(15,23,42,0.05);
+            box-shadow: 0 12px 24px rgba(15,23,4<?php
+session_start();
+
+if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
+    header('Location: index.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'] ?? '';
+$user_name = $_SESSION['user_name'] ?? 'Ana Silva';
+$user_email = $_SESSION['user_email'] ?? $_SESSION['user_telefone'] ?? 'ana.silva@email.com';
+$login_type = $_SESSION['login_type'] ?? 'Padrão';
+
+$page = $_GET['page'] ?? 'inicio';
+
+require_once __DIR__ . '/blog.php';
+require_once __DIR__ . '/consultas.php';
+require_once __DIR__ . '/exames.php';
+require_once __DIR__ . '/informacoes.php';
+require_once __DIR__ . '/suporte.php';
+require_once __DIR__ . '/inicio.php';
+
+$blogHtml = function_exists('getDashboardBlogHtml') ? getDashboardBlogHtml() : (function_exists('getBlogHtml') ? getBlogHtml() : '');
+$consultasHtml = function_exists('getConsultasHtml') ? getConsultasHtml() : '';
+$examesHtml = function_exists('getExamesHtml') ? getExamesHtml() : '';
+$informacoesHtml = function_exists('getInformacoesHtml') ? getInformacoesHtml() : '';
+$suporteHtml = function_exists('getSuporteHtml') ? getSuporteHtml() : '';
+$inicioHtml = function_exists('getInicioHtml') ? getInicioHtml($user_name) : '';
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioWeb - Painel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f4f0f1; overflow: hidden; height: 100vh; }
+        .app-container { display: flex; height: 100vh; width: 100%; background: #f5f0f1; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: linear-gradient(180deg, #4d0617 0%, #781a2b 100%); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.12); }
+        .logo-area { padding: 26px 24px 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #f0c14b; background: rgba(255,255,255,0.08); }
+        .logo-text h2 { font-size: 17px; letter-spacing: -0.06em; font-weight: 800; margin: 0; }
+        .logo-text p { font-size: 9px; opacity: 0.9; margin-top: 2px; letter-spacing: 0.12em; text-transform: uppercase; }
+        .nav-menu { flex: 1; padding: 18px 18px 0; }
+        .nav-item { display: flex; align-items: center; gap: 14px; padding: 15px 18px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.8); }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.18); color: white; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+        .nav-item i { width: 20px; font-size: 18px; text-align: center; }
+        .nav-item span { font-size: 15px; }
+        .user-section { padding: 20px 18px 18px; margin: 0 10px 18px; background: rgba(255,255,255,0.03); border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); }
+        .user-avatar { width: 48px; height: 48px; background: rgba(255,255,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .user-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+        .user-email { font-size: 11px; opacity: 0.76; margin-bottom: 14px; word-break: break-all; }
+        .logout-btn { background: rgba(255,255,255,0.08); color: white; padding: 10px 12px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .logout-btn:hover { background: rgba(255,255,255,0.14); }
+
+        /* MAIN */
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .main-header { background: rgba(255,255,255,0.5); padding: 18px 18px 14px 18px; border-bottom: 1px solid #ecdfe1; display: flex; justify-content: space-between; align-items: center; }
+        .header-search { flex: 1; display: flex; justify-content: center; }
+        .search-box { width: min(740px, 100%); background: rgba(255,255,255,0.8); border: 1px solid rgba(118, 84, 92, 0.12); border-radius: 18px; padding: 13px 18px; display: flex; align-items: center; gap: 12px; color: #8b7a7d; box-shadow: 0 5px 14px rgba(66, 26, 35, 0.04); }
+        .search-box i { font-size: 18px; }
+        .search-box span { font-size: 15px; color: #876d74; }
+        .header-actions { display: flex; align-items: center; gap: 12px; margin-left: 18px; }
+        .header-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.8); border: 1px solid rgba(118,84,92,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f2a33; cursor: pointer; }
+        .user-mini { display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; background: rgba(255,255,255,0.5); border-radius: 999px; color: #4d2a33; font-weight: 600; }
+        .mini-avatar { width: 30px; height: 30px; border-radius: 50%; background: #8d1e36; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .content-area { flex: 1; overflow-y: auto; padding: 24px 22px 18px; }
+
+        /* CARDS */
+        .info-card { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .info-card h3 { color: #1e2a3a; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+
+        /* CHAT */
+        .chat-sidebar { width: 340px; background: #f2efee; border-left: 1px solid #f1dfe2; display: flex; flex-direction: column; box-shadow: -2px 0 18px rgba(0,0,0,0.04); }
+        .chat-header { padding: 18px 16px 14px; border-bottom: 1px solid #efdde0; background: #f3efef; color: #421f2d; }
+        .chat-header h3 { font-size: 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+        .chat-header p { font-size: 12px; opacity: 0.75; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 15px; }
+        .message { display: flex; gap: 12px; max-width: 94%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message-avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .message.user .message-avatar { background: #851e32; color: white; }
+        .message.bot .message-avatar { background: #6f1d32; color: white; }
+        .message-bubble { background: #f1f5f9; padding: 12px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; color: #1e2a3a; box-shadow: 0 6px 16px rgba(15,23,42,0.02); }
+        .message.user .message-bubble { background: #f1e9eb; color: #3d1824; }
+        .chat-input-area { padding: 14px 14px 18px; border-top: 1px solid #e9dfe2; display: flex; gap: 10px; background: #f2efee; }
+        .chat-input { flex: 1; padding: 12px 14px; border: 1px solid #e5d7db; border-radius: 999px; outline: none; font-family: inherit; background: rgba(255,255,255,0.8); }
+        .chat-input:focus { border-color: #851e32; }
+        .chat-send { width: 42px; height: 42px; background: #7d1628; border: none; border-radius: 50%; color: white; cursor: pointer; transition: all 0.3s; }
+        .chat-send:hover { background: #5d1022; }
+
+        /* MODAL */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { padding: 25px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 22px; font-weight: 700; color: #1e2a3a; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .modal-close { background: none; border: none; font-size: 28px; color: #999; cursor: pointer; }
+        .modal-body { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e2a3a; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { font-family: inherit; border: 1px solid #ddd; border-radius: 8px; width: 100%; padding: 12px; }
+        .contact-btn { background: #851e32; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+
+        @media (max-width: 1000px) { .chat-sidebar { width: 300px; } }
+        @media (max-width: 800px) { .chat-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
+                    <div class="logo-text">
+                        <h2>CardioWeb</h2>
+                        <p>Saúde & Monitoramento Cardiológico</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item <?php echo $page == 'inicio' ? 'active' : ''; ?>" onclick="changePage('inicio')">
+                    <i class="fas fa-home"></i><span>Início</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" onclick="changePage('blog')">
+                    <i class="fas fa-newspaper"></i><span>Blog</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" onclick="changePage('exames')">
+                    <i class="fas fa-flask"></i><span>Exames</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" onclick="changePage('informacoes')">
+                    <i class="fas fa-info-circle"></i><span>Informações</span>
+                </div>
+                <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" onclick="changePage('suporte')">
+                    <i class="fas fa-headset"></i><span>Suporte</span>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-avatar"><?php echo strtoupper(substr($user_name, 0, 1)); ?></div>
+                <div class="user-name"><?php echo htmlspecialchars($user_name); ?></div>
+                <div class="user-email"><?php echo htmlspecialchars($user_email); ?></div>
+                <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="main-content">
+            <div class="main-header">
+                <div class="header-search">
+                    <div class="search-box">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span>Buscar exames, consultas, informações...</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-icon"><i class="fas fa-bell"></i></div>
+                    <div class="header-icon"><i class="fas fa-gear"></i></div>
+                    <div class="user-mini">
+                        <div class="mini-avatar"><?php echo strtoupper(substr($user_name, 0, 1)); ?></div>
+                        <div style="display:flex; flex-direction:column; line-height:1.1;">
+                            <span style="font-size:13px;"><?php echo htmlspecialchars($user_name); ?></span>
+                            <span style="font-size:10px; color:#8b7a7d;">Paciente</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size:12px; opacity:.75;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="content-area" id="contentArea">
+                <?php echo $inicioHtml; ?>
+            </div>
+        </div>
+
+        <!-- CHAT -->
+        <div class="chat-sidebar">
+            <div class="chat-header">
+                <h3><i class="fas fa-heartbeat"></i> Assistente CardioWeb</h3>
+                <p>Converse comigo sobre sua saúde!</p>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                    <div class="message-bubble">Olá! Eu sou o assistente do CardioWeb. Como posso ajudar você hoje? 💙</div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sectionHtml = {
+            'inicio': <?php echo json_encode($inicioHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'blog': <?php echo json_encode($blogHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'exames': <?php echo json_encode($examesHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'informacoes': <?php echo json_encode($informacoesHtml, JSON_UNESCAPED_UNICODE); ?>,
+            'suporte': <?php echo json_encode($suporteHtml, JSON_UNESCAPED_UNICODE); ?>
+        };
+
+        function changePage(page) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', page);
+            window.history.pushState({}, '', url);
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.getAttribute('onclick') === `changePage('${page}')`);
+            if (activeItem) activeItem.classList.add('active');
+            document.getElementById('contentArea').innerHTML = sectionHtml[page] || sectionHtml['inicio'];
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            addMessage(msg, 'user');
+            input.value = '';
+            setTimeout(() => addMessage(getBotResponse(msg), 'bot'), 500);
+        }
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            const avatar = sender === 'user' ? '<div class="message-avatar"><i class="fas fa-user"></i></div>' : '<div class="message-avatar"><i class="fas fa-robot"></i></div>';
+            div.innerHTML = avatar + `<div class="message-bubble">${text}</div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        function getBotResponse(msg) {
+            const m = msg.toLowerCase();
+            if (m.includes('olá') || m.includes('oi')) return 'Olá! Como posso ajudar? 💙';
+            if (m.includes('pressão')) return 'A pressão ideal é abaixo de 120/80 mmHg. Mantenha uma alimentação saudável!';
+            if (m.includes('consulta')) return 'Para agendar uma consulta, acesse o menu correspondente ou ligue para (11) 4002-8922.';
+            if (m.includes('exame')) return 'Seus exames ficam disponíveis na seção "Exames" após liberação médica.';
+            return 'Entendi! Para mais informações, leia nossos artigos no blog ou acesse o suporte. 💙';
+        }
+    </script>
+</body>
+</html>
             padding: 24px 22px;
         }
         .cardio-card h3 {
