@@ -789,19 +789,19 @@ if (!function_exists('getDashboardSuporteHtml')) {
                 </div>
             </div>
             <div class="nav-menu">
-                <div class="nav-item <?php echo $page == 'inicio' || $page == 'monitoramento' ? 'active' : ''; ?>" data-page="inicio">
+                <div class="nav-item <?php echo $page == 'inicio' || $page == 'monitoramento' ? 'active' : ''; ?>" data-page="inicio" onclick="changePage('inicio')">
                     <i class="fas fa-heartbeat"></i><span>Monitoramento</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" data-page="blog">
+                <div class="nav-item <?php echo $page == 'blog' ? 'active' : ''; ?>" data-page="blog" onclick="changePage('blog')">
                     <i class="fas fa-newspaper"></i><span>Blog</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" data-page="exames">
+                <div class="nav-item <?php echo $page == 'exames' ? 'active' : ''; ?>" data-page="exames" onclick="changePage('exames')">
                     <i class="fas fa-flask"></i><span>Exames</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" data-page="informacoes">
+                <div class="nav-item <?php echo $page == 'informacoes' ? 'active' : ''; ?>" data-page="informacoes" onclick="changePage('informacoes')">
                     <i class="fas fa-info-circle"></i><span>Informações</span>
                 </div>
-                <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" data-page="suporte">
+                <div class="nav-item <?php echo $page == 'suporte' ? 'active' : ''; ?>" data-page="suporte" onclick="changePage('suporte')">
                     <i class="fas fa-headset"></i><span>Suporte</span>
                 </div>
             </div>
@@ -939,12 +939,6 @@ if (!function_exists('getDashboardSuporteHtml')) {
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.nav-item').forEach(function (item) {
-                item.addEventListener('click', function () {
-                    changePage(this.getAttribute('data-page'));
-                });
-            });
-
             const fileInput = document.getElementById('chatFileInput');
             if (fileInput) {
                 fileInput.addEventListener('change', function () {
