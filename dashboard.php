@@ -898,37 +898,34 @@ require_once __DIR__ . '/informacoes.php';
                     </div>
                 `;
             } else if (page === 'blog') {
-                const entries = Object.entries(articlesData);
-                const [firstId, firstArticle] = entries[0] || [];
-                const secondary = entries.slice(1, 3);
-                const bottomCards = entries.slice(3, 7);
+                const entries = Object.entries(articlesData).slice(0, 5);
 
                 let html = `
                     <div class="blog-shell">
                         <div class="blog-feature-grid">
-                            <div class="blog-brand-panel" onclick="openArticle('${firstId}', event)">
+                            <div class="blog-brand-panel" onclick="openArticle('${entries[0][0]}', event)">
                                 <div class="brand-copy">
                                     <span class="brand-kicker">CardioWeb</span>
                                     <span class="brand-name">Cardio</span>
                                 </div>
                             </div>
 
-                            <div class="blog-feature-card" onclick="openArticle('${firstId}', event)">
+                            <div class="blog-feature-card" onclick="openArticle('${entries[0][0]}', event)">
                                 <div style="position:relative;">
-                                    <img src="${firstArticle.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${firstArticle.title}">
+                                    <img src="${entries[0][1].image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${entries[0][1].title}">
                                     <span class="feature-badge">Cardio</span>
                                 </div>
                                 <div class="feature-copy">
-                                    <h3>${firstArticle.title}</h3>
-                                    <p>${firstArticle.summary}</p>
+                                    <h3>${entries[0][1].title}</h3>
+                                    <p>${entries[0][1].summary}</p>
                                 </div>
                             </div>
 
-                            <div class="blog-side-card" onclick="openArticle('${secondary[0]?.[0] || firstId}', event)">
-                                <img src="${(secondary[0]?.[1]?.image) || 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'}" alt="${(secondary[0]?.[1]?.title) || 'Saúde cardiovascular'}">
+                            <div class="blog-side-card" onclick="openArticle('${entries[1][0]}', event)">
+                                <img src="${entries[1][1].image || 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'}" alt="${entries[1][1].title}">
                                 <div class="feature-copy">
-                                    <h3>Nosso foco</h3>
-                                    <p>${(secondary[0]?.[1]?.summary) || 'Ações preventivas e acompanhamento clínico para reduzir riscos cardíacos e melhorar a qualidade de vida.'}</p>
+                                    <h3>${entries[1][1].title}</h3>
+                                    <p>${entries[1][1].summary}</p>
                                 </div>
                             </div>
                         </div>
@@ -936,7 +933,7 @@ require_once __DIR__ . '/informacoes.php';
                         <div class="blog-bottom-grid">
                 `;
 
-                bottomCards.forEach(([id, article]) => {
+                entries.slice(2, 5).forEach(([id, article]) => {
                     html += `
                         <article class="blog-card" onclick="openArticle('${id}', event)">
                             <img src="${article.image || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80'}" alt="${article.title}">
